@@ -1,5 +1,5 @@
 use pnp_2
-/* 0322
+/* 19:28
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -581,20 +581,64 @@ select	fechapnp,versionpnp,tipopnp
 				end IdGeneradora
 		,cet
 from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].CETPNCP
---*/
 
+insert into cetcp values ('2000-01-01',0,0,20,10,0)
+insert into cetcp values ('2000-01-01',0,0,22,14,0)
+insert into cetcp values ('2000-01-01',0,0,34,14,0)
 
-select * from PNCPconCET
+insert into cetcp values ('2018-09-01','2001V1','Mes',	34,	14,	0)
+insert into cetcp values ('2018-09-01','2001V1','Mes',	22,	14,	0)
+insert into cetcp values ('2018-10-01','2001V1','Mes',	34,	14,	0)
+insert into cetcp values ('2018-10-01','2001V1','Mes',	22,	14,	0)
+insert into cetcp values ('2018-11-01','2001V1','Mes',	34,	14,	0)
+insert into cetcp values ('2018-11-01','2001V1','Mes',	22,	14,	0)
+insert into cetcp values ('2018-12-01','2001V1','Mes',	34,	14,	0)
+insert into cetcp values ('2018-12-01','2001V1','Mes',	22,	14,	0)
+insert into cetcp values ('2018-11-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2018-12-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-01-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-02-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-03-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-04-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-05-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-06-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-07-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-08-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-09-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-10-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-11-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2019-12-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2018-09-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2018-10-01','2001V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-01-01','2007V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-02-01','2007V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-03-01','2007V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-04-01','2007V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-05-01','2007V1','Mes',	20,	10,	0)
+insert into cetcp values ('2020-06-01','2007V1','Mes',	20,	10,	0)
+
+insert into PNCPconCET
 select	t1.idversion,t3.idversion idversionefact,fechaEfact,Mes_PNCP,VersionPNCP,t2.IdBarraNacional,precionudoenergiapeso
-		,fechaPNP,VersionPNP,TipoPNP
-		,'' idGeneradora
-		,'' IdDistribuidora
-		,CETDolar,ValorDolar,PrecioNudoEnergiaDolar,PrecioNudoPotenciaDolar
+		,case when fechaPNP is null then '2000-01-01' else fechaPNP end fechaPNP
+		,case when VersionPNP is null then '0' else VersionPNP end VersionPNP
+		,case when TipoPNP is null then '0' else TipoPNP end TipoPNP
+		,case	when codigocontrato='Contrato Corto Plazo_Coelcha_ENDESA' then 14
+				when codigocontrato='Contrato Corto Plazo_Frontel_ENDESA' then 14
+				when codigocontrato='Contrato Corto Plazo_COOPERSOL_E-CL' then 10
+				end IdGeneradora
+		,case	when codigocontrato='Contrato Corto Plazo_Coelcha_ENDESA' then 34
+				when codigocontrato='Contrato Corto Plazo_Frontel_ENDESA' then 22
+				when codigocontrato='Contrato Corto Plazo_COOPERSOL_E-CL' then 20
+				end IdDistribuidora
+		,CETDolar,ValorDolar,PrecioNudoEnergiaDolar,PrecioNudoPotenciaDolar		
 from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].PNCPconCET t1
 left join barranacional t2 on t1.barranacional=t2.BarraNAcional
 left join versionefact t3 on t3.Descripcion=t1.VersionEfact
+where codigocontrato not in ('DÉFICIT_Coopelan') and t1.IdVersion !=0
+--*/
 
-select * from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].PNCPconCET t1
-where mes_pncp is null
+--select * from cetcp
+--select * from PNCPconCET
+--select * from versionrec
 
---tema con versiones FPEC
+--*/

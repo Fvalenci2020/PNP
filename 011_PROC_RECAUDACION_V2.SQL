@@ -21,7 +21,7 @@ declare @VersionEFACT int	select @VersionEFACT=idversion from versionefact where
 													select ValorTexto from versionrecdetalle where idversion=@idVersion and registro='VersionEfact');--Para crear versión y extraer antecedentes Efact
 DECLARE @FECHAEFACT DATE 				select @FECHAEFACT=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='FECHAEFACT';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
 
-declare @VersionPNCP varchar(15)	select @VersionPNCP=valortexto from versionrecdetalle where idversion=@idVersion and Registro='VersionPNCP';--Para crear versión y extraer antecedentes Efact
+declare @VersionPNCP varchar(255)	select @VersionPNCP=valortexto from versionrecdetalle where idversion=@idVersion and Registro='VersionPNCP';--Para crear versión y extraer antecedentes Efact
 DECLARE @FECHAPNCP DATE 			select @FECHAPNCP=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='Mes_PNCP';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
 declare @DolarPNCP float			select @DolarPNCP=valorfloat from versionrecdetalle where idversion=@idVersion and Registro='DolarPNCP';--
 
@@ -84,7 +84,6 @@ WHERE IdTipoDespacho=1
 --CREAR PNCP CON CET
 --	/*
 delete from PNCPconCET where Idversion=@IdVersion
-
 --insert into PNCPconCET
 SELECT	t1.idversion,T1.VersionEfact,t1.FechaEfact,t1.BarraNacional,t1.CodigoContrato,
 		T2.Mes_PNCP,t2.VERSIONPNCP,PrecioNudoEnergiaPeso,
