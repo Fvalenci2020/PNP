@@ -84,18 +84,22 @@ WHERE IdTipoDespacho=1
 --CREAR PNCP CON CET
 --	/*
 delete from PNCPconCET where Idversion=@IdVersion
---insert into PNCPconCET
-SELECT	t1.idversion,T1.VersionEfact,t1.FechaEfact,t1.BarraNacional,t1.CodigoContrato,
-		T2.Mes_PNCP,t2.VERSIONPNCP,PrecioNudoEnergiaPeso,
-		t3.versionpnp,t3.fechaPNP,t3.tipoPNP,isnull(T3.CET,0) CETDolar,
-		@DolarPNCP DolarVersion,
-		PrecioNudoEnergiaPeso/@DolarPNCP*1000 PrecioNudoEnergiaDolar,
-		PrecioNudoPotenciaPeso/@DolarPNCP PrecioNudoPotenciaDolar
-FROM tempefact T1--CONTRATOS QUE SON DE CORTO PLAZO
-LEFT JOIN PNCP T2 on T2.Mes_PNCP=@FECHAPNCP and t2.VersionPNCP=@VersionPNCP and t1.BarraNAcional=t2.Nudo
-left join CETPNCP T3 on T3.codigocontrato=T1.codigocontrato and T3.FechaPNP=@FECHAPNP and t3.versionpnp=@versionpnp and t3.tipopnp=@tipopnp
+insert into PNCPconCET
+select	@idversion idversion,idVersionEfact,FechaEfact
+		,T2.mes Mes_PNCP,t2.version VERSIONPNCP,idBarraNacional,PrecioNudoE_Peso
+		,case when t3.MesIndexacion is null then '2000-01-01' else t3.MesIndexacion end MesIndexacion
+		,case when t3.VersionIndex is null then '0' else t3.VersionIndex end VersionIndex
+		,case when t3.Version is null then '0' else t3.Version end [Version]
+		,t1.IdGeneradora,t1.IdDistribuidora,isnull(T3.CET,0) CETDolar
+		,@DolarPNCP DolarVersion
+		,PrecioNudoE_Peso/@DolarPNCP*1000 PrecioNudoEnergiaDolar
+		,PrecioNudoP_Peso/@DolarPNCP PrecioNudoPotenciaDolar
+from tempefact t1
+left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
+LEFT JOIN PNCP T2 on T2.MES=@FECHAPNCP and t2.Version=@VersionPNCP and t5.IdBarraNacional=t2.IdNudo
+left join cetcp T3 on	T3.IdDistribuidora=T1.IdDistribuidora and t3.IdGeneradora=t1.IdGeneradora and T3.MesIndexacion=@FECHAPNP 
+						and t3.VersionIndex=@versionpnp and t3.Version=@tipopnp
 where IdTipoDespacho=2
---*/
 
 	--ASIGNA PRECIOS A CONTRATOS DE CORTO PLAZO
 /*
@@ -114,7 +118,7 @@ where FlagCtr=1 and Idversion=@idVersion
 )T
 --*/
 
-
+/*
 --insert into RecaudacionDetalle 
 SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdTipoDespacho,t1.Energia,t1.Potencia
 		,t2.IdSistemaZonal,t3.Fecha FechaPZ,t3.Version VersionPZ,t3.Factor FEPE, t4.Factor FEPP
@@ -133,8 +137,7 @@ left join perdidazonal t3 on t3.IdSistemaZonal=t2.IdSistemaZonal and t3.Version=
 left join perdidazonal t4 on t4.IdSistemaZonal=t2.IdSistemaZonal and t4.Version=@VersionPerdida and t4.Fecha=@FECHAPerdida and t4.TipoFactor='FEPP'
 left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
 WHERE IdTipoDespacho=2
-
-SELECT * FROM tipodespacho
+*/
 --BORRADO TABLAS TEMPORALES
 /*
 drop table tempefact

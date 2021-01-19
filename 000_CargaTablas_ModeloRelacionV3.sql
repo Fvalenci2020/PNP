@@ -1,5 +1,5 @@
 use pnp_2
-/* 19:28
+--/* 22:28
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -635,10 +635,4 @@ from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].PNCPconCET t1
 left join barranacional t2 on t1.barranacional=t2.BarraNAcional
 left join versionefact t3 on t3.Descripcion=t1.VersionEfact
 where codigocontrato not in ('DÉFICIT_Coopelan') and t1.IdVersion !=0
---*/
-
---select * from cetcp
---select * from PNCPconCET
---select * from versionrec
-
 --*/
