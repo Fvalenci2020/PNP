@@ -6,8 +6,11 @@ as
 --DECLARACION VARIABLES, SOLAMENTE PARA REALIZACIÓN DE PRUEBAS ANTES DE PROCEDIMIENTO.
 use pnp_2
 declare @idVersionRef varchar(15)	set @idVersionRef=118;--Para crear versión y extraer antecedentes Efact
-declare @idVersion varchar(15)	set @idVersion=(select max(IdVersion)+1 from versionrec)
+declare @idVersion varchar(15)	set @idVersion=135
 select @idVersionRef,@idVersion NuevoID
+
+delete from PNCPconCET where Idversion=@IdVersion
+delete from RecaudacionDetalle where idversion=@idversion
 delete from versionrecdetalle where IdVersion=@idVersion
 delete from versionrec where IdVersion=@idVersion
 
@@ -16,7 +19,7 @@ delete from versionrec where IdVersion=@idVersion
 insert into versionrec select  @idVersion,Descripcion from versionrec where IdVersion=@idVersionRef
 insert into versionrecdetalle select @idVersion,Registro,ValorTexto,ValorFecha,ValorInt,ValorFloat,Descripcion from versionrecdetalle where IdVersion=@idVersionRef
 --select * from versionrecdetalle where IdVersion=@idVersion
-
+--*/
 declare @VersionEFACT int	select @VersionEFACT=idversion from versionefact where Descripcion in (
 													select ValorTexto from versionrecdetalle where idversion=@idVersion and registro='VersionEfact');--Para crear versión y extraer antecedentes Efact
 DECLARE @FECHAEFACT DATE 				select @FECHAEFACT=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='FECHAEFACT';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
@@ -37,7 +40,7 @@ DECLARE @FECHAPerdida DATE 			select @FECHAPerdida=valorfecha from versionrecdet
 
 DECLARE @PtoRetiroSistemaAno int	select @PtoRetiroSistemaAno=ValorInt from versionrecdetalle where idversion=@idVersion and Registro='PtoRetiroSistemaAno';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
 
---crear tabla EfactPNP Temporal
+--crear tabla Efact y PNP Temporal
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
 select t1.[IdEfact],t1.[IdVersion] IdversionEfact,t1.[Fecha] FechaEfact,t1.[IdDistribuidora],[IdGeneradora],[IdCodigoContrato]
       ,t1.[IdPuntoRetiro],t1.[IdTipoDespacho],t1.[Energia],t1.[Potencia]
@@ -52,12 +55,13 @@ into temppnp
 from pnp 
 where VersionIndex=@VersionPNP and MesIndexacion=@FECHAPNP and Version=@TipoPNP
 
---CÁLCULO DE ENERGÍA Y POTENCIA RECAUDADA, MISMOS REGISTROS DE EFACTPNP
---/*
 --BORRADO VERSION DE TRABAJO
 delete from RecaudacionDetalle where idversion=@idversion
 
---RECAUDACION PARA ENERGÍAS DE LICITACION IdTipoDespacho=1 --"Licitacion"
+--RECAUDACION PARA ENERGÍAS DE CORTO PLAZO IdTipoDespacho=4 --"Déficit"
+	--PENDIENTE
+
+--RECAUDACION PARA ENERGÍAS DE LICITACION IdTipoDespacho IN(1,5) --"Licitacion" Y "Dx con contratos Holding"
 insert into RecaudacionDetalle 
 SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdTipoDespacho,t1.Energia,t1.Potencia
 		,t2.IdSistemaZonal,t3.Fecha FechaPZ,t3.Version VersionPZ,t3.Factor FEPE, t4.Factor FEPP
@@ -76,13 +80,10 @@ left join perdidazonal t3 on t3.IdSistemaZonal=t2.IdSistemaZonal and t3.Version=
 left join perdidazonal t4 on t4.IdSistemaZonal=t2.IdSistemaZonal and t4.Version=@VersionPerdida and t4.Fecha=@FECHAPerdida and t4.TipoFactor='FEPP'
 left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
 left join temppnp t6 on t1.IdCodigoContrato=t6.IdCodigoContrato and t5.IdBarraNacional=t6.IdBarraNacional and t6.VersionIndex=@VersionPNP and t6.Version=@TipoPNP and t6.MesIndexacion=@FECHAPNP
-WHERE IdTipoDespacho=1
+WHERE IdTipoDespacho in(1,5)
 
---RECAUDACION PARA ENERGÍAS DE LICITACION IdTipoDespacho=2 --"Corto Plazo"
-
-	--DESPACHO DE CONTRATOS CORTO PLAZO
---CREAR PNCP CON CET
---	/*
+--RECAUDACION PARA ENERGÍAS DE CORTO PLAZO IdTipoDespacho=2 --"Corto Plazo"
+	--CREAR PNCP CON CET
 delete from PNCPconCET where Idversion=@IdVersion
 insert into PNCPconCET
 select	@idversion idversion,idVersionEfact,FechaEfact
@@ -100,49 +101,45 @@ LEFT JOIN PNCP T2 on T2.MES=@FECHAPNCP and t2.Version=@VersionPNCP and t5.IdBarr
 left join cetcp T3 on	T3.IdDistribuidora=T1.IdDistribuidora and t3.IdGeneradora=t1.IdGeneradora and T3.MesIndexacion=@FECHAPNP 
 						and t3.VersionIndex=@versionpnp and t3.Version=@tipopnp
 where IdTipoDespacho=2
-
-	--ASIGNA PRECIOS A CONTRATOS DE CORTO PLAZO
-/*
-drop table if exists EfactPNP_PNCP;
-select * 
-into EfactPNP_PNCP
-from (
-select t1.*,t2.Mes_PNCP,t2.CETDolar,t2.PrecioNudoEnergiaDolar,t2.PrecioNudoPotenciaDolar
-from EfactPNP t1
-left join PNCPconCET t2 on t1.idversion=t2.idversion and t1.FechaEfact=t2.fechaefact and t2.BarraNacional=t1.BarraNAcional and t1.CodigoContrato=t2.CodigoContrato
-where	FlagCtr=0 and t1.idversion=@idVersion
-union all
-select EfactPNP.*,Null Mes_PNCP,null CETDolar, Null PrecioNudoEnergiaDolar,Null PrecioNudoPotenciaDolar 
-from EfactPNP
-where FlagCtr=1 and Idversion=@idVersion
-)T
---*/
-
-/*
---insert into RecaudacionDetalle 
+	--CALCULAR RECAUDACION
+insert into RecaudacionDetalle 
 SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdTipoDespacho,t1.Energia,t1.Potencia
 		,t2.IdSistemaZonal,t3.Fecha FechaPZ,t3.Version VersionPZ,t3.Factor FEPE, t4.Factor FEPP
 		,t5.IdBarraNacional,t5.Periodo,t5.Factor FactorR
 		,'','2000-01-01' MesIndexacion,'',0,0
-		,'2000-01-01' PNCP_Mes,'',0,0,0,0
+		,t6.MES_PNCP,t6.VersionPNCP,t6.IdNudo,t6.CETDolar,t6.PrecioNudoEnergiaDolar,t6.PrecioNudoPotenciaDolar
 		,Energia*t5.Factor*t3.Factor EnergiaPC,Potencia*t5.Factor*t4.Factor PotenciaPC
-		,Energia*t5.Factor*t3.Factor*t6.PNELP/1000 EnergiaRecDolar
-		,Potencia*t5.Factor*t4.Factor*t6.PNPLP PotenciaRecDolar
+		,Energia*t5.Factor*t3.Factor*t6.PrecioNudoEnergiaDolar/1000 EnergiaRecDolar
+		,Potencia*t5.Factor*t4.Factor*t6.PrecioNudoPotenciaDolar PotenciaRecDolar
 		,@DolarVersion Dolar
-		,Energia*t5.Factor*t3.Factor*t6.PNELP*@DolarVersion/1000 EnergiaRecPeso
-		,Potencia*t5.Factor*t4.Factor*t6.PNPLP*@DolarVersion PotenciaRecPeso		
+		,Energia*t5.Factor*t3.Factor*t6.PrecioNudoEnergiaDolar*@DolarVersion/1000 EnergiaRecPeso
+		,Potencia*t5.Factor*t4.Factor*t6.PrecioNudoPotenciaDolar*@DolarVersion PotenciaRecPeso			
 FROM tempefact t1
 left join PtoRetiroSistema t2 on t2.idpuntoRetiro=t1.IdpuntoRetiro and t2.ano=@PtoRetiroSistemaAno
 left join perdidazonal t3 on t3.IdSistemaZonal=t2.IdSistemaZonal and t3.Version=@VersionPerdida and t3.Fecha=@FECHAPerdida and t3.TipoFactor='FEPE'
 left join perdidazonal t4 on t4.IdSistemaZonal=t2.IdSistemaZonal and t4.Version=@VersionPerdida and t4.Fecha=@FECHAPerdida and t4.TipoFactor='FEPP'
 left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
+left join pncpconcet t6 on t6.FechaEfact=t1.FechaEfact and t6.IdVersion=@idversion and t6.FechaEfact=t1.FechaEfact and t6.IdDistribuidora=t1.IdDistribuidora and t6.IdGeneradora=t1.IdGeneradora and t6.IdNudo=t5.IdBarraNacional
 WHERE IdTipoDespacho=2
-*/
+
+--RECAUDACION PARA ENERGÍAS DE TRASPASO DE EXCEDENTES IdTipoDespacho=4 --"Traspaso Excedentes"
+declare @VersionCMG varchar(255)='2101V3'
+delete from PNPTraspExc where versionPNP=@VersionCMG
+
+insert into PNPTraspExc
+select t2.*,t5.ValorDolar DolarMes,t3.CMG_Peso/t5.ValorDolar*1000 CMGPtoSuministro,t4.CMG_Peso/t5.ValorDolar*1000 CMGPtoOferta,(t2.PE_Index_USD-CET_USD)+(t3.CMG_Peso-t4.CMG_Peso)/t5.ValorDolar*1000 PeTraspExc
+from pnp t2
+left join CMGPromedio t3 on t2.PtoCompra=t3.barranacional and t2.Fecha=t3.fecha
+left join CMGPromedio t4 on t2.PtoOferta=t4.barranacional and t2.fecha=t4.fecha
+inner join IndexacionDolar t5 on t5.Fecha=t2.Fecha
+where t2.Distribuidora='coelcha'
+and t2.VersionPNP=@VersionCMG and PtoCompra!=PtoOferta
+and PtoCompra in (select distinct BarraNacional from EfactPNP where dx='mataquito')
+
 --BORRADO TABLAS TEMPORALES
 /*
 drop table tempefact
 drop table temppnp
-drop table if exists EfactPNP_PNCP;
 drop table if exists ContratoCPTemp
 
 --RESULTADOS

@@ -1,5 +1,5 @@
 use pnp_2
---/* 22:28
+/* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -635,4 +635,37 @@ from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].PNCPconCET t1
 left join barranacional t2 on t1.barranacional=t2.BarraNAcional
 left join versionefact t3 on t3.Descripcion=t1.VersionEfact
 where codigocontrato not in ('DÉFICIT_Coopelan') and t1.IdVersion !=0
+
+insert into CMGPromedio
+select t1.Version VersionCMG,t1.fecha,t2.IdBarraNacional,t1.CMG_Peso,t1.observacion
+from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.CMGPromedio t1
+left join barranacional t2 on t1.barranacional=t2.BarraNAcional
 --*/
+
+--pnpNoFM
+/*
+IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
+GO
+select	distinct versionpnp,fecha,[version]
+		,case	when distribuidora in ('CGE Distribución','CGE DISTRIBUCIÓN') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','CGE Distribucion','_', generadora)
+				when distribuidora in ('MATAQUITO') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','COELCHA','_', generadora)
+				else concat(Licitacion,'_',bloque,'_',tipobloque,'_',distribuidora,'_', generadora) end CodigoContrato
+		,Licitacion,tipobloque,bloque,distribuidora,generadora,t2.IdBarraNacional,PtoOferta
+		,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
+into temppnp
+from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.pnp t1
+left join barranacional t2 on t1.ptooferta=t2.BarraNAcional
+where pe_index_usd is not null
+
+--insert into pnpNoFM
+select	versionpnp,fecha,version,t2.idcodigocontrato,t1.IdBarraNacional IdPtoOferta,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
+from temppnp t1
+left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
+where t1.CodigoContrato not in ('EMEL-SIC 2006/01_BB1_BB_CGE Distribucion_ENDESA','EMEL-SIC 2006/01-2_BB_Sur_BB_CGE Distribucion_AES GENER','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Abengoa','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Norvind','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_El Campesino')
+and t1.distribuidora !='MATAQUITO'
+and not (versionPNP='2001V1' and fecha in('2018-07-01','2018-09-01','2018-10-01','2018-11-01','2018-12-01') and version in('ITD','Mes') and IdCodigoContrato in(708,734,760))
+
+IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
+--*/
+--PNPTraspExc
+--select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.PNPTraspExc
