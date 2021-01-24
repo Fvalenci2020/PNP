@@ -667,7 +667,7 @@ and t1.distribuidora !='MATAQUITO'
 
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
 
---*/
+
 --PNPTraspExc
 IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
 select	VersionPNP,fecha,Version
@@ -683,10 +683,11 @@ from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.PNPTraspExc t1
 left join barranacional t2 on t1.ptooferta=t2.BarraNAcional
 left join barranacional t3 on t1.PtoCompra=t3.BarraNAcional
 
---insert into PNPTraspExc
+insert into PNPTraspExc
 select	t1.VersionPNP,t1.fecha,t1.version,idCodigoContrato,IdPtoOferta,IdPtoCompra,CET_USD,PrecioEnergia,PrecioPotencia,t1.observacion,DolarMes
 		,t1.VersionPNP VersionCMG,t1.fecha FechaCMG,CMGPtoSuministro,CMGPtoOferta,PeTraspExc
 from temptrasp t1
 left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
 
 IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
+--*/

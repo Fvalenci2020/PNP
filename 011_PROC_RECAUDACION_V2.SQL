@@ -123,29 +123,57 @@ left join pncpconcet t6 on t6.FechaEfact=t1.FechaEfact and t6.IdVersion=@idversi
 WHERE IdTipoDespacho=2
 
 --RECAUDACION PARA ENERGÍAS DE TRASPASO DE EXCEDENTES IdTipoDespacho=4 --"Traspaso Excedentes"
+
+	--CARGAR PRECIOS A PNPTraspExc
 declare @VersionCMG varchar(255)='2101V3'
-delete from PNPTraspExc where versionPNP=@VersionCMG
+delete from PNPTraspExc where versionPNP=@VersionCMG and VersionPNP=@VersionPNP and Fecha=@FECHAPNP and version=@TipoPNP
 
 insert into PNPTraspExc
-select t2.*,t5.ValorDolar DolarMes,t3.CMG_Peso/t5.ValorDolar*1000 CMGPtoSuministro,t4.CMG_Peso/t5.ValorDolar*1000 CMGPtoOferta,(t2.PE_Index_USD-CET_USD)+(t3.CMG_Peso-t4.CMG_Peso)/t5.ValorDolar*1000 PeTraspExc
-from pnp t2
-left join CMGPromedio t3 on t2.PtoCompra=t3.barranacional and t2.Fecha=t3.fecha
-left join CMGPromedio t4 on t2.PtoOferta=t4.barranacional and t2.fecha=t4.fecha
-inner join IndexacionDolar t5 on t5.Fecha=t2.Fecha
-where t2.Distribuidora='coelcha'
-and t2.VersionPNP=@VersionCMG and PtoCompra!=PtoOferta
-and PtoCompra in (select distinct BarraNacional from EfactPNP where dx='mataquito')
+select	t2.versionindex,t2.mesindexacion,t2.version,t1.IdCodigoContrato,t2.idptooferta,t5.idBarraNacional PtoCompra,t2.cet_USD,t2.PrecioEnergia,t2.PrecioPotencia,t2.Observacion
+		,t6.Valor DolarMes,t3.VersionCMg,t3.Fecha FechaCMG
+		,t3.CMG_Peso/t6.Valor*1000 CMGPtoSuministro
+		,t4.CMG_Peso/t6.Valor*1000 CMGPtoOferta
+		,(t2.PrecioEnergia-t2.cet_USD)+(t3.CMG_Peso-t4.CMG_Peso)/t6.Valor*1000 PeTraspExc
+FROM tempefact t1
+left join pnpindex t2 on t1.IdCodigoContrato=t2.idcodigocontrato and Versionindex=@VersionPNP and t2.mesindexacion=@FECHAPNP and t2.version=@TipoPNP
+left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
+inner join IndexacionDolar t6 on t6.Fecha=t2.mesindexacion
+left join CMGPromedio t3 on t5.IdBarraNacional=t3.IdBarraNacional and t2.mesindexacion=t3.fecha and t3.VersionCMg=@VersionCMG
+left join CMGPromedio t4 on t2.idPtoOferta=t4.IdBarraNacional and t2.mesindexacion=t4.fecha and t4.VersionCMg=@VersionCMG
+where idtipodespacho=4
+
+	--CARGAR RECAUDACIÓN
+insert into RecaudacionDetalle 
+SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdTipoDespacho,t1.Energia,t1.Potencia
+		,t2.IdSistemaZonal,t3.Fecha FechaPZ,t3.Version VersionPZ,t3.Factor FEPE, t4.Factor FEPP
+		,t5.IdBarraNacional,t5.Periodo,t5.Factor FactorR
+		,t6.VersionPNP,t6.FEcha,t6.[Version],t6.PeTRaspExc,t7.PNPLP
+		,'2000-01-01' PNCP_Mes,'',0,0,0,0
+		,Energia*t5.Factor*t3.Factor EnergiaPC,Potencia*t5.Factor*t4.Factor PotenciaPC
+		,Energia*t5.Factor*t3.Factor*t6.PeTRaspExc/1000 EnergiaRecDolar
+		,Potencia*t5.Factor*t4.Factor*t7.PNPLP PotenciaRecDolar
+		,@DolarVersion Dolar
+		,Energia*t5.Factor*t3.Factor*t6.PeTRaspExc*@DolarVersion/1000 EnergiaRecPeso
+		,Potencia*t5.Factor*t4.Factor*t7.PNPLP*@DolarVersion PotenciaRecPeso		
+FROM tempefact t1
+left join PtoRetiroSistema t2 on t2.idpuntoRetiro=t1.IdpuntoRetiro and t2.ano=@PtoRetiroSistemaAno
+left join perdidazonal t3 on t3.IdSistemaZonal=t2.IdSistemaZonal and t3.Version=@VersionPerdida and t3.Fecha=@FECHAPerdida and t3.TipoFactor='FEPE'
+left join perdidazonal t4 on t4.IdSistemaZonal=t2.IdSistemaZonal and t4.Version=@VersionPerdida and t4.Fecha=@FECHAPerdida and t4.TipoFactor='FEPP'
+left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECHAPNP>=t5.FechaInicio and  @FECHAPNP<=t5.FechaFin
+left join PNPTraspExc t6 on t1.IdCodigoContrato=t6.IdCodigoContrato and t5.IdBarraNacional=t6.IDPTOCOMPRA and t6.VersionPNP=@VersionPNP and t6.Version=@TipoPNP and t6.FECHA=@FECHAPNP
+left join temppnp t7 on t1.IdCodigoContrato=t7.IdCodigoContrato and t5.IdBarraNacional=t7.IdBarraNacional and t7.VersionIndex=@VersionPNP and t6.Version=@TipoPNP and t7.MesIndexacion=@FECHAPNP
+WHERE IdTipoDespacho in(4)
 
 --BORRADO TABLAS TEMPORALES
-/*
-drop table tempefact
-drop table temppnp
-drop table if exists ContratoCPTemp
+IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
+IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
+IF OBJECT_ID('ContratoCPTemp', 'U') IS NOT NULL DROP TABLE ContratoCPTempemptrasp
 
 --RESULTADOS
-select idversion,FechaEfact,VersionEfact,sum(EnergiaPC) EnergiaPC,sum(PotenciaPC)PotenciaPC,sum(EnergiaRecPeso) EnergiaRecPeso,sum(PotenciaRecPeso) PotenciaRecPeso
+
+select idversion,FechaEfact,idVersionEfact,sum(EPC) EPC,sum(PPC) PPC,sum(ERec_Peso) ERec_Peso,sum(PRec_Peso) PRec_Peso
 from Recaudaciondetalle
 where idversion=@idversion
-group by FechaEfact,VersionEfact,idversion
-order by idversion,versionefact,FechaEfact
+group by FechaEfact,idVersionEfact,idversion
+order by idversion,idversionefact,FechaEfact
 --*/
