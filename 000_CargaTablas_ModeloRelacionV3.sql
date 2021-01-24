@@ -640,32 +640,53 @@ insert into CMGPromedio
 select t1.Version VersionCMG,t1.fecha,t2.IdBarraNacional,t1.CMG_Peso,t1.observacion
 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.CMGPromedio t1
 left join barranacional t2 on t1.barranacional=t2.BarraNAcional
---*/
 
---pnpNoFM
-/*
+insert into CMGPromedio-- para version que se calculó sin CMG
+select '2007ProyV1',fecha,idbarranacional,0,'' from CMGPromedio where fecha in ('2020-09-01','2020-10-01')
+
+--pnpIndex
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
 GO
 select	distinct versionpnp,fecha,[version]
 		,case	when distribuidora in ('CGE Distribución','CGE DISTRIBUCIÓN') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','CGE Distribucion','_', generadora)
 				when distribuidora in ('MATAQUITO') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','COELCHA','_', generadora)
 				else concat(Licitacion,'_',bloque,'_',tipobloque,'_',distribuidora,'_', generadora) end CodigoContrato
-		,Licitacion,tipobloque,bloque,distribuidora,generadora,t2.IdBarraNacional,PtoOferta
+		,t2.IdBarraNacional,PtoOferta
 		,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
 into temppnp
 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.pnp t1
 left join barranacional t2 on t1.ptooferta=t2.BarraNAcional
 where pe_index_usd is not null
 
---insert into pnpNoFM
-select	versionpnp,fecha,version,t2.idcodigocontrato,t1.IdBarraNacional IdPtoOferta,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
+insert into pnpIndex
+select	versionpnp VersionIndex,fecha MesIndexacion,version,t2.idcodigocontrato,t1.IdBarraNacional IdPtoOferta,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
 from temppnp t1
 left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
 where t1.CodigoContrato not in ('EMEL-SIC 2006/01_BB1_BB_CGE Distribucion_ENDESA','EMEL-SIC 2006/01-2_BB_Sur_BB_CGE Distribucion_AES GENER','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Abengoa','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Norvind','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_El Campesino')
 and t1.distribuidora !='MATAQUITO'
-and not (versionPNP='2001V1' and fecha in('2018-07-01','2018-09-01','2018-10-01','2018-11-01','2018-12-01') and version in('ITD','Mes') and IdCodigoContrato in(708,734,760))
 
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
+
 --*/
 --PNPTraspExc
---select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.PNPTraspExc
+IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
+select	VersionPNP,fecha,Version
+		,case	when distribuidora in ('CGE Distribución','CGE DISTRIBUCIÓN') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','CGE Distribucion','_', generadora)
+				when distribuidora in ('MATAQUITO') then concat(Licitacion,'_',bloque,'_',tipobloque,'_','COELCHA','_', generadora)
+				else concat(Licitacion,'_',bloque,'_',tipobloque,'_',distribuidora,'_', generadora) end CodigoContrato
+		,t2.IdBarraNacional IdPtoOferta,PtoOferta
+		,t3.IdBarraNacional IdPtoCompra,PtoCompra
+		,t1.CET_USD,t1.PE_Index_USD PrecioEnergia,t1.PP_Index_USD PrecioPotencia,t1.observacion
+		,DolarMes,CMGPtoSuministro,CMGPtoOferta,PeTraspExc
+into temptrasp
+from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.PNPTraspExc t1
+left join barranacional t2 on t1.ptooferta=t2.BarraNAcional
+left join barranacional t3 on t1.PtoCompra=t3.BarraNAcional
+
+--insert into PNPTraspExc
+select	t1.VersionPNP,t1.fecha,t1.version,idCodigoContrato,IdPtoOferta,IdPtoCompra,CET_USD,PrecioEnergia,PrecioPotencia,t1.observacion,DolarMes
+		,t1.VersionPNP VersionCMG,t1.fecha FechaCMG,CMGPtoSuministro,CMGPtoOferta,PeTraspExc
+from temptrasp t1
+left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
+
+IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
