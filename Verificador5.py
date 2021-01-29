@@ -55,11 +55,7 @@ conn.close()
 del conn
 del cursor
 
-#AGREGO IDS
-    #Renombrar columna tablas
-#distribuidora=distribuidora.rename(columns={'NombreDistribuidora': 'Distribuidora'})
-#generadora=generadora.rename(columns={'NombreGeneradora': 'Suministrador'})
-
+#Agrego Id
     #Agrego Id Distribuidora
 Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
     #Agrego Id Generadora
@@ -68,6 +64,29 @@ Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='
 Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')#.iloc[:,:-1]
     #Agrego Id a contrato
 Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')#.iloc[:,:-1]
+
+#Agrega columna con tipo de despacho->VER SI PUEDO DEJAR COND JUNTAS
+    #Crea columna con datos del despacho
+Datos['IdDespacho']=np.nan
+    #Agrega categoría reconversión energética a tabla despacho
+despacho=despacho.append(pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion']),ignore_index=True)
+
+    #Caso 1	Licitacion
+Datos.IdDespacho=1
+    #Caso 2	Corto Plazo
+Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') , 2, inplace=True,)    
+Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') , 2, inplace=True,)    
+Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL') , 2, inplace=True,)    
+    #Caso 3	Déficit
+Datos['IdDespacho'].where(~(Datos.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
+    #Caso 4	Traspaso Excedentes
+Datos['IdDespacho'].where(~(Datos.IdDistribuidora==45) , 4, inplace=True,)    
+    #Caso 5	Dx con contratos Holding
+Datos['IdDespacho'].where(~(Datos.IdDistribuidora==12) , 5, inplace=True,)
+Datos['IdDespacho'].where(~(Datos.IdDistribuidora==13) , 5, inplace=True,)
+Datos['IdDespacho'].where(~(Datos.IdDistribuidora==15) , 5, inplace=True,)
+    #Caso 6 Reconversión energética
+Datos['IdDespacho'].where(~(Datos.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
 
 #Agregar columnas con flag
     #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
@@ -105,12 +124,12 @@ Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Obser
     #Elimina columnas creadas
 Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], axis=1, inplace=True)
 
+
+
 #Crea Tabla Efact con errores en observación
     #Crea columna con la id de la versión
 Datos['IdVersion']=16 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
-    #Crea columna con datos del despacho
-Datos['IdDespacho']=np.nan
-Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]']]
+Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
 
