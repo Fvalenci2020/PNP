@@ -9,6 +9,7 @@ Created on Thu Jan 28 17:22:42 2021
 Created on Fri Jan 22 10:36:22 2021
 @author: Asus
 """
+
 import pandas as pd
 import numpy as np
 import datetime
@@ -26,16 +27,18 @@ Datos= Datos.iloc[:, 1:11]
 
 #Base de datos SQL
 import pyodbc 
-'''
+
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=DESKTOP-SSPJTJO\SQLEXPRESS;'
                       'Database=Modelo PNP;'
                       'Trusted_Connection=yes;')
+
 '''
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=GTD-NOT019\SQLSERVER2012;'
                       'Database=PNP_2;'
                       'Trusted_Connection=yes;')
+'''
 
 cursor = conn.cursor()
 
@@ -62,9 +65,28 @@ Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_o
     #Agrego Id Generadora
 Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='NombreGeneradora',how = 'left').iloc[:,:-1]
     #Agrego Id Punto de Retiro
-Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro'     ,how = 'left')#.iloc[:,:-1]
+Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')#.iloc[:,:-1]
     #Agrego Id a contrato
 Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')#.iloc[:,:-1]
+
+#Agregar columnas con flag
+    #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
+Datos['flag distribuidora']=1
+    #Reemplaza datos cuando la condición es False
+Datos['flag distribuidora'].where(Datos.IdDistribuidora.isna(), 0, inplace=True,)
+    #Crea fila de flag para IdGeneradora. Cuando IdGeneradora es nan, flag=1
+Datos['Flag generadora']=1
+    #Reemplaza datos cuando la condición es False
+Datos['Flag generadora'].where(Datos.IdGeneradora.isna(), 0, inplace=True,)
+    #Crea fila de flag para IdPuntoRetiro. Cuando IdPuntoRetiro es nan, flag=1
+Datos['Flag puntoretiro']=1
+    #Reemplaza datos cuando la condición es False
+Datos['Flag puntoretiro'].where(Datos.IdPuntoRetiro.isna(), 0, inplace=True,)
+    #Crea fila de flag para IdGeneradora. Cuando IdDistribuidora es nan, flag=1
+Datos['Flag codigocontrato']=1
+    #Reemplaza datos cuando la condición es False
+Datos['Flag codigocontrato'].where(Datos.IdCodigoContrato.isna(), 0, inplace=True,)
+
 
     #P2 tabla con errores de Efact.
         #crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
