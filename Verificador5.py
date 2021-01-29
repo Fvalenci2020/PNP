@@ -105,6 +105,13 @@ Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Obser
     #Elimina columnas creadas
 Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], axis=1, inplace=True)
 
+#Crea Tabla Efact con errores en observación
+    #Crea columna con la id de la versión
+Datos['IdVersion']=16 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+    #Crea columna con datos del despacho
+Datos['IdDespacho']=np.nan
+Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]']]
+
 
 
 
