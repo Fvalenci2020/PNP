@@ -26,11 +26,19 @@ Datos= Datos.iloc[:, 1:11]
 
 #Base de datos SQL
 import pyodbc 
+'''
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=DESKTOP-SSPJTJO\SQLEXPRESS;'
                       'Database=Modelo PNP;'
                       'Trusted_Connection=yes;')
+'''
+conn = pyodbc.connect('Driver={SQL Server};'
+                      'Server=GTD-NOT019\SQLSERVER2012;'
+                      'Database=PNP_2;'
+                      'Trusted_Connection=yes;')
+
 cursor = conn.cursor()
+
 
 demanda = pd.read_sql_query('select * from demandafiltrado',conn)
 generadora= pd.read_sql_query('select * from generadora',conn)
@@ -43,7 +51,6 @@ despacho= pd.read_sql_query('select * from tipodespacho',conn)
 conn.close()
 del conn
 del cursor
-
 
 #AGREGO IDS
 distribuidora=distribuidora.rename(columns={'NombreDistribuidora': 'Distribuidora'})
