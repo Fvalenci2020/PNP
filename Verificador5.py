@@ -75,17 +75,37 @@ Datos['flag distribuidora']=1
     #Reemplaza datos cuando la condición es False
 Datos['flag distribuidora'].where(Datos.IdDistribuidora.isna(), 0, inplace=True,)
     #Crea fila de flag para IdGeneradora. Cuando IdGeneradora es nan, flag=1
-Datos['Flag generadora']=1
+Datos['flag generadora']=1
     #Reemplaza datos cuando la condición es False
-Datos['Flag generadora'].where(Datos.IdGeneradora.isna(), 0, inplace=True,)
+Datos['flag generadora'].where(Datos.IdGeneradora.isna(), 0, inplace=True,)
     #Crea fila de flag para IdPuntoRetiro. Cuando IdPuntoRetiro es nan, flag=1
-Datos['Flag puntoretiro']=1
+Datos['flag puntoretiro']=1
     #Reemplaza datos cuando la condición es False
-Datos['Flag puntoretiro'].where(Datos.IdPuntoRetiro.isna(), 0, inplace=True,)
+Datos['flag puntoretiro'].where(Datos.IdPuntoRetiro.isna(), 0, inplace=True,)
     #Crea fila de flag para IdGeneradora. Cuando IdDistribuidora es nan, flag=1
-Datos['Flag codigocontrato']=1
+Datos['flag codigocontrato']=1
     #Reemplaza datos cuando la condición es False
-Datos['Flag codigocontrato'].where(Datos.IdCodigoContrato.isna(), 0, inplace=True,)
+Datos['flag codigocontrato'].where(Datos.IdCodigoContrato.isna(), 0, inplace=True,)
+
+#Agregar comentario de error cuando flag igual a 1
+    #Crea columnas con observaciones, luego serán borradas
+Datos['Observación1']=''
+Datos['Observación2']=''
+Datos['Observación3']=''
+Datos['Observación4']=''
+
+    #Agrega mensaje de error a observaciones creadas. Si flag es 1 agrega error.
+Datos['Observación1'].where(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
+Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
+Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
+Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
+
+    #Suma strings con errores y los pega en columna Observación original
+Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Observación3']+Datos['Observación4']
+    #Elimina columnas creadas
+Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], axis=1, inplace=True)
+
+
 
 
     #P2 tabla con errores de Efact.
