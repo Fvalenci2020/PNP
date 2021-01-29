@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import pyodbc
 pd.options.mode.chained_assignment = None
 plt.close("all")
-import matplotlib.animation as animation
 
 
 #IMPORTAR DATOS
@@ -48,12 +47,18 @@ generadora= pd.read_sql_query('select * from generadora',conn)
 distribuidora= pd.read_sql_query('select * from distribuidora',conn)
 contrato= pd.read_sql_query('select * from codigocontrato',conn)
 puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
-#efact= pd.read_sql_query('select * from efactfiltrado',conn)
+efact= pd.read_sql_query('select * from efactfiltrado',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
 
 conn.close()
 del conn
 del cursor
+
+#P2 tabla con errores de Efact.
+#LISTO#crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
+#LISTO#agregar descripción error
+#LISTO#agregar columna al final con mensaje de los errores que existen.
+#LISTO#"Error nombre de Distribuidora"-"Error nombre de Generadora"
 
 #Agrego Id
     #Agrego Id Distribuidora
@@ -64,29 +69,6 @@ Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='
 Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')#.iloc[:,:-1]
     #Agrego Id a contrato
 Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')#.iloc[:,:-1]
-
-#Agrega columna con tipo de despacho->VER SI PUEDO DEJAR COND JUNTAS
-    #Crea columna con datos del despacho
-Datos['IdDespacho']=np.nan
-    #Agrega categoría reconversión energética a tabla despacho
-despacho=despacho.append(pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion']),ignore_index=True)
-
-    #Caso 1	Licitacion
-Datos.IdDespacho=1
-    #Caso 2	Corto Plazo
-Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') , 2, inplace=True,)    
-Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') , 2, inplace=True,)    
-Datos['IdDespacho'].where(~(Datos.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL') , 2, inplace=True,)    
-    #Caso 3	Déficit
-Datos['IdDespacho'].where(~(Datos.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
-    #Caso 4	Traspaso Excedentes
-Datos['IdDespacho'].where(~(Datos.IdDistribuidora==45) , 4, inplace=True,)    
-    #Caso 5	Dx con contratos Holding
-Datos['IdDespacho'].where(~(Datos.IdDistribuidora==12) , 5, inplace=True,)
-Datos['IdDespacho'].where(~(Datos.IdDistribuidora==13) , 5, inplace=True,)
-Datos['IdDespacho'].where(~(Datos.IdDistribuidora==15) , 5, inplace=True,)
-    #Caso 6 Reconversión energética
-Datos['IdDespacho'].where(~(Datos.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
 
 #Agregar columnas con flag
     #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
@@ -125,25 +107,100 @@ Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Obser
 Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], axis=1, inplace=True)
 
 
-
 #Crea Tabla Efact con errores en observación
     #Crea columna con la id de la versión
-Datos['IdVersion']=16 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+Datos['IdDespacho']=np.nan
+Datos['IdVersion']=np.nan #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
 
-
-    #P2 tabla con errores de Efact.
-        #crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
-        #agregar descripción error
-        #agregar columna al final con mensaje de los errores que existen.
-        #"Error nombre de Distribuidora"-"Error nombre de Generadora"
+###########################################################################
 
 #P* corregir a la mala
+Efact_corregido=Datos[['IdData','IdVersion','Fecha','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
-#P0 agregar registro a VErsionEFact        
-#P1    tabla EFACT 
+#Agrega Ids ignorando caracteres especiales y mayúsculas 
+    #Crea columna temporal de NombreDistribuidora sin tilde y en minúscula en Efact_corregido y en tabla distribuidora
+Efact_corregido['Distribuidora_temp']=Efact.Distribuidora.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+distribuidora['Distribuidora_temp']=distribuidora.NombreDistribuidora.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+    #Crea columna temporal de generadora sin tilde y en minúscula en Efact_corregido y en tabla generadora
+Efact_corregido['Generadora_temp']=Efact.Suministrador.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+generadora['Generadora_temp']=generadora.NombreGeneradora.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+    #Crea columna temporal de Punto de Retiro sin tilde y en minúscula en Efact_corregido y en tabla puntoretiro
+Efact_corregido['PuntoRetiro_temp']=Efact.PuntoRetiro.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+puntoretiro['PuntoRetiro_temp']=puntoretiro.PuntoRetiro.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+     #Crea columna temporal de Código de Contrato sin tilde y en minúscula en Efact_corregido y en tabla contrato
+Efact_corregido['CodigoContrato_temp']=Efact.CodigoContrato.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+contrato['CodigoContrato_temp']=contrato.CodigoContrato.str.lower().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+
+#Agrego Id
+    #Agrego Id Distribuidora
+Efact_corregido=pd.merge(Efact_corregido,distribuidora.iloc[:, lambda df: [0, 3]],left_on='Distribuidora_temp',right_on='Distribuidora_temp',how = 'left')
+    #Agrego Id Generadora
+Efact_corregido=pd.merge(Efact_corregido,generadora.iloc[:, lambda df: [0, 3]],left_on='Generadora_temp',right_on='Generadora_temp',how = 'left')
+    #Agrego Id Punto de Retiro
+Efact_corregido=pd.merge(Efact_corregido,puntoretiro.iloc[:, lambda df: [0, 3]],left_on='PuntoRetiro_temp'  ,right_on='PuntoRetiro_temp' ,how = 'left')
+    #Agrego Id a contrato
+Efact_corregido=pd.merge(Efact_corregido,contrato.iloc[:, lambda df: [0, 11]],left_on='CodigoContrato_temp',right_on='CodigoContrato_temp',how = 'left')
+    #Elimina tablas temporales de Efact_corregido y las demás tablas
+Efact_corregido.drop(['Distribuidora_temp', 'Generadora_temp','PuntoRetiro_temp', 'CodigoContrato_temp'], axis=1, inplace=True)
+distribuidora.drop('Distribuidora_temp', axis=1, inplace=True)
+generadora.drop('Generadora_temp', axis=1, inplace=True)
+puntoretiro.drop('PuntoRetiro_temp', axis=1, inplace=True)
+contrato.drop('CodigoContrato_temp', axis=1, inplace=True)
+    
+#Id Casos especiales
+    #Distribuidora
+Efact_corregido['IdDistribuidora'].where(~((Efact_corregido.Distribuidora=='CGE Distribución') | (Efact_corregido.Distribuidora=='CGED') | (Efact_corregido.Distribuidora=='CGE DISTRIBUCION')) ,18 , inplace=True,)    
+Efact_corregido['IdDistribuidora'].where(~((Efact_corregido.Distribuidora=='Enel Distribución') | (Efact_corregido.Distribuidora=='CHILECTRA') | (Efact_corregido.Distribuidora=='ENEL DISTRIBUCIÓN')) ,10 , inplace=True,)    
+Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='TIL-TIL') ,13 , inplace=True,)    
+Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='LUZANDES') ,15 , inplace=True,)    
+Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='MATAQUITO') ,45 , inplace=True,)    
+    #Código Contrato
+Efact_corregido['IdCodigoContrato'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 0, inplace=True,)    
+Efact_corregido['IdCodigoContrato'].where(~(Datos.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 0, inplace=True,)    
+    #Caso punto retiro en blanco
+Efact_corregido['IdPuntoRetiro'].where(~(Datos.PuntoRetiro=='(en blanco)') , 194, inplace=True,)   
+Efact_corregido['PuntoRetiro'].where(~(Datos.PuntoRetiro=='(en blanco)') ,'Quirihue 023' , inplace=True,)    
+    #Busca punto faltante en efact mes 07. El punto faltante es	Quirihue 023
+#mask= ((efact.Fecha=='2020-08-01')&(efact.IdDistribuidora==33) & (efact.IdGeneradora==21) & (efact.IdCodigoContrato==624))
+#mask2= ((Efact_corregido.IdDistribuidora==33) & (Efact_corregido.IdGeneradora==21) & (Efact_corregido.IdCodigoContrato==624))
+#Puntofaltante=efact[mask]
+#Puntofaltante2=Efact_corregido[mask2] 
+
+
+
+#Agrega columna con tipo de despacho
+    #Crea columna con datos del despacho
+Efact_corregido['IdDespacho']=np.nan
+    #Agrega categoría reconversión energética a tabla despacho
+despacho=despacho.append(pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion']),ignore_index=True)
+    #Caso 1	Licitacion
+Efact_corregido.IdDespacho=1
+    #Caso 2	Corto Plazo
+Efact_corregido['IdDespacho'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 2, inplace=True,)    
+    #Caso 3	Déficit
+Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
+    #Caso 4	Traspaso Excedentes
+Efact_corregido['IdDespacho'].where(~(Efact_corregido.IdDistribuidora==45) , 4, inplace=True,)    
+    #Caso 5	Dx con contratos Holding
+Efact_corregido['IdDespacho'].where(~((Efact_corregido.IdDistribuidora==12) | (Efact_corregido.IdDistribuidora==13) | (Efact_corregido.IdDistribuidora==15)) , 5, inplace=True,)
+    #Caso 6 Reconversión energética
+Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
+
+
+#Crea columna con la id de la versión
+Efact_corregido['IdVersion']=16 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+
+#Quita errores de observación
+Efact_corregido['Observación']=np.nan
+
+#Crea Tabla Efact sin errores en observación
+Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
+
+#FALTA#P0 agregar registro a VErsionEFact        
+#LISTO#P1    tabla EFACT 
         #agregar id despacho
         #agregar version
 
