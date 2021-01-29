@@ -40,12 +40,12 @@ conn = pyodbc.connect('Driver={SQL Server};'
 cursor = conn.cursor()
 
 
-demanda = pd.read_sql_query('select * from demandafiltrado',conn)
+#demanda = pd.read_sql_query('select * from Demanda where fecha',conn)
 generadora= pd.read_sql_query('select * from generadora',conn)
 distribuidora= pd.read_sql_query('select * from distribuidora',conn)
 contrato= pd.read_sql_query('select * from codigocontrato',conn)
 puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
-efact= pd.read_sql_query('select * from efactfiltrado',conn)
+#efact= pd.read_sql_query('select * from efactfiltrado',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
 
 conn.close()
@@ -53,22 +53,37 @@ del conn
 del cursor
 
 #AGREGO IDS
-distribuidora=distribuidora.rename(columns={'NombreDistribuidora': 'Distribuidora'})
-#Agrego Id Distribuidora
-Datos=Datos.merge(distribuidora.iloc[:,[0,1]],how = 'outer').dropna(subset=['IdData'])
-#Agrego Id Generadora
-generadora=generadora.rename(columns={'NombreGeneradora': 'Suministrador'})
-Datos=Datos.merge(generadora.iloc[:,[0,1]],how = 'outer').dropna(subset=['IdData'])
-#Agrego Id Punto de Retiro
-Datos=Datos.merge(puntoretiro.iloc[:,[0,1]],how = 'outer').dropna(subset=['IdData'])
-#Agrego Id a contrato
-Datos=Datos.merge(contrato.iloc[:,[0,1]],how = 'outer').dropna(subset=['IdData']).sort_values('IdData',ascending=True)
+    #Renombrar columna tablas
+#distribuidora=distribuidora.rename(columns={'NombreDistribuidora': 'Distribuidora'})
+#generadora=generadora.rename(columns={'NombreGeneradora': 'Suministrador'})
 
+    #Agrego Id Distribuidora
+Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
+    #Agrego Id Generadora
+Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='NombreGeneradora',how = 'left').iloc[:,:-1]
+    #Agrego Id Punto de Retiro
+Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro'     ,how = 'left')#.iloc[:,:-1]
+    #Agrego Id a contrato
+Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')#.iloc[:,:-1]
 
+    #P2 tabla con errores de Efact.
+        #crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
+        #agregar descripción error
+        #agregar columna al final con mensaje de los errores que existen.
+        #"Error nombre de Distribuidora"-"Error nombre de Generadora"
+
+#P* corregir a la mala
+
+#P0 agregar registro a VErsionEFact        
+#P1    tabla EFACT 
+        #agregar id despacho
+        #agregar version
+
+'''
 #AGREGA DATO DE HOLDING AL QUE PERTENECE
 Holding=pd.DataFrame([], columns=['IdDistribuidora','IdHolding','Holding'])
 Holding.IdDistribuidora=distribuidora.IdDistribuidora
-
+'''
 '''
 CGE:            ENEL:             CHILQUINTA:         SAESA:  
 EMELARI 1       ENEL 10           CHILQUINTA 6        FRONTEL 22
@@ -93,6 +108,7 @@ SOCOEPA 35
 TIL-TIL 13
 SASIPA 44
 COOPRESOL 20
+'''
 '''
 CGE=[1,2,3,4,7,18,25,45] #CGE
 ENEL=[10,12,15] #ENEL
@@ -171,3 +187,4 @@ del Prueba_fechas
 del date_obj
 
 #REVISAR NOMBRE DISTRIBUIDORA
+'''
