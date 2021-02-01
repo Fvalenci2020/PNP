@@ -47,8 +47,9 @@ generadora= pd.read_sql_query('select * from generadora',conn)
 distribuidora= pd.read_sql_query('select * from distribuidora',conn)
 contrato= pd.read_sql_query('select * from codigocontrato',conn)
 puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
-efact= pd.read_sql_query('select * from efactfiltrado',conn)
+#efact= pd.read_sql_query('select * from efactfiltrado',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
+version= pd.read_sql_query('select * from versionefact',conn)
 
 conn.close()
 del conn
@@ -116,8 +117,8 @@ Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCo
 
 
 ###########################################################################
-
 #P* corregir a la mala
+
 Efact_corregido=Datos[['IdData','IdVersion','Fecha','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 #Agrega Ids ignorando caracteres especiales y mayúsculas 
@@ -191,13 +192,17 @@ Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERS
 
 
 #Crea columna con la id de la versión
-Efact_corregido['IdVersion']=16 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+Efact_corregido['IdVersion']=15 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
 
 #Quita errores de observación
 Efact_corregido['Observación']=np.nan
 
 #Crea Tabla Efact sin errores en observación
 Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
+
+
+version=version.append(pd.DataFrame([[15, '2010V1']], columns=['IdVersion','Descripcion']),ignore_index=True)
+
 
 #FALTA#P0 agregar registro a VErsionEFact        
 #LISTO#P1    tabla EFACT 
