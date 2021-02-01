@@ -55,12 +55,6 @@ conn.close()
 del conn
 del cursor
 
-#P2 tabla con errores de Efact.
-#LISTO#crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
-#LISTO#agregar descripción error
-#LISTO#agregar columna al final con mensaje de los errores que existen.
-#LISTO#"Error nombre de Distribuidora"-"Error nombre de Generadora"
-
 #Agrego Id
     #Agrego Id Distribuidora
 Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
@@ -111,13 +105,12 @@ Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], 
 #Crea Tabla Efact con errores en observación
     #Crea columna con la id de la versión
 Datos['IdDespacho']=np.nan
-Datos['IdVersion']=np.nan #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+Datos['IdVersion']=np.nan #Este podría ser cualquier número
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
 
 ###########################################################################
-#P* corregir a la mala
 
 Efact_corregido=Datos[['IdData','IdVersion','Fecha','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
@@ -192,7 +185,7 @@ Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERS
 
 
 #Crea columna con la id de la versión
-Efact_corregido['IdVersion']=15 #Este podría ser cualquier número, por convención 16 es V1 y 17 V2
+Efact_corregido['IdVersion']=15 #Este podría ser cualquier número, por convención 15 es V1 y 16 V2
 
 #Quita errores de observación
 Efact_corregido['Observación']=np.nan
@@ -204,7 +197,14 @@ Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora',
 version=version.append(pd.DataFrame([[15, '2010V1']], columns=['IdVersion','Descripcion']),ignore_index=True)
 
 
-#FALTA#P0 agregar registro a VErsionEFact        
+#P2 tabla con errores de Efact.
+#LISTO#crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
+#LISTO#agregar descripción error
+#LISTO#agregar columna al final con mensaje de los errores que existen.
+#LISTO#"Error nombre de Distribuidora"-"Error nombre de Generadora"
+
+#P* corregir a la mala
+#LISTO#P0 agregar registro a VErsionEFact        
 #LISTO#P1    tabla EFACT 
         #agregar id despacho
         #agregar version
