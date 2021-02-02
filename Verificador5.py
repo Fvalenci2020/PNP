@@ -114,7 +114,7 @@ Datos['IdDespacho']=np.nan
 Datos['IdVersion']=IdVersion 
 #UTILIZAR IDVERSION CREADO MÁS ARRIBA
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-Efact
+Efact_error=Efact[Efact['Observación']!='']
 
 
 ###########################################################################
@@ -243,10 +243,9 @@ eng = sqlalchemy.create_engine('mssql://', creator=creator)
 #print(rows)
 
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
-#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False, index_label=None)                                 
-despacho.to_sql('tipodespacho',eng, if_exists='replace', index=False, index_label=None)                                 
-version.to_sql('versionefact',eng, if_exists='replace', index=False, index_label=None)                                 
-
+despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
+version.iloc[-1].to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
+Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False, index_label=None)                                                                
 #Efact_corregido.to_sql('Efactfiltrado', conn, schema=None, if_exists='append', index=False, index_label=None)
 #conn.close()
 #del conn
