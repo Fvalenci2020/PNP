@@ -18,15 +18,9 @@ import pyodbc
 pd.options.mode.chained_assignment = None
 plt.close("all")
 
-
-#IMPORTAR DATOS
-path = 'Entrega_Revisión_EFacDx_2010.v01.xlsx' 
-Datos = pd.read_excel(path,skiprows=6)
-Datos= Datos.iloc[:, 1:11]
-
 #Base de datos SQL
 import pyodbc 
-
+'''
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=DESKTOP-SSPJTJO\SQLEXPRESS;'
                       'Database=Modelo PNP;'
@@ -37,11 +31,21 @@ conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=GTD-NOT019\SQLSERVER2012;'
                       'Database=PNP_2;'
                       'Trusted_Connection=yes;')
-'''
+
 
 cursor = conn.cursor()
 
+#DATOS DE ENTRADA
+    #Definición de Versión
+    IdVersion=15#INDICAR ID DE VERSION QUE SE VA A UTILIZAR
+    VersionDescripcion='2010V1'#DEFINIR DESCRIPCIÓN DE VERSIÓN
 
+    #IMPORTAR DATOS
+path = 'Entrega_Revisión_EFacDx_2010.v01.xlsx' 
+Datos = pd.read_excel(path,skiprows=6)
+Datos= Datos.iloc[:, 1:11]
+    
+    #EXTRAR DE DB TABLAS QUE SE NECESITAN
 #demanda = pd.read_sql_query('select * from Demanda where fecha',conn)
 generadora= pd.read_sql_query('select * from generadora',conn)
 distribuidora= pd.read_sql_query('select * from distribuidora',conn)
@@ -105,9 +109,10 @@ Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], 
 #Crea Tabla Efact con errores en observación
     #Crea columna con la id de la versión
 Datos['IdDespacho']=np.nan
-Datos['IdVersion']=np.nan #Este podría ser cualquier número
+Datos['IdVersion']=IdVersion #Este podría ser cualquier número
+#UTILIZAR IDVERSION CREADO MÁS ARRIBA
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-
+Efact
 
 
 ###########################################################################
@@ -185,7 +190,7 @@ Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERS
 
 
 #Crea columna con la id de la versión
-Efact_corregido['IdVersion']=15 #Este podría ser cualquier número, por convención 15 es V1 y 16 V2
+Efact_corregido['IdVersion']=IdVersion #Este podría ser cualquier número, por convención 15 es V1 y 16 V2
 
 #Quita errores de observación
 Efact_corregido['Observación']=np.nan
@@ -194,7 +199,7 @@ Efact_corregido['Observación']=np.nan
 Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
-version=version.append(pd.DataFrame([[15, '2010V1']], columns=['IdVersion','Descripcion']),ignore_index=True)
+version=version.append(pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion']),ignore_index=True)
 
 
 #P2 tabla con errores de Efact.
