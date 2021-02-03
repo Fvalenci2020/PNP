@@ -16,6 +16,7 @@ import datetime
 import matplotlib.pyplot as plt
 import pyodbc
 import sqlalchemy
+from sqlalchemy.types import Integer
 
 pd.options.mode.chained_assignment = None
 plt.close("all")
@@ -242,11 +243,28 @@ eng = sqlalchemy.create_engine('mssql://', creator=creator)
 #rows = cnxn.execute("SELECT name FROM sys.tables").fetchall()
 #print(rows)
 
+#despacho.iloc[-1].IdTipoDEspacho=despacho.iloc[-1].IdTipoDEspacho.astype(int)
+
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
-despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
-version.iloc[-1].to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
-Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False, index_label=None)                                                                
-#Efact_corregido.to_sql('Efactfiltrado', conn, schema=None, if_exists='append', index=False, index_label=None)
+despacho_temp=pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion'])
+version_temp=pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion'])
+despacho_temp.to_sql('tipodespacho',eng, if_exists='append',index=False)
+version_temp.to_sql('versionefact',eng, if_exists='append',index=False)          
+            
+#Test
+#despacho.iloc[-1].to_frame().to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
+#version.iloc[-1].to_frame().to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
+
+#despacho.iloc[-1].to_frame().to_sql('tipodespacho',eng, if_exists='append',index_label=None)                                 
+#version.iloc[-1].to_frame().to_sql('versionefact',eng, if_exists='append',index_label=None)
+
+#despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
+#version.iloc[-1].to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
+
+#despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append')                                 
+#version.iloc[-1].to_sql('versionefact',eng, if_exists='append')
+
+Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
 #conn.close()
 #del conn
 #del cursor
