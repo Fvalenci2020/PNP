@@ -58,9 +58,6 @@ puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
 version= pd.read_sql_query('select * from versionefact',conn)
 
-conn.close()
-del conn
-del cursor
 
 #Agrego Id
     #Agrego Id Distribuidora
@@ -217,54 +214,57 @@ version=version.append(pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['
         #agregar id despacho
         #agregar version
 
-
-#eng = sqlalchemy.create_engine("mssql+pyodbc://DESKTOP-SSPJTJO\Asus@DESKTOP-SSPJTJO\SQLEXPRESS/Modelo PNP",echo=False)
-#eng = sqlalchemy.create_engine('mssql+pyodbc://DESKTOP-SSPJTJO\SQLEXPRESS/Modelo PNP')
-#eng = sqlalchemy.create_engine('mssql+pyodbc://DESKTOP-SSPJTJO\SQLEXPRESS/Modelo PNP?driver=SQL+Server+Native+Client+11.0')
-#eng = sqlalchemy.create_engine('mssql+pyodbc://DESKTOP-SSPJTJO\Asus/Modelo PNP')
-
-
+#Se crea conexión con DB
 def creator():
     return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
 
 eng = sqlalchemy.create_engine('mssql://', creator=creator)
 
-#eng = create_engine('mssql://', conn)
-#import urllib
-#conn_str = (
- #   r'Driver=ODBC Driver 17 for SQL Server;'
-  #  r'Server=(local)\SQLEXPRESS;'
-   # r'Database=myDb;'
-    #r'Trusted_Connection=yes;'
-#)
-#quoted_conn_str = urllib.parse.quote_plus(conn_str)
-#engine = create_engine(f'mssql+pyodbc:///?odbc_connect={quoted_conn_str}')
-#cnxn = engine.connect()
-#rows = cnxn.execute("SELECT name FROM sys.tables").fetchall()
-#print(rows)
 
-#despacho.iloc[-1].IdTipoDEspacho=despacho.iloc[-1].IdTipoDEspacho.astype(int)
-
+#Se cambian nombres de columnas para que calcen con la tabla destino en DB
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
-despacho_temp=pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion'])
-version_temp=pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion'])
-despacho_temp.to_sql('tipodespacho',eng, if_exists='append',index=False)
-version_temp.to_sql('versionefact',eng, if_exists='append',index=False)          
-            
-#Test
-#despacho.iloc[-1].to_frame().to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
-#version.iloc[-1].to_frame().to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
 
-#despacho.iloc[-1].to_frame().to_sql('tipodespacho',eng, if_exists='append',index_label=None)                                 
-#version.iloc[-1].to_frame().to_sql('versionefact',eng, if_exists='append',index_label=None)
 
-#despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append', index=False, index_label=None)                                 
-#version.iloc[-1].to_sql('versionefact',eng, if_exists='append', index=False, index_label=None)
+#test
+#Crea variables temporales con el dato extra de despacho y versión que debe ser agregado a DB 
+#despacho_temp=pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion'])
+#version_temp=pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion'])
 
-#despacho.iloc[-1].to_sql('tipodespacho',eng, if_exists='append')                                 
-#version.iloc[-1].to_sql('versionefact',eng, if_exists='append')
+#despacho_temp=pd.DataFrame([['Reconversión energética']], columns=['Descripcion'])
+#version_temp=pd.DataFrame([[VersionDescripcion]], columns=['Descripcion'])
 
-Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
+#Se ingresan primero datos con llaves para evitar restricción entre datos y Ids
+#despacho_temp.to_sql('tipodespacho',eng, if_exists='append',index=False)
+#version_temp.to_sql('versionefact',eng, if_exists='append',index=False)          
+   
+#test 2
+#Agrega nueva versión con cursor en vez de usar engine
+    #Borra versión agregada en ejecución anterior para que no se apilen Ids
+cursor.execute('''
+                DELETE FROM versionefact WHERE Descripcion='2010V1';
+                ''')
+conn.commit()
+cursor.execute('''
+                DELETE FROM tipodespacho WHERE Descripcion='Reconversión energética';
+                ''')
+conn.commit()
+    
+    #Agrega versión
+cursor.execute('''
+                INSERT INTO versionefact(Descripcion)
+                VALUES ('2010V1');
+                ''')
+conn.commit()
+    #Agrega nueva categoria
+cursor.execute('''
+                INSERT INTO tipodespacho(Descripcion)
+                VALUES ('Reconversión energética');
+                ''')
+conn.commit()
+        
+
+
+#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
 #conn.close()
 #del conn
 #del cursor
