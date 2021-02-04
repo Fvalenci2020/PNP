@@ -15,12 +15,15 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 import pyodbc
+import sqlalchemy
+from sqlalchemy.types import Integer
+
 pd.options.mode.chained_assignment = None
 plt.close("all")
 
 #Base de datos SQL
 import pyodbc 
-'''
+
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=DESKTOP-SSPJTJO\SQLEXPRESS;'
                       'Database=Modelo PNP;'
@@ -31,17 +34,31 @@ conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=GTD-NOT019\SQLSERVER2012;'
                       'Database=PNP_2;'
                       'Trusted_Connection=yes;')
-
+'''
 
 cursor = conn.cursor()
 
 #DATOS DE ENTRADA
     #Definición de Versión
-    IdVersion=15#INDICAR ID DE VERSION QUE SE VA A UTILIZAR
-    VersionDescripcion='2010V1'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+
+  #Agrega versión a base de datos
+#cursor.execute('''
+ #              INSERT INTO versionefact(Descripcion)
+  #             VALUES (?);
+   #            ''', (VersionDescripcion))
+#conn.commit()
+
+    #Agrega categoría Reconversión energética a tabla con tipos de despacho
+#cursor.execute('''
+ #              INSERT INTO tipodespacho
+  #              VALUES (6,'Reconversión energética'); 
+   #             ''')
+#conn.commit()
+        
 
     #IMPORTAR DATOS
-path = 'Entrega_Revisión_EFacDx_2010.v01.xlsx' 
+path = 'Entrega_Revisión_EFacDx_2010.v02.xlsx' 
 Datos = pd.read_excel(path,skiprows=6)
 Datos= Datos.iloc[:, 1:11]
     
@@ -55,9 +72,9 @@ puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
 version= pd.read_sql_query('select * from versionefact',conn)
 
-conn.close()
-del conn
-del cursor
+#Extrae versión de tabla version
+IdVersion=version.IdVersion[version.Descripcion==VersionDescripcion].to_numpy()#INDICAR ID DE VERSION QUE SE VA A UTILIZAR
+IdVersion=int(IdVersion)
 
 #Agrego Id
     #Agrego Id Distribuidora
@@ -109,10 +126,10 @@ Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4'], 
 #Crea Tabla Efact con errores en observación
     #Crea columna con la id de la versión
 Datos['IdDespacho']=np.nan
-Datos['IdVersion']=IdVersion #Este podría ser cualquier número
+Datos['IdVersion']=IdVersion 
 #UTILIZAR IDVERSION CREADO MÁS ARRIBA
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-Efact
+Efact_error=Efact[Efact['Observación']!='']
 
 
 ###########################################################################
@@ -172,21 +189,20 @@ Efact_corregido['PuntoRetiro'].where(~(Datos.PuntoRetiro=='(en blanco)') ,'Quiri
 
 #Agrega columna con tipo de despacho
     #Crea columna con datos del despacho
-Efact_corregido['IdDespacho']=np.nan
+Efact_corregido['IdTipoDespacho']=np.nan
     #Agrega categoría reconversión energética a tabla despacho
-despacho=despacho.append(pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion']),ignore_index=True)
     #Caso 1	Licitacion
-Efact_corregido.IdDespacho=1
+Efact_corregido.IdTipoDespacho=1
     #Caso 2	Corto Plazo
-Efact_corregido['IdDespacho'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 2, inplace=True,)    
+Efact_corregido['IdTipoDespacho'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 2, inplace=True,)    
     #Caso 3	Déficit
-Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
+Efact_corregido['IdTipoDespacho'].where(~(Efact_corregido.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
     #Caso 4	Traspaso Excedentes
-Efact_corregido['IdDespacho'].where(~(Efact_corregido.IdDistribuidora==45) , 4, inplace=True,)    
+Efact_corregido['IdTipoDespacho'].where(~(Efact_corregido.IdDistribuidora==45) , 4, inplace=True,)    
     #Caso 5	Dx con contratos Holding
-Efact_corregido['IdDespacho'].where(~((Efact_corregido.IdDistribuidora==12) | (Efact_corregido.IdDistribuidora==13) | (Efact_corregido.IdDistribuidora==15)) , 5, inplace=True,)
+Efact_corregido['IdTipoDespacho'].where(~((Efact_corregido.IdDistribuidora==12) | (Efact_corregido.IdDistribuidora==13) | (Efact_corregido.IdDistribuidora==15)) , 5, inplace=True,)
     #Caso 6 Reconversión energética
-Efact_corregido['IdDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
+Efact_corregido['IdTipoDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
 
 
 #Crea columna con la id de la versión
@@ -196,10 +212,7 @@ Efact_corregido['IdVersion']=IdVersion #Este podría ser cualquier número, por 
 Efact_corregido['Observación']=np.nan
 
 #Crea Tabla Efact sin errores en observación
-Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-
-
-version=version.append(pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion']),ignore_index=True)
+Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdTipoDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
 #P2 tabla con errores de Efact.
@@ -214,12 +227,30 @@ version=version.append(pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['
         #agregar id despacho
         #agregar version
 
-'''
+#Se crea conexión con DB
+def creator():
+    return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
+
+eng = sqlalchemy.create_engine('mssql://', creator=creator)
+
+
+#Se cambian nombres de columnas para que calcen con la tabla destino en DB
+Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
+
+#Agrega Efact corregido a la base de datos
+#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
+conn.close()
+del conn
+del cursor
+
+
+
 #AGREGA DATO DE HOLDING AL QUE PERTENECE
 Holding=pd.DataFrame([], columns=['IdDistribuidora','IdHolding','Holding'])
 Holding.IdDistribuidora=distribuidora.IdDistribuidora
+
 '''
-'''
+
 CGE:            ENEL:             CHILQUINTA:         SAESA:  
 EMELARI 1       ENEL 10           CHILQUINTA 6        FRONTEL 22
 ELIQSA 2        COLINA 12         LITORAL 9           SAESA 23
@@ -243,8 +274,9 @@ SOCOEPA 35
 TIL-TIL 13
 SASIPA 44
 COOPRESOL 20
+
 '''
-'''
+
 CGE=[1,2,3,4,7,18,25,45] #CGE
 ENEL=[10,12,15] #ENEL
 CHILQUINTA=[6,9,28,31,32] #CHILQUINTA
@@ -283,26 +315,20 @@ del EEPA
 del NA
 
 #DATOS DE POTENCIA Y ENERGÍA CERO
-bool_energia=Datos['Energía [kWh]'] == 0
-bool_potencia=Datos['Potencia [kW]'] == 0
+bool_energia=Efact_corregido['Energia'] == 0
+bool_potencia=Efact_corregido['Potencia'] == 0
 Dato_cero= (bool_energia & bool_potencia)
-corregir_E_P=Datos.IdData[Dato_cero]
+cero_EP=Efact_corregido[Dato_cero]
 
 #REVISAR DUPLICADOS
-Duplicados_bool = Datos.duplicated(keep=False)
-Duplicados_all= Datos[Duplicados_bool]
-if len(Duplicados_all)!=0:
-    print("\033[;36m"+'Corregir filas duplicadas:'+'\033[0;m')
-    print('En índices '+ str(Duplicados_all.loc[:,'IdData'])+'\n')
+Duplicados_bool = Efact_corregido.duplicated(keep=False)
+Duplicados_all= Efact_corregido[Duplicados_bool]
 del Duplicados_bool
 
 #DUPLICADOS DE ENERGÍA Y POTENCIA
-Datos_temp=Datos[~Dato_cero]
-Duplicados_bool = Datos_temp.duplicated(subset=['Energía [kWh]','Potencia [kW]'],keep=False)
-Duplicados_EP= Datos_temp[Duplicados_bool].sort_values(by=['Energía [kWh]'])
-if len(Duplicados_EP)!=0:
-    print("\033[;36m"+'Corregir filas duplicadas de energía y potencia:'+'\033[0;m')
-    print('En ' + str(Duplicados_EP) +'\n')
+Datos_temp=Efact_corregido[~Dato_cero]
+Duplicados_bool = Datos_temp.duplicated(subset=['Energia','Potencia'],keep=False)
+Duplicados_EP= Datos_temp[Duplicados_bool].sort_values(by=['Energia'])
 
 del Duplicados_bool
 del Datos_temp
@@ -310,16 +336,3 @@ del bool_energia
 del bool_potencia
 del Dato_cero
 
-#REVISAR FECHA
-Prueba_fechas=Datos.iloc[:, [3]].astype(str)
-for x in range(len(Prueba_fechas)):
-    try:
-        date_obj =datetime.datetime.strptime(Prueba_fechas.Fecha[x], '%Y-%m-%d')
-    except ValueError:
-        print("Formato incorrecto de fecha en dato: "+str(Datos.loc[x,'IdData']))
-        
-del Prueba_fechas
-del date_obj
-
-#REVISAR NOMBRE DISTRIBUIDORA
-'''
