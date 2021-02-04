@@ -40,11 +40,25 @@ cursor = conn.cursor()
 
 #DATOS DE ENTRADA
     #Definición de Versión
-IdVersion=15#INDICAR ID DE VERSION QUE SE VA A UTILIZAR
-VersionDescripcion='2010V1'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+
+  #Agrega versión a base de datos
+cursor.execute('''
+               INSERT INTO versionefact(Descripcion)
+               VALUES (?);
+               ''', (VersionDescripcion))
+conn.commit()
+
+    #Agrega categoría Reconversión energética a tabla con tipos de despacho
+#cursor.execute('''
+ #              INSERT INTO tipodespacho
+  #              VALUES (6,'Reconversión energética'); 
+   #             ''')
+#conn.commit()
+        
 
     #IMPORTAR DATOS
-path = 'Entrega_Revisión_EFacDx_2010.v01.xlsx' 
+path = 'Entrega_Revisión_EFacDx_2010.v02.xlsx' 
 Datos = pd.read_excel(path,skiprows=6)
 Datos= Datos.iloc[:, 1:11]
     
@@ -58,6 +72,9 @@ puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
 despacho= pd.read_sql_query('select * from tipodespacho',conn)
 version= pd.read_sql_query('select * from versionefact',conn)
 
+#Extrae versión de tabla version
+IdVersion=version.IdVersion[version.Descripcion==VersionDescripcion].to_numpy()#INDICAR ID DE VERSION QUE SE VA A UTILIZAR
+IdVersion=int(IdVersion)
 
 #Agrego Id
     #Agrego Id Distribuidora
@@ -174,7 +191,6 @@ Efact_corregido['PuntoRetiro'].where(~(Datos.PuntoRetiro=='(en blanco)') ,'Quiri
     #Crea columna con datos del despacho
 Efact_corregido['IdTipoDespacho']=np.nan
     #Agrega categoría reconversión energética a tabla despacho
-despacho=despacho.append(pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion']),ignore_index=True)
     #Caso 1	Licitacion
 Efact_corregido.IdTipoDespacho=1
     #Caso 2	Corto Plazo
@@ -199,9 +215,6 @@ Efact_corregido['Observación']=np.nan
 Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdTipoDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 
 
-version=version.append(pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion']),ignore_index=True)
-
-
 #P2 tabla con errores de Efact.
 #LISTO#crear flar de error si error alaguo de los 4 anteriores, then 1 else 0
 #LISTO#agregar descripción error
@@ -224,50 +237,11 @@ eng = sqlalchemy.create_engine('mssql://', creator=creator)
 #Se cambian nombres de columnas para que calcen con la tabla destino en DB
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
 
-
-#test
-#Crea variables temporales con el dato extra de despacho y versión que debe ser agregado a DB 
-#despacho_temp=pd.DataFrame([[6, 'Reconversión energética']], columns=['IdTipoDEspacho','Descripcion'])
-#version_temp=pd.DataFrame([[IdVersion,VersionDescripcion]], columns=['IdVersion','Descripcion'])
-
-#despacho_temp=pd.DataFrame([['Reconversión energética']], columns=['Descripcion'])
-#version_temp=pd.DataFrame([[VersionDescripcion]], columns=['Descripcion'])
-
-#Se ingresan primero datos con llaves para evitar restricción entre datos y Ids
-#despacho_temp.to_sql('tipodespacho',eng, if_exists='append',index=False)
-#version_temp.to_sql('versionefact',eng, if_exists='append',index=False)          
-   
-#test 2
-#Agrega nueva versión con cursor en vez de usar engine
-    #Borra versión agregada en ejecución anterior para que no se apilen Ids
-cursor.execute('''
-                DELETE FROM versionefact WHERE Descripcion='2010V1';
-                ''')
-conn.commit()
-cursor.execute('''
-                DELETE FROM tipodespacho WHERE Descripcion='Reconversión energética';
-                ''')
-conn.commit()
-    
-    #Agrega versión
-cursor.execute('''
-                INSERT INTO versionefact(Descripcion)
-                VALUES ('2010V1');
-                ''')
-conn.commit()
-    #Agrega nueva categoria
-cursor.execute('''
-                INSERT INTO tipodespacho(Descripcion)
-                VALUES ('Reconversión energética');
-                ''')
-conn.commit()
-        
-
-
-#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
-#conn.close()
-#del conn
-#del cursor
+#Agrega Efact corregido a la base de datos
+Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
+conn.close()
+del conn
+del cursor
 
 
 '''
