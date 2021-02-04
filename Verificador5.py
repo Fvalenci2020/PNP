@@ -43,11 +43,11 @@ cursor = conn.cursor()
 VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
 
   #Agrega versión a base de datos
-cursor.execute('''
-               INSERT INTO versionefact(Descripcion)
-               VALUES (?);
-               ''', (VersionDescripcion))
-conn.commit()
+#cursor.execute('''
+ #              INSERT INTO versionefact(Descripcion)
+  #             VALUES (?);
+   #            ''', (VersionDescripcion))
+#conn.commit()
 
     #Agrega categoría Reconversión energética a tabla con tipos de despacho
 #cursor.execute('''
@@ -238,16 +238,18 @@ eng = sqlalchemy.create_engine('mssql://', creator=creator)
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
 
 #Agrega Efact corregido a la base de datos
-Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
+#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
 conn.close()
 del conn
 del cursor
 
 
-'''
+
 #AGREGA DATO DE HOLDING AL QUE PERTENECE
 Holding=pd.DataFrame([], columns=['IdDistribuidora','IdHolding','Holding'])
 Holding.IdDistribuidora=distribuidora.IdDistribuidora
+
+'''
 
 CGE:            ENEL:             CHILQUINTA:         SAESA:  
 EMELARI 1       ENEL 10           CHILQUINTA 6        FRONTEL 22
@@ -272,6 +274,8 @@ SOCOEPA 35
 TIL-TIL 13
 SASIPA 44
 COOPRESOL 20
+
+'''
 
 CGE=[1,2,3,4,7,18,25,45] #CGE
 ENEL=[10,12,15] #ENEL
@@ -311,8 +315,8 @@ del EEPA
 del NA
 
 #DATOS DE POTENCIA Y ENERGÍA CERO
-bool_energia=Efact_corregido['Energía [kWh]'] == 0
-bool_potencia=Efact_corregido['Potencia [kW]'] == 0
+bool_energia=Efact_corregido['Energia'] == 0
+bool_potencia=Efact_corregido['Potencia'] == 0
 Dato_cero= (bool_energia & bool_potencia)
 cero_EP=Efact_corregido[Dato_cero]
 
@@ -323,8 +327,8 @@ del Duplicados_bool
 
 #DUPLICADOS DE ENERGÍA Y POTENCIA
 Datos_temp=Efact_corregido[~Dato_cero]
-Duplicados_bool = Datos_temp.duplicated(subset=['Energía [kWh]','Potencia [kW]'],keep=False)
-Duplicados_EP= Datos_temp[Duplicados_bool].sort_values(by=['Energía [kWh]'])
+Duplicados_bool = Datos_temp.duplicated(subset=['Energia','Potencia'],keep=False)
+Duplicados_EP= Datos_temp[Duplicados_bool].sort_values(by=['Energia'])
 
 del Duplicados_bool
 del Datos_temp
@@ -332,4 +336,3 @@ del bool_energia
 del bool_potencia
 del Dato_cero
 
-'''
