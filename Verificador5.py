@@ -23,7 +23,7 @@ plt.close("all")
 
 #Base de datos SQL
 import pyodbc 
-
+'''
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=DESKTOP-SSPJTJO\SQLEXPRESS;'
                       'Database=Modelo PNP;'
@@ -34,34 +34,34 @@ conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=GTD-NOT019\SQLSERVER2012;'
                       'Database=PNP_2;'
                       'Trusted_Connection=yes;')
-'''
+
 
 cursor = conn.cursor()
 
 #DATOS DE ENTRADA
     #Definición de Versión
-VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+#VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
 
   #Agrega versión a base de datos
 #cursor.execute('''
  #              INSERT INTO versionefact(Descripcion)
-  #             VALUES (?);
-   #            ''', (VersionDescripcion))
+ #              VALUES (?);
+ #              ''', (VersionDescripcion))
 #conn.commit()
 
     #Agrega categoría Reconversión energética a tabla con tipos de despacho
+    
 #cursor.execute('''
- #              INSERT INTO tipodespacho
-  #              VALUES (6,'Reconversión energética'); 
-   #             ''')
+#              INSERT INTO tipodespacho
+#                VALUES (6,'Reconversión energética'); 
+#                ''')
 #conn.commit()
-        
 
     #IMPORTAR DATOS
 path = 'Entrega_Revisión_EFacDx_2010.v02.xlsx' 
 Datos = pd.read_excel(path,skiprows=6)
 Datos= Datos.iloc[:, 1:11]
-    
+
     #EXTRAR DE DB TABLAS QUE SE NECESITAN
 #demanda = pd.read_sql_query('select * from Demanda where fecha',conn)
 generadora= pd.read_sql_query('select * from generadora',conn)
@@ -82,9 +82,9 @@ Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_o
     #Agrego Id Generadora
 Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='NombreGeneradora',how = 'left').iloc[:,:-1]
     #Agrego Id Punto de Retiro
-Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')#.iloc[:,:-1]
+Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')
     #Agrego Id a contrato
-Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')#.iloc[:,:-1]
+Datos=pd.merge(Datos,contrato.iloc[:,[0,1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')
 
 #Agregar columnas con flag
     #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
@@ -130,8 +130,9 @@ Datos['IdVersion']=IdVersion
 #UTILIZAR IDVERSION CREADO MÁS ARRIBA
 Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
 Efact_error=Efact[Efact['Observación']!='']
+Efact_error.to_csv("Efact_error.csv", sep=';', index=False,header=True,encoding='latin_1')
 
-
+#PROCEDIMIENTO DE CORRECCIÓN DE DATOS PARA QUE PUEDA CARGARSE EN SQL.
 ###########################################################################
 
 Efact_corregido=Datos[['IdData','IdVersion','Fecha','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
@@ -186,7 +187,6 @@ Efact_corregido['PuntoRetiro'].where(~(Datos.PuntoRetiro=='(en blanco)') ,'Quiri
 #Puntofaltante2=Efact_corregido[mask2] 
 
 
-
 #Agrega columna con tipo de despacho
     #Crea columna con datos del despacho
 Efact_corregido['IdTipoDespacho']=np.nan
@@ -228,10 +228,12 @@ Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora',
         #agregar version
 
 #Se crea conexión con DB
-def creator():
-    return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
+#def creator():
+    #return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
+#     return pyodbc.connect(r'Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;')
 
-eng = sqlalchemy.create_engine('mssql://', creator=creator)
+#eng = sqlalchemy.create_engine('mssql://', creator=creator)
+
 
 
 #Se cambian nombres de columnas para que calcen con la tabla destino en DB
@@ -239,10 +241,9 @@ Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministra
 
 #Agrega Efact corregido a la base de datos
 #Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
-conn.close()
-del conn
-del cursor
-
+#conn.close()
+#del conn
+#del cursor
 
 
 #AGREGA DATO DE HOLDING AL QUE PERTENECE
@@ -336,3 +337,13 @@ del bool_energia
 del bool_potencia
 del Dato_cero
 
+
+'''
+1 COMPARACIÓN DE ENERGÍA A NIVEL DE HOLDING/MES, INDICANDO ERROR DE LA DDA ESTIMADA
+DX
+PTO RETIRO
+ERROR: FUERA DE VECINDAD PROM+-2 DESVeST
+WARNING: COMPARACIÓN CON VENTANA MÓVIL de 1 año (), MES ANTERIOR,
+dda 0 que antes tenían energía o potencia
+
+'''

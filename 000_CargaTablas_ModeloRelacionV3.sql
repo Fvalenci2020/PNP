@@ -1,5 +1,5 @@
 use pnp_2
-/* 19:04
+--/* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
