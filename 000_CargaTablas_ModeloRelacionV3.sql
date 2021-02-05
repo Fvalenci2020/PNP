@@ -1,5 +1,5 @@
 use pnp_2
---/* 19:04
+/* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -422,6 +422,16 @@ from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.version where registro='FECHAEFACT'
 
 insert into [dbo].[versionrecdetalle]
 select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.version
+
+--Se agregan estos registros para identificación única de antecedentes de CMg utilizados para iddespacho=4
+insert into versionrecdetalle
+select  IdVersion,'VersionCMG', ValorTexto,ValorFecha,ValorInt,ValorFloat,Descripcion
+from versionrecdetalle where Registro='VersionPNP' and
+IdVersion in (
+select IdVersion from versionrecdetalle where registro='tipopnp' and valortexto='Mes'
+and IdVersion in (select IdVersion from versionrecdetalle where registro='FECHAEFACT' and ValorFecha>='2020-04-01')
+)  
+and ValorTexto in ('2007ProyV1','2101V3','FPEC_2010V1')
 
 IF OBJECT_ID('tempRecD', 'U') IS NOT NULL DROP TABLE tempRecD
 GO

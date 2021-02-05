@@ -1,9 +1,10 @@
-/*
+--/*
 create procedure [011_PROC_RECAUDACION]
 					@idversion int
 as
-*/
+--*/
 --DECLARACION VARIABLES, SOLAMENTE PARA REALIZACIÓN DE PRUEBAS ANTES DE PROCEDIMIENTO.
+/*
 use pnp_2
 declare @idVersionRef varchar(15)	set @idVersionRef=118;--Para crear versión y extraer antecedentes Efact
 declare @idVersion varchar(15)	set @idVersion=135
@@ -39,6 +40,8 @@ declare @VersionPerdida varchar(15)	select @VersionPerdida=valortexto from versi
 DECLARE @FECHAPerdida DATE 			select @FECHAPerdida=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='FECHAPerdida';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
 
 DECLARE @PtoRetiroSistemaAno int	select @PtoRetiroSistemaAno=ValorInt from versionrecdetalle where idversion=@idVersion and Registro='PtoRetiroSistemaAno';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
+
+DECLARE @VersionCMG varchar(255)	select @VersionCMG=Valortexto from versionrecdetalle where idversion=@idVersion and Registro='VersionCMG';--Version pata calcular CMG
 
 --crear tabla Efact y PNP Temporal
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
@@ -125,7 +128,6 @@ WHERE IdTipoDespacho=2
 --RECAUDACION PARA ENERGÍAS DE TRASPASO DE EXCEDENTES IdTipoDespacho=4 --"Traspaso Excedentes"
 
 	--CARGAR PRECIOS A PNPTraspExc
-declare @VersionCMG varchar(255)='2101V3'
 delete from PNPTraspExc where versionPNP=@VersionCMG and VersionPNP=@VersionPNP and Fecha=@FECHAPNP and version=@TipoPNP
 
 insert into PNPTraspExc
@@ -140,7 +142,7 @@ left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECH
 inner join IndexacionDolar t6 on t6.Fecha=t2.mesindexacion
 left join CMGPromedio t3 on t5.IdBarraNacional=t3.IdBarraNacional and t2.mesindexacion=t3.fecha and t3.VersionCMg=@VersionCMG
 left join CMGPromedio t4 on t2.idPtoOferta=t4.IdBarraNacional and t2.mesindexacion=t4.fecha and t4.VersionCMg=@VersionCMG
-where idtipodespacho=4
+where idtipodespacho=4 and @VersionCMG is not null
 
 	--CARGAR RECAUDACIÓN
 insert into RecaudacionDetalle 
