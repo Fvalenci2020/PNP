@@ -40,14 +40,16 @@ cursor = conn.cursor()
 
 #DATOS DE ENTRADA
     #Definición de Versión
-#VersionDescripcion='2010V2'#DEFINIR DESCRIPCIÓN DE VERSIÓN
+VersionDescripcion='2011V1'#DEFINIR DESCRIPCIÓN DE VERSIÓN
 
   #Agrega versión a base de datos
+
 #cursor.execute('''
- #              INSERT INTO versionefact(Descripcion)
- #              VALUES (?);
- #              ''', (VersionDescripcion))
+#              INSERT INTO versionefact(Descripcion)
+#              VALUES (?);
+#              ''', (VersionDescripcion))
 #conn.commit()
+
 
     #Agrega categoría Reconversión energética a tabla con tipos de despacho
     
@@ -58,7 +60,8 @@ cursor = conn.cursor()
 #conn.commit()
 
     #IMPORTAR DATOS
-path = 'Entrega_Revisión_EFacDx_2010.v02.xlsx' 
+#path = 'Entrega_Revisión_EFacDx_2010.v02.xlsx' 
+path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Entrega_Revisión_EFacDx_2011.v01.xlsx'
 Datos = pd.read_excel(path,skiprows=6)
 Datos= Datos.iloc[:, 1:11]
 
@@ -227,12 +230,13 @@ Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora',
         #agregar id despacho
         #agregar version
 
-#Se crea conexión con DB
-#def creator():
-    #return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
-#     return pyodbc.connect(r'Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;')
 
-#eng = sqlalchemy.create_engine('mssql://', creator=creator)
+#Se crea conexión con DB
+def creator():
+    #return pyodbc.connect(r'Driver={SQL Server};Server=DESKTOP-SSPJTJO\SQLEXPRESS;Database=Modelo PNP;Trusted_Connection=yes;')
+     return pyodbc.connect(r'Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;')
+
+eng = sqlalchemy.create_engine('mssql://', creator=creator)
 
 
 
@@ -240,15 +244,17 @@ Efact_corregido=Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora',
 Efact_corregido=Efact_corregido.rename(columns={"IdData": "IdEfact", "Suministrador": "Generadora", "Energía [kWh]": "Energia", "Potencia [kW]": "Potencia","Observación": "Observacion"})
 
 #Agrega Efact corregido a la base de datos
-#Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
-#conn.close()
-#del conn
-#del cursor
+Efact_corregido.to_sql('Efact', eng, if_exists='append', index=False)                                                                
+conn.close()
+del conn
+del cursor
 
 
 #AGREGA DATO DE HOLDING AL QUE PERTENECE
+'''
 Holding=pd.DataFrame([], columns=['IdDistribuidora','IdHolding','Holding'])
 Holding.IdDistribuidora=distribuidora.IdDistribuidora
+'''
 
 '''
 
@@ -277,7 +283,7 @@ SASIPA 44
 COOPRESOL 20
 
 '''
-
+'''
 CGE=[1,2,3,4,7,18,25,45] #CGE
 ENEL=[10,12,15] #ENEL
 CHILQUINTA=[6,9,28,31,32] #CHILQUINTA
@@ -336,7 +342,7 @@ del Datos_temp
 del bool_energia
 del bool_potencia
 del Dato_cero
-
+'''
 
 '''
 1 COMPARACIÓN DE ENERGÍA A NIVEL DE HOLDING/MES, INDICANDO ERROR DE LA DDA ESTIMADA
