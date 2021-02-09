@@ -177,7 +177,7 @@ IF OBJECT_ID('ContratoCPTemp', 'U') IS NOT NULL DROP TABLE ContratoCPTempemptras
 
 select idversion,FechaEfact,idVersionEfact,sum(EPC) EPC,sum(PPC) PPC,sum(ERec_Peso) ERec_Peso,sum(PRec_Peso) PRec_Peso
 from Recaudaciondetalle
-where idversion in (@idversion,@idVersionRef)
+--where idversion in (@idversion,@idVersionRef)
 group by FechaEfact,idVersionEfact,idversion
 order by idversion,idversionefact,FechaEfact
 --*/
