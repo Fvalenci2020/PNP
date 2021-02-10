@@ -5,6 +5,8 @@ Created on Thu Feb  4 15:39:56 2021
 @author: Asus
 """
 
+#Falta cambiar mensajes de alerta y agregar flags cuando hay puntos con potencia y luego sin
+
 def Comparador(ConectorDB,Efact_corregido):
     
     import pandas as pd
