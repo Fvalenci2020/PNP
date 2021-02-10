@@ -31,7 +31,7 @@ path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFac
 Efact_error,Efact=Validador(ConectorDB,path,IdVersion)#
 Efact_corregido=CorrectorEfact(ConectorDB,IdVersion,Efact)#
 CargaEfactDB(ConectorDB,Efact_corregido)#
-
+"""
 #Para noviembre  2020
 IdVersion=20
 
@@ -41,3 +41,4 @@ path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFac
 Efact_error,Efact=Validador(ConectorDB,path,IdVersion)#
 Efact_corregido=CorrectorEfact(ConectorDB,IdVersion,Efact)#
 CargaEfactDB(ConectorDB,Efact_corregido)#
+"""
