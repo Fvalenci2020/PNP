@@ -423,6 +423,16 @@ from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.version where registro='FECHAEFACT'
 insert into [dbo].[versionrecdetalle]
 select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.version
 
+--Se agregan estos registros para identificación única de antecedentes de CMg utilizados para iddespacho=4
+insert into versionrecdetalle
+select  IdVersion,'VersionCMG', ValorTexto,ValorFecha,ValorInt,ValorFloat,Descripcion
+from versionrecdetalle where Registro='VersionPNP' and
+IdVersion in (
+select IdVersion from versionrecdetalle where registro='tipopnp' and valortexto='Mes'
+and IdVersion in (select IdVersion from versionrecdetalle where registro='FECHAEFACT' and ValorFecha>='2020-04-01')
+)  
+and ValorTexto in ('2007ProyV1','2101V3','FPEC_2010V1')
+
 IF OBJECT_ID('tempRecD', 'U') IS NOT NULL DROP TABLE tempRecD
 GO
 select t1.idversion,t1.idcen,VE.idversion IdVersionEfact,t1.fechaEfact
@@ -550,7 +560,7 @@ select case	when t1.PuntoRetiro='Abanico 13.8' then 30
 				when t1.PuntoRetiro='Mariscal 023' then 138
 				when t1.PuntoRetiro='Panguipulli 024' then 360
 				when t1.PuntoRetiro='Paso Hondo 012' then 338
-				when t1.PuntoRetiro='Pirque 015' then 110
+				--when t1.PuntoRetiro='Pirque 015' then 110 Se comenta porque genera error de duplicidad de llave
 				when t1.PuntoRetiro='Polpaico ENEL DISTRIBUCIÓN 023' then 290
 				when t1.PuntoRetiro='Pozo Almonte 023' then 248
 				when t1.PuntoRetiro='Puerto Varas 024' then 10

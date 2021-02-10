@@ -1,9 +1,10 @@
-/*
+--/*
 create procedure [011_PROC_RECAUDACION]
 					@idversion int
 as
-*/
+--*/
 --DECLARACION VARIABLES, SOLAMENTE PARA REALIZACIÓN DE PRUEBAS ANTES DE PROCEDIMIENTO.
+/*
 use pnp_2
 declare @idVersionRef varchar(15)	set @idVersionRef=118;--Para crear versión y extraer antecedentes Efact
 declare @idVersion varchar(15)	set @idVersion=135
@@ -39,6 +40,8 @@ declare @VersionPerdida varchar(15)	select @VersionPerdida=valortexto from versi
 DECLARE @FECHAPerdida DATE 			select @FECHAPerdida=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='FECHAPerdida';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
 
 DECLARE @PtoRetiroSistemaAno int	select @PtoRetiroSistemaAno=ValorInt from versionrecdetalle where idversion=@idVersion and Registro='PtoRetiroSistemaAno';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
+
+DECLARE @VersionCMG varchar(255)	select @VersionCMG=Valortexto from versionrecdetalle where idversion=@idVersion and Registro='VersionCMG';--Version pata calcular CMG
 
 --crear tabla Efact y PNP Temporal
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
@@ -109,10 +112,10 @@ SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDist
 		,'','2000-01-01' MesIndexacion,'',0,0
 		,t6.MES_PNCP,t6.VersionPNCP,t6.IdNudo,t6.CETDolar,t6.PrecioNudoEnergiaDolar,t6.PrecioNudoPotenciaDolar
 		,Energia*t5.Factor*t3.Factor EnergiaPC,Potencia*t5.Factor*t4.Factor PotenciaPC
-		,Energia*t5.Factor*t3.Factor*t6.PrecioNudoEnergiaDolar/1000 EnergiaRecDolar
+		,Energia*t5.Factor*t3.Factor*(t6.PrecioNudoEnergiaDolar-t6.CETDolar)/1000 EnergiaRecDolar
 		,Potencia*t5.Factor*t4.Factor*t6.PrecioNudoPotenciaDolar PotenciaRecDolar
 		,@DolarVersion Dolar
-		,Energia*t5.Factor*t3.Factor*t6.PrecioNudoEnergiaDolar*@DolarVersion/1000 EnergiaRecPeso
+		,Energia*t5.Factor*t3.Factor*(t6.PrecioNudoEnergiaDolar-t6.CETDolar)*@DolarVersion/1000 EnergiaRecPeso
 		,Potencia*t5.Factor*t4.Factor*t6.PrecioNudoPotenciaDolar*@DolarVersion PotenciaRecPeso			
 FROM tempefact t1
 left join PtoRetiroSistema t2 on t2.idpuntoRetiro=t1.IdpuntoRetiro and t2.ano=@PtoRetiroSistemaAno
@@ -125,7 +128,6 @@ WHERE IdTipoDespacho=2
 --RECAUDACION PARA ENERGÍAS DE TRASPASO DE EXCEDENTES IdTipoDespacho=4 --"Traspaso Excedentes"
 
 	--CARGAR PRECIOS A PNPTraspExc
-declare @VersionCMG varchar(255)='2101V3'
 delete from PNPTraspExc where versionPNP=@VersionCMG and VersionPNP=@VersionPNP and Fecha=@FECHAPNP and version=@TipoPNP
 
 insert into PNPTraspExc
@@ -140,7 +142,7 @@ left join factorreferenciacion t5 on t1.IdPuntoRetiro=t5.IdPuntoRetiro and @FECH
 inner join IndexacionDolar t6 on t6.Fecha=t2.mesindexacion
 left join CMGPromedio t3 on t5.IdBarraNacional=t3.IdBarraNacional and t2.mesindexacion=t3.fecha and t3.VersionCMg=@VersionCMG
 left join CMGPromedio t4 on t2.idPtoOferta=t4.IdBarraNacional and t2.mesindexacion=t4.fecha and t4.VersionCMg=@VersionCMG
-where idtipodespacho=4
+where idtipodespacho=4 and @VersionCMG is not null
 
 	--CARGAR RECAUDACIÓN
 insert into RecaudacionDetalle 
@@ -164,6 +166,8 @@ left join PNPTraspExc t6 on t1.IdCodigoContrato=t6.IdCodigoContrato and t5.IdBar
 left join temppnp t7 on t1.IdCodigoContrato=t7.IdCodigoContrato and t5.IdBarraNacional=t7.IdBarraNacional and t7.VersionIndex=@VersionPNP and t6.Version=@TipoPNP and t7.MesIndexacion=@FECHAPNP
 WHERE IdTipoDespacho in(4)
 
+--TENER PRESENTE QUE PRECIOS DE MATAQUITO PARA "Versión Contratos PNP" HASTA 2101 NO CONTIENE CÁLCULO DE PRECIOS CON CMG.
+
 --BORRADO TABLAS TEMPORALES
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
@@ -173,7 +177,7 @@ IF OBJECT_ID('ContratoCPTemp', 'U') IS NOT NULL DROP TABLE ContratoCPTempemptras
 
 select idversion,FechaEfact,idVersionEfact,sum(EPC) EPC,sum(PPC) PPC,sum(ERec_Peso) ERec_Peso,sum(PRec_Peso) PRec_Peso
 from Recaudaciondetalle
-where idversion=@idversion
+--where idversion in (@idversion,@idVersionRef)
 group by FechaEfact,idVersionEfact,idversion
 order by idversion,idversionefact,FechaEfact
 --*/
