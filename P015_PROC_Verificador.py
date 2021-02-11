@@ -6,97 +6,98 @@ Created on Thu Jan 28 17:22:42 2021
 #PROCEDIMIENTO DE GENERACION DE ERRORES DE EFACT INFORMADO
 ###########################################################################
 #Para corrida local de los proc.
+"""
 ConectorDB='Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;'
 IdVersion=22
 path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFacDx_2012.v01.xlsx'
-
-#def Validador(ConectorDB,path,IdVersion):
+"""
+def Validador(ConectorDB,path,IdVersion):
+        
+    import pandas as pd
+    import numpy as np
+    import pyodbc
+    pd.options.mode.chained_assignment = None
+        
+    #Base de datos SQL    
+    import pyodbc
+    conn = pyodbc.connect(ConectorDB)
     
-import pandas as pd
-import numpy as np
-import pyodbc
-pd.options.mode.chained_assignment = None
+    #IMPORTAR DATOS ENTRADA
+    Datos = pd.read_excel(path,skiprows=6)
+    Datos= Datos.iloc[:, 1:11]
     
-#Base de datos SQL    
-import pyodbc
-conn = pyodbc.connect(ConectorDB)
-
-#IMPORTAR DATOS ENTRADA
-Datos = pd.read_excel(path,skiprows=6)
-Datos= Datos.iloc[:, 1:11]
-
-#EXTRAR DE DB TABLAS QUE SE NECESITAN
-generadora= pd.read_sql_query('select * from generadora',conn)
-distribuidora= pd.read_sql_query('select * from distribuidora',conn)
-#contrato= pd.read_sql_query('select * from codigocontrato',conn)
-contrato= pd.read_sql_query('select t1.*,t2.VigenciaInicio,t2.VigenciaFin from codigocontrato t1 left join licitaciongx t2 on t1.IdLicitacion=t2.IdLicitacion and t1.IdGeneradora=t2.IdGeneradora and t1.TipoBloque=t2.TipoBloque and t1.Bloque=t2.Bloque',conn)
-puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
-
-#Agrego Id
-    #Agrego Id Distribuidora
-Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
-    #Agrego Id Generadora
-Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='NombreGeneradora',how = 'left').iloc[:,:-1]
-    #Agrego Id Punto de Retiro
-Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')
-    #Agrego Id a contrato y su vigencia
-Datos=pd.merge(Datos,contrato.iloc[:,[0,1,-2,-1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')
-Datos['VigenciaFin']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
-Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
-
-#Agregar columnas con flag
-    #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
-Datos['flag distribuidora']=1
-    #Reemplaza datos cuando la condición es False
-Datos['flag distribuidora'].where(Datos.IdDistribuidora.isna(), 0, inplace=True,)
-    #Crea fila de flag para IdGeneradora. Cuando IdGeneradora es nan, flag=1
-Datos['flag generadora']=1
-    #Reemplaza datos cuando la condición es False
-Datos['flag generadora'].where(Datos.IdGeneradora.isna(), 0, inplace=True,)
-    #Crea fila de flag para IdPuntoRetiro. Cuando IdPuntoRetiro es nan, flag=1
-Datos['flag puntoretiro']=1
-    #Reemplaza datos cuando la condición es False
-Datos['flag puntoretiro'].where(Datos.IdPuntoRetiro.isna(), 0, inplace=True,)
-    #Crea fila de flag para IdGeneradora. Cuando IdDistribuidora es nan, flag=1
-Datos['flag codigocontrato']=1
-    #Reemplaza datos cuando la condición es False
-Datos['flag codigocontrato'].where(Datos.IdCodigoContrato.isna(), 0, inplace=True,)
-    #Reemplaza datos cuando la condición es False
-Datos['flag codigocontrato Vigencia']=1
-    #Reemplaza datos cuando la condición es False
-Datos['flag codigocontrato Vigencia'].where((Datos.VigenciaInicio < Datos.Fecha & Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
-
-#Agregar comentario de error cuando flag igual a 1
-    #Crea columnas con observaciones, luego serán borradas
-Datos['Observación1']=''
-Datos['Observación2']=''
-Datos['Observación3']=''
-Datos['Observación4']=''
-Datos['Observación5']=''
-
-    #Agrega mensaje de error a observaciones creadas. Si flag es 1 agrega error.
-Datos['Observación1'].where(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
-Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
-Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
-Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
-Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
-
-    #Suma strings con errores y los pega en columna Observación original
-Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Observación3']+Datos['Observación4']+Datos['Observación5']
-    #Elimina columnas creadas
-Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4', 'Observación5'], axis=1, inplace=True)
+    #EXTRAR DE DB TABLAS QUE SE NECESITAN
+    generadora= pd.read_sql_query('select * from generadora',conn)
+    distribuidora= pd.read_sql_query('select * from distribuidora',conn)
+    contrato= pd.read_sql_query('select t1.*,t2.VigenciaInicio,t2.VigenciaFin from codigocontrato t1 left join licitaciongx t2 on t1.IdLicitacion=t2.IdLicitacion and t1.IdGeneradora=t2.IdGeneradora and t1.TipoBloque=t2.TipoBloque and t1.Bloque=t2.Bloque',conn)
+    puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
     
-#Crea Tabla Efact con errores en observación
-    #Crea columna con la id de la versión
-Datos['IdDespacho']=np.nan
-Datos['IdVersion']=IdVersion 
-#UTILIZAR IDVERSION CREADO MÁS ARRIBA
-Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-Efact_error=Efact[Efact['Observación']!='']
-Efact_error.to_excel(r"Efact_error.xlsx", index=False,header=True,encoding='latin_1')
-conn.close()
-del conn
-    #return Efact_error,Efact    
+    #Agrego Id
+        #Agrego Id Distribuidora
+    Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
+        #Agrego Id Generadora
+    Datos=pd.merge(Datos,generadora.iloc[:,[0,1]],left_on='Suministrador',right_on='NombreGeneradora',how = 'left').iloc[:,:-1]
+        #Agrego Id Punto de Retiro
+    Datos=pd.merge(Datos,puntoretiro.iloc[:,[0,1]],left_on='PuntoRetiro'  ,right_on='PuntoRetiro' ,how = 'left')
+        #Agrego Id a contrato y su vigencia
+    Datos=pd.merge(Datos,contrato.iloc[:,[0,1,-2,-1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')
+    Datos['VigenciaFin']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
+    Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
+    
+    #Agregar columnas con flag
+        #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
+    Datos['flag distribuidora']=1
+        #Reemplaza datos cuando la condición es False
+    Datos['flag distribuidora'].where(Datos.IdDistribuidora.isna(), 0, inplace=True,)
+        #Crea fila de flag para IdGeneradora. Cuando IdGeneradora es nan, flag=1
+    Datos['flag generadora']=1
+        #Reemplaza datos cuando la condición es False
+    Datos['flag generadora'].where(Datos.IdGeneradora.isna(), 0, inplace=True,)
+        #Crea fila de flag para IdPuntoRetiro. Cuando IdPuntoRetiro es nan, flag=1
+    Datos['flag puntoretiro']=1
+        #Reemplaza datos cuando la condición es False
+    Datos['flag puntoretiro'].where(Datos.IdPuntoRetiro.isna(), 0, inplace=True,)
+        #Crea fila de flag para IdGeneradora. Cuando IdDistribuidora es nan, flag=1
+    Datos['flag codigocontrato']=1
+        #Reemplaza datos cuando la condición es False
+    Datos['flag codigocontrato'].where(Datos.IdCodigoContrato.isna(), 0, inplace=True,)
+        #Reemplaza datos cuando la condición es False
+    Datos['flag codigocontrato Vigencia']=1
+        #Reemplaza datos cuando la condición es False
+    #Datos['flag codigocontrato Vigencia'].where((Datos.VigenciaInicio < Datos.Fecha & Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+ #################### ACÁ SE DEBE AGREGAR ANÁLISIS DE VIGENCIA DE CONTRATO   
+    
+    #Agregar comentario de error cuando flag igual a 1
+        #Crea columnas con observaciones, luego serán borradas
+    Datos['Observación1']=''
+    Datos['Observación2']=''
+    Datos['Observación3']=''
+    Datos['Observación4']=''
+    Datos['Observación5']=''
+    
+        #Agrega mensaje de error a observaciones creadas. Si flag es 1 agrega error.
+    Datos['Observación1'].where(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
+    Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
+    Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
+    Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
+    #Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
+    
+        #Suma strings con errores y los pega en columna Observación original
+    Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Observación3']+Datos['Observación4']+Datos['Observación5']
+        #Elimina columnas creadas
+    Datos.drop(['Observación1', 'Observación2','Observación3', 'Observación4', 'Observación5'], axis=1, inplace=True)
+        
+    #Crea Tabla Efact con errores en observación
+        #Crea columna con la id de la versión
+    Datos['IdDespacho']=np.nan
+    Datos['IdVersion']=IdVersion 
+    #UTILIZAR IDVERSION CREADO MÁS ARRIBA
+    Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
+    Efact_error=Efact[Efact['Observación']!='']
+    Efact_error.to_excel(r"Efact_error.xlsx", index=False,header=True,encoding='latin_1')
+    conn.close()
+    del conn
+    return Efact_error,Efact    
 ###########################################################################
 
 #PROCEDIMIENTO DE CORRECCIÓN DE DATOS PARA QUE PUEDA CARGARSE EN SQL.

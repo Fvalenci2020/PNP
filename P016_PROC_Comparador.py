@@ -7,7 +7,7 @@ Created on Thu Feb  4 15:39:56 2021
 
 #Falta cambiar mensajes de alerta y agregar flags cuando hay puntos con potencia y luego sin
 
-def Comparador(ConectorDB,Efact_corregido):
+def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     
     import pandas as pd
     import numpy as np
@@ -18,20 +18,15 @@ def Comparador(ConectorDB,Efact_corregido):
     conn = pyodbc.connect(ConectorDB)
     
     cursor = conn.cursor()
+
     
-    #Esta debería ser la entrada de la función
-    efact_corregido=Efact_corregido
-    
-    #IMPORTAR TABLAS DESDE BASE DE DATOS
-    proy= pd.read_sql_query('''select * from demanda where Version='2007ProyV1' order by Mes;''',conn) 
+    #IMPORTAR TABLAS DESDE BASE DE DATOS    
     puntoretiro= pd.read_sql_query('select * from puntoretiro',conn) #Estas no tengo que llamarlas
     distribuidora= pd.read_sql_query('select * from distribuidora',conn) #Esta tampoco
     contrato= pd.read_sql_query('select * from codigocontrato',conn) 
         #Selecciona datos desde 2018-09-01 hasta 2020-12-01 y los ordena por fecha
-    efact_historico= pd.read_sql_query('''select * from efact where IdVersion=13 Union select * from efact where IdVersion=10
-    Union select * from efact where IdVersion=2 Union select * from efact where IdVersion=22
-    Union select * from efact where IdVersion=23 Union select * from efact where IdVersion=24 order by Fecha;
-    ;''',conn)
+
+    
     
     #Esta parte del código prepara rango de fechas entre mes anterior y un año previo a este 
     #Con esto se filtrará efact para sacar la ventana de 12 meses
