@@ -1,5 +1,5 @@
 use pnp_2
-/* 19:04
+--/* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -93,6 +93,15 @@ left join generadora G on G.NombreGeneradora=t1.Generadora
 left join barranacional BN on t1.PtoOferta=BN.BarraNAcional
 left join [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.VigenciaContrato VC on VC.Licitacion=t1.Licitacion and VC.gx=t1.Generadora and VC.Bloque=t1.BLOQUE
 left join [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.LicitacionGxPotencia LGP on LGP.licitacion=t1.licitacion and LGP.Generadora=t1.Generadora
+
+--Actualización de error de contratos de Pelumpen
+update licitaciongx 
+set VigenciaInicio='2019-01-01',Observacion='Se cambia vigenciaInicio, porque reemplaza IdLicitacionGx =129'
+where IdLicitacionGx in (133,134)
+
+update licitaciongx 
+set VigenciaFin='2018-12-31',Observacion='Se cambia VigenciaFin, porque es reemplazado por IdLicitacionGx in (133,134)'
+where IdLicitacionGx in (129)
 
 GO
 insert into codigocontrato
@@ -676,6 +685,12 @@ where t1.CodigoContrato not in ('EMEL-SIC 2006/01_BB1_BB_CGE Distribucion_ENDESA
 and t1.distribuidora !='MATAQUITO'
 
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
+
+	--cargar registro de contrato faltante
+insert into pnpindex
+select VersionIndex,MesIndexacion,Version, 186 IdCodigoContrato,IdPtoOferta,Cet_USD,PrecioEnergia,PrecioPotencia,CONCAT(Observacion,'. Se agrega 20210211 porque no existen') Observacion
+from pnpindex where MesIndexacion='2020-10-01' and VersionIndex='FPEC_2010V1'
+and IdCodigoContrato=185
 
 
 --PNPTraspExc
