@@ -718,4 +718,7 @@ IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
 
 insert into DolarFijacion
 select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),* from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.dolarFijacion
+
+insert into Estabilizacion
+select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),*,'' from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Estabilizacion
 --*/
