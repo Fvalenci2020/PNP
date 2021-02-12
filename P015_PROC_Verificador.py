@@ -6,6 +6,7 @@ Created on Thu Jan 28 17:22:42 2021
 #PROCEDIMIENTO DE GENERACION DE ERRORES DE EFACT INFORMADO
 ###########################################################################
 #Para corrida local de los proc.
+<<<<<<< Updated upstream
 """
 ConectorDB='Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;'
 IdVersion=22
@@ -32,6 +33,38 @@ def Validador(ConectorDB,path,IdVersion):
     contrato= pd.read_sql_query('select t1.*,t2.VigenciaInicio,t2.VigenciaFin from codigocontrato t1 left join licitaciongx t2 on t1.IdLicitacion=t2.IdLicitacion and t1.IdGeneradora=t2.IdGeneradora and t1.TipoBloque=t2.TipoBloque and t1.Bloque=t2.Bloque',conn)
     puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
     
+=======
+
+#ConectorDB='Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;'
+#path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFacDx_2012.v01.xlsx'
+#ConectorDB='Driver={SQL Server};''Server=DESKTOP-SSPJTJO\SQLEXPRESS;''Database=Modelo PNP;''Trusted_Connection=yes;'
+#IdVersion=22
+#path='Entrega_Revisión_EFacDx_2010.v02.xlsx'
+
+def Validador(ConectorDB,path,IdVersion):
+    
+    import pandas as pd
+    import numpy as np
+    import pyodbc
+    pd.options.mode.chained_assignment = None
+    
+    #Base de datos SQL    
+    conn = pyodbc.connect(ConectorDB)
+    
+    
+    #IMPORTAR DATOS ENTRADA
+    Datos = pd.read_excel(path,skiprows=6)
+    Datos= Datos.iloc[:, 1:11]
+        
+    
+    #EXTRAR DE DB TABLAS QUE SE NECESITAN
+    generadora= pd.read_sql_query('select * from generadora',conn)
+    distribuidora= pd.read_sql_query('select * from distribuidora',conn)
+    #contrato= pd.read_sql_query('select * from codigocontrato',conn)
+    contrato= pd.read_sql_query('select t1.*,t2.VigenciaInicio,t2.VigenciaFin from codigocontrato t1 left join licitaciongx t2 on t1.IdLicitacion=t2.IdLicitacion and t1.IdGeneradora=t2.IdGeneradora and t1.TipoBloque=t2.TipoBloque and t1.Bloque=t2.Bloque',conn)
+    puntoretiro= pd.read_sql_query('select * from puntoretiro',conn)
+    
+>>>>>>> Stashed changes
     #Agrego Id
         #Agrego Id Distribuidora
     Datos=pd.merge(Datos,distribuidora.iloc[:,[0,1]],left_on='Distribuidora',right_on='NombreDistribuidora',how = 'left').iloc[:,:-1]
@@ -42,10 +75,21 @@ def Validador(ConectorDB,path,IdVersion):
         #Agrego Id a contrato y su vigencia
     Datos=pd.merge(Datos,contrato.iloc[:,[0,1,-2,-1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')
     Datos['VigenciaFin']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
+<<<<<<< Updated upstream
     Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
     
     #Agregar columnas con flag
         #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
+=======
+    #Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
+    Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaInicio'], format='%Y-%m-%d')
+    
+    
+    #Agregar columnas con flag
+        #Crea fila de flag para IdDistribuidora
+    conn = pyodbc.connect(ConectorDB)
+        #Cuando IdDistribuidora es nan, flag=1
+>>>>>>> Stashed changes
     Datos['flag distribuidora']=1
         #Reemplaza datos cuando la condición es False
     Datos['flag distribuidora'].where(Datos.IdDistribuidora.isna(), 0, inplace=True,)
@@ -64,8 +108,12 @@ def Validador(ConectorDB,path,IdVersion):
         #Reemplaza datos cuando la condición es False
     Datos['flag codigocontrato Vigencia']=1
         #Reemplaza datos cuando la condición es False
-    #Datos['flag codigocontrato Vigencia'].where((Datos.VigenciaInicio < Datos.Fecha & Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+    Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio < Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+<<<<<<< Updated upstream
  #################### ACÁ SE DEBE AGREGAR ANÁLISIS DE VIGENCIA DE CONTRATO   
+=======
+    Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio<Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+>>>>>>> Stashed changes
     
     #Agregar comentario de error cuando flag igual a 1
         #Crea columnas con observaciones, luego serán borradas
@@ -80,7 +128,11 @@ def Validador(ConectorDB,path,IdVersion):
     Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
     Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
     Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
+<<<<<<< Updated upstream
     #Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
+=======
+    Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
+>>>>>>> Stashed changes
     
         #Suma strings con errores y los pega en columna Observación original
     Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Observación3']+Datos['Observación4']+Datos['Observación5']
@@ -97,8 +149,13 @@ def Validador(ConectorDB,path,IdVersion):
     Efact_error.to_excel(r"Efact_error.xlsx", index=False,header=True,encoding='latin_1')
     conn.close()
     del conn
+<<<<<<< Updated upstream
     return Efact_error,Efact    
 ###########################################################################
+=======
+        #return Efact_error,Efact    
+    ###########################################################################
+>>>>>>> Stashed changes
 
 #PROCEDIMIENTO DE CORRECCIÓN DE DATOS PARA QUE PUEDA CARGARSE EN SQL.
 ###########################################################################
