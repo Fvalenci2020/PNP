@@ -1,33 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb  4 15:39:56 2021
+Created on Thu Feb 11 16:59:02 2021
 
 @author: Asus
 """
 
-#Falta cambiar mensajes de alerta y agregar flags cuando hay puntos con potencia y luego sin
+"""
+-LISTO-DEJAR AL INICIO % DE ERROR A CONSIDERAR COMO VARIABLE
+-LISTO-AGREGAR UNIDADES A NOMBRES DE CAMPO DE SALIDA
+-LISTO-MENSAJES DE OBSERVACIÓN QUE ESTÉN REFERENCIADOS AL % DE ERROR DE VARIABLE Y NO AL DEL REGISTRO
+-LISTO-MENSAJES NO DEBEN CONTENER JUICIOS DE VALOR
+-LISTO-QUE VALORES EN PORCENTAJE APAREZCAN COMO NÚMERO
+-LISTO-ELIMINAR PABRA ERROR CUANDO SE COMPRARAN DATOS HISTÓRICOS
+CORREGIR p015 PARA QUE VERIFIQUE VIGENCIA CONTRATO.
+"""
 
 def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
+    
+    
+    #Límites para generar alertas en datos a nivel de punto de retiro
+    umbral_proy_PR=0.1 #Error tolerado en proyección de energía
+    umbral_1m_E_PR=0.2 #Variación tolerada con respecto a la energía del mes anterior
+    umbral_1m_P_PR=0.2 #Variación tolerada con respecto a la Potencia del mes anterior
+    umbral_12m_E_PR=0.2 #Variación tolerada con respecto a la energía promedio de 12 meses
+    umbral_12m_P_PR=0.2 #Variación tolerada con respecto a la Potencia promedio de 12 meses
+    
     
     import pandas as pd
     import numpy as np
     import pyodbc 
     pd.options.mode.chained_assignment = None
     
-    
     conn = pyodbc.connect(ConectorDB)
     
     cursor = conn.cursor()
-
-    
-    #IMPORTAR TABLAS DESDE BASE DE DATOS    
+        
+    #IMPORTAR TABLAS DESDE BASE DE DATOS
     puntoretiro= pd.read_sql_query('select * from puntoretiro',conn) #Estas no tengo que llamarlas
     distribuidora= pd.read_sql_query('select * from distribuidora',conn) #Esta tampoco
     contrato= pd.read_sql_query('select * from codigocontrato',conn) 
-        #Selecciona datos desde 2018-09-01 hasta 2020-12-01 y los ordena por fecha
-
-    
-    
+        
     #Esta parte del código prepara rango de fechas entre mes anterior y un año previo a este 
     #Con esto se filtrará efact para sacar la ventana de 12 meses
     separador='-'
@@ -169,8 +181,6 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     efact_suma_PR=pd.merge(efact_suma_PR,puntoretiro.iloc[:,[0,1]],left_on='IdPuntoRetiro',right_on='IdPuntoRetiro',how = 'left')
     
     
-    
-    
     #Nivel Código contrato (CC)
     #Tabla con energia a nivel contrato mes actual (CodigoContrato = CC)
     efact_suma_CC=efact_corregido[['IdCodigoContrato','Energia','Potencia']]
@@ -181,8 +191,6 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     
      #Inserta nombre contrato 
     efact_suma_CC=pd.merge(efact_suma_CC,contrato.iloc[:,[0,1]],left_on='IdCodigoContrato',right_on='IdCodigoContrato',how = 'left')
-    
-    
     
     
     #################################################################
@@ -198,12 +206,12 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     proy_suma_Holding=proy_suma_Holding.groupby(by=['IdHolding']).sum()
         #Vuelve a dejar como indice el Holding (Desaparece con instrucción 'groupby')
     proy_suma_Holding.reset_index(level=[0], inplace=True)
-    proy_suma_Holding.rename(columns={"Demanda": "Proyección Energía"},inplace=True)
+    proy_suma_Holding.rename(columns={"Demanda": "Proyección Energía [MWh]"},inplace=True)
                                                                   
           #Agrega Proy a tabla efact_suma
     efact_suma_Holding=pd.merge(efact_suma_Holding,proy_suma_Holding,how = 'left')
          #Agrega error c/r a proyección
-    efact_suma_Holding['Error Proyección [%]']=100*(efact_suma_Holding['Energia']-efact_suma_Holding['Proyección Energía'])/efact_suma_Holding['Energia']
+    efact_suma_Holding['Error relativo proyección ']=(efact_suma_Holding['Energia']-efact_suma_Holding['Proyección Energía [MWh]'])/efact_suma_Holding['Energia']
     
     
     #COMPARACIÓN DE ENERGÍA A NIVEL DE DISTRIBUIDORA/MES
@@ -234,13 +242,12 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         proy_suma_Dx.reset_index(inplace=True, drop=True)
     
     
-    proy_suma_Dx.rename(columns={"Demanda": "Proyección Energía"},inplace=True)
+    proy_suma_Dx.rename(columns={"Demanda": "Proyección Energía [MWh]"},inplace=True)
     
           #Agrega Proy a tabla efact_suma
     efact_suma_Dx=pd.merge(efact_suma_Dx,proy_suma_Dx,how = 'left')
           #Agrega Error c/r a proyección
-    efact_suma_Dx['Error Proyección [%]']=100*(efact_suma_Dx['Energia']-efact_suma_Dx['Proyección Energía'])/efact_suma_Dx['Energia']
-    
+    efact_suma_Dx['Error relativo proyección ']=(efact_suma_Dx['Energia']-efact_suma_Dx['Proyección Energía [MWh]'])/efact_suma_Dx['Energia']
     
     
     #COMPARACIÓN DE ENERGÍA A NIVEL DE PUNTO DE RETIRO
@@ -250,13 +257,13 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     proy_suma_PR=proy_suma_PR.groupby(by=['IdPuntoRetiro']).sum()
        #Vuelve a dejar como indices la fecha y el Holding (Desaparecen con instrucción 'groupby')
     proy_suma_PR.reset_index(level=[0], inplace=True)
-    proy_suma_PR.rename(columns={"Demanda": "Proyección Energía"},inplace=True)
+    proy_suma_PR.rename(columns={"Demanda": "Proyección Energía [MWh]"},inplace=True)
     
         #Agrega Proy a tabla efact_suma
     efact_suma_PR=pd.merge(efact_suma_PR,proy_suma_PR,how = 'left')
     
        #Agrega Error c/r a proyección
-    efact_suma_PR['Error Proyección [%]']=100*(efact_suma_PR['Energia']-efact_suma_PR['Proyección Energía'])/efact_suma_PR['Energia']
+    efact_suma_PR['Error relativo proyección ']=(efact_suma_PR['Energia']-efact_suma_PR['Proyección Energía [MWh]'])/efact_suma_PR['Energia']
     
     
     #################################################################
@@ -270,29 +277,29 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Suma agrupada por holding y fecha
     efact_1m_Holding=efact_1m_Holding.groupby(by=['IdHolding']).sum()/1000
     efact_1m_Holding.reset_index(level=[0], inplace=True)
-    efact_1m_Holding.rename(columns={"Energia": "Energía Mes anterior"},inplace=True)
-    efact_1m_Holding.rename(columns={"Potencia": "Potencia Mes anterior"},inplace=True)
+    efact_1m_Holding.rename(columns={"Energia": "Energía Mes anterior [MWh]"},inplace=True)
+    efact_1m_Holding.rename(columns={"Potencia": "Potencia Mes anterior [MW]"},inplace=True)
     #Agrega mes anterior a tabla efact_suma
     efact_suma_Holding=pd.merge(efact_suma_Holding,efact_1m_Holding,how = 'left')
     
         #Agrega error c/r a mes anterior
-    efact_suma_Holding['Error Energía c/r mes anterior [%]']=abs(100*(efact_suma_Holding['Energia']-efact_suma_Holding['Energía Mes anterior'])/efact_suma_Holding['Energia'])
-    efact_suma_Holding['Error Potencia c/r mes anterior [%]']=abs(100*(efact_suma_Holding['Potencia']-efact_suma_Holding['Potencia Mes anterior'])/efact_suma_Holding['Potencia'])
+    efact_suma_Holding['Variación relativa  Energía c/r mes anterior ']=abs((efact_suma_Holding['Energia']-efact_suma_Holding['Energía Mes anterior [MWh]'])/efact_suma_Holding['Energia'])
+    efact_suma_Holding['Variación relativa Potencia c/r mes anterior ']=abs((efact_suma_Holding['Potencia']-efact_suma_Holding['Potencia Mes anterior [MW]'])/efact_suma_Holding['Potencia'])
     
     #NIVEL DISTRIBUIDORA
     efact_1m_Dx=efact_1m[['IdDistribuidora','Energia','Potencia']]
         #Suma agrupada por holding y fecha
     efact_1m_Dx=efact_1m_Dx.groupby(by=['IdDistribuidora']).sum()/1000
     efact_1m_Dx.reset_index(level=[0], inplace=True)
-    efact_1m_Dx.rename(columns={"Energia": "Energía Mes anterior"},inplace=True)
-    efact_1m_Dx.rename(columns={"Potencia": "Potencia Mes anterior"},inplace=True)
+    efact_1m_Dx.rename(columns={"Energia": "Energía Mes anterior [MWh]"},inplace=True)
+    efact_1m_Dx.rename(columns={"Potencia": "Potencia Mes anterior [MW]"},inplace=True)
     #Agrega mes anterior a tabla efact_suma
     efact_suma_Dx=pd.merge(efact_suma_Dx,efact_1m_Dx,how = 'left')
     
     
         #Agrega error c/r a mes anterior
-    efact_suma_Dx['Error Energía c/r mes anterior [%]']=100*(efact_suma_Dx['Energia']-efact_suma_Dx['Energía Mes anterior'])/efact_suma_Dx['Energia']
-    efact_suma_Dx['Error Potencia c/r mes anterior [%]']=100*(efact_suma_Dx['Potencia']-efact_suma_Dx['Potencia Mes anterior'])/efact_suma_Dx['Potencia']
+    efact_suma_Dx['Variación relativa  Energía c/r mes anterior ']=(efact_suma_Dx['Energia']-efact_suma_Dx['Energía Mes anterior [MWh]'])/efact_suma_Dx['Energia']
+    efact_suma_Dx['Variación relativa Potencia c/r mes anterior ']=(efact_suma_Dx['Potencia']-efact_suma_Dx['Potencia Mes anterior [MW]'])/efact_suma_Dx['Potencia']
     
     
     
@@ -301,14 +308,14 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Suma agrupada por holding y fecha
     efact_1m_PR=efact_1m_PR.groupby(by=['IdPuntoRetiro']).sum()/1000
     efact_1m_PR.reset_index(level=[0], inplace=True)
-    efact_1m_PR.rename(columns={"Energia": "Energía Mes anterior"},inplace=True)
-    efact_1m_PR.rename(columns={"Potencia": "Potencia Mes anterior"},inplace=True)
+    efact_1m_PR.rename(columns={"Energia": "Energía Mes anterior [MWh]"},inplace=True)
+    efact_1m_PR.rename(columns={"Potencia": "Potencia Mes anterior [MW]"},inplace=True)
     #Agrega mes anterior a tabla efact_suma
     efact_suma_PR=pd.merge(efact_suma_PR,efact_1m_PR,how = 'left')
     
       #Agrega error c/r a mes anterior
-    efact_suma_PR['Error Energía c/r mes anterior [%]']=100*(efact_suma_PR['Energia']-efact_suma_PR['Energía Mes anterior'])/efact_suma_PR['Energia']
-    efact_suma_PR['Error Potencia c/r mes anterior [%]']=100*(efact_suma_PR['Potencia']-efact_suma_PR['Potencia Mes anterior'])/efact_suma_PR['Potencia']
+    efact_suma_PR['Variación relativa  Energía c/r mes anterior ']=(efact_suma_PR['Energia']-efact_suma_PR['Energía Mes anterior [MWh]'])/efact_suma_PR['Energia']
+    efact_suma_PR['Variación relativa Potencia c/r mes anterior ']=(efact_suma_PR['Potencia']-efact_suma_PR['Potencia Mes anterior [MW]'])/efact_suma_PR['Potencia']
     
     
     
@@ -317,15 +324,14 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Suma agrupada por holding y fecha
     efact_1m_CC=efact_1m_CC.groupby(by=['IdCodigoContrato']).sum()/1000
     efact_1m_CC.reset_index(level=[0], inplace=True)
-    efact_1m_CC.rename(columns={"Energia": "Energía Mes anterior"},inplace=True)
-    efact_1m_CC.rename(columns={"Potencia": "Potencia Mes anterior"},inplace=True)
+    efact_1m_CC.rename(columns={"Energia": "Energía Mes anterior [MWh]"},inplace=True)
+    efact_1m_CC.rename(columns={"Potencia": "Potencia Mes anterior [MW]"},inplace=True)
     #Agrega mes anterior a tabla efact_suma
     efact_suma_CC=pd.merge(efact_suma_CC,efact_1m_CC,how = 'left')
     
       #Agrega error c/r a mes anterior
-    efact_suma_CC['Error Energía c/r mes anterior [%]']=100*(efact_suma_CC['Energia']-efact_suma_CC['Energía Mes anterior'])/efact_suma_CC['Energia']
-    efact_suma_CC['Error Potencia c/r mes anterior [%]']=100*(efact_suma_CC['Potencia']-efact_suma_CC['Potencia Mes anterior'])/efact_suma_CC['Potencia']
-    
+    efact_suma_CC['Variación relativa  Energía c/r mes anterior ']=(efact_suma_CC['Energia']-efact_suma_CC['Energía Mes anterior [MWh]'])/efact_suma_CC['Energia']
+    efact_suma_CC['Variación relativa Potencia c/r mes anterior ']=(efact_suma_CC['Potencia']-efact_suma_CC['Potencia Mes anterior [MW]'])/efact_suma_CC['Potencia']
     
     
     #################################################################
@@ -338,7 +344,7 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Agrupa y suma datos por holding y fecha
     efact_12M_Holding=efact_12M_Holding.groupby(by=['IdHolding','Fecha']).sum().groupby(level=[0,1]).sum()/1000
         #Calcula promedio agrupando por fecha y cambia nombre a columna 
-    efact_12M_promedio=efact_12M_Holding.groupby(by=['IdHolding']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses","Potencia": "Potencia Promedio 12 Meses"})
+    efact_12M_promedio=efact_12M_Holding.groupby(by=['IdHolding']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses [MWh]","Potencia": "Potencia Promedio 12 Meses [MW]"})
         #Calcula desviación estándar por fecha
     efact_12M_std=efact_12M_Holding.groupby(by=['IdHolding']).std()
         #Deja tabla efact_12M en el formato deseado para hacer cruce con efact_suma_holding (tabla del mes presente)
@@ -355,8 +361,8 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     del efact_12M_std
     
     #Agrega error c/r a promedio
-    efact_suma_Holding['Error Energía c/r a promedio [%]']=100*(efact_suma_Holding['Energia']-efact_suma_Holding['Energía Promedio 12 Meses'])/efact_suma_Holding['Energia']
-    efact_suma_Holding['Error Potencia c/r a promedio [%]']=100*(efact_suma_Holding['Potencia']-efact_suma_Holding['Potencia Promedio 12 Meses'])/efact_suma_Holding['Potencia']
+    efact_suma_Holding['Variación relativa  Energía c/r a promedio ']=(efact_suma_Holding['Energia']-efact_suma_Holding['Energía Promedio 12 Meses [MWh]'])/efact_suma_Holding['Energia']
+    efact_suma_Holding['Variación relativa Potencia c/r a promedio ']=(efact_suma_Holding['Potencia']-efact_suma_Holding['Potencia Promedio 12 Meses [MW]'])/efact_suma_Holding['Potencia']
     
     
     #NIVEL DISTRIBUIDORA
@@ -365,7 +371,7 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Agrupa y suma datos por holding y fecha
     efact_12M_Dx=efact_12M_Dx.groupby(by=['IdDistribuidora','Fecha']).sum().groupby(level=[0,1]).sum()/1000
         #Calcula promedio agrupando por fecha y cambia nombre a columna 
-    efact_12M_promedio=efact_12M_Dx.groupby(by=['IdDistribuidora']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses","Potencia": "Potencia Promedio 12 Meses"})
+    efact_12M_promedio=efact_12M_Dx.groupby(by=['IdDistribuidora']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses [MWh]","Potencia": "Potencia Promedio 12 Meses [MW]"})
         #Calcula desviación estándar por fecha
     efact_12M_std=efact_12M_Dx.groupby(by=['IdDistribuidora']).std()
         #Deja tabla efact_12M en el formato deseado para hacer cruce con efact_suma_holding (tabla del mes presente)
@@ -386,10 +392,9 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     efact_suma_Dx=pd.merge(efact_suma_Dx,efact_12M_Dx,how = 'left')
     
     #Agrega error c/r a promedio
-    efact_suma_Dx['Error Energía c/r a promedio [%]']=100*(efact_suma_Dx['Energia']-efact_suma_Dx['Energía Promedio 12 Meses'])/efact_suma_Dx['Energia']
-    efact_suma_Dx['Error Potencia c/r a promedio [%]']=100*(efact_suma_Dx['Potencia']-efact_suma_Dx['Potencia Promedio 12 Meses'])/efact_suma_Dx['Potencia']
-    
-    
+    efact_suma_Dx['Variación relativa  Energía c/r a promedio ']=(efact_suma_Dx['Energia']-efact_suma_Dx['Energía Promedio 12 Meses [MWh]'])/efact_suma_Dx['Energia']
+    efact_suma_Dx['Variación relativa Potencia c/r a promedio ']=(efact_suma_Dx['Potencia']-efact_suma_Dx['Potencia Promedio 12 Meses [MW]'])/efact_suma_Dx['Potencia']
+      
     
     #NIVEL PUNTO RETIRO
      #Crea tabla con datos necesarios desde efact_historico para la comparación a nivel distribuidora
@@ -397,7 +402,7 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Agrupa y suma datos por holding y fecha
     efact_12M_PR=efact_12M_PR.groupby(by=['IdPuntoRetiro','Fecha']).sum().groupby(level=[0,1]).sum()/1000
         #Calcula promedio agrupando por fecha y cambia nombre a columna 
-    efact_12M_promedio=efact_12M_PR.groupby(by=['IdPuntoRetiro']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses","Potencia": "Potencia Promedio 12 Meses"})
+    efact_12M_promedio=efact_12M_PR.groupby(by=['IdPuntoRetiro']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses [MWh]","Potencia": "Potencia Promedio 12 Meses [MW]"})
         #Calcula desviación estándar por fecha
     efact_12M_std=efact_12M_PR.groupby(by=['IdPuntoRetiro']).std()
         #Deja tabla efact_12M en el formato deseado para hacer cruce con efact_suma_holding (tabla del mes presente)
@@ -414,11 +419,8 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     del efact_12M_std
     
     #Agrega error c/r a promedio
-    efact_suma_PR['Error Energía c/r a promedio [%]']=100*(efact_suma_PR['Energia']-efact_suma_PR['Energía Promedio 12 Meses'])/efact_suma_PR['Energia']
-    efact_suma_PR['Error Potencia c/r a promedio [%]']=100*(efact_suma_PR['Potencia']-efact_suma_PR['Potencia Promedio 12 Meses'])/efact_suma_PR['Potencia']
-    
-    
-    
+    efact_suma_PR['Variación relativa  Energía c/r a promedio ']=(efact_suma_PR['Energia']-efact_suma_PR['Energía Promedio 12 Meses [MWh]'])/efact_suma_PR['Energia']
+    efact_suma_PR['Variación relativa Potencia c/r a promedio ']=(efact_suma_PR['Potencia']-efact_suma_PR['Potencia Promedio 12 Meses [MW]'])/efact_suma_PR['Potencia']
     
     
     #NIVEL CONTRATO
@@ -427,7 +429,7 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         #Agrupa y suma datos por holding y fecha
     efact_12M_CC=efact_12M_CC.groupby(by=['IdCodigoContrato','Fecha']).sum().groupby(level=[0,1]).sum()/1000
         #Calcula promedio agrupando por fecha y cambia nombre a columna 
-    efact_12M_promedio=efact_12M_CC.groupby(by=['IdCodigoContrato']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses","Potencia": "Potencia Promedio 12 Meses"})
+    efact_12M_promedio=efact_12M_CC.groupby(by=['IdCodigoContrato']).mean().rename(columns={"Energia": "Energía Promedio 12 Meses [MWh]","Potencia": "Potencia Promedio 12 Meses [MW]"})
         #Calcula desviación estándar por fecha
     efact_12M_std=efact_12M_CC.groupby(by=['IdCodigoContrato']).std()
         #Deja tabla efact_12M en el formato deseado para hacer cruce con efact_suma_holding (tabla del mes presente)
@@ -444,220 +446,17 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     efact_suma_CC=pd.merge(efact_suma_CC,efact_12M_CC,how = 'left')
     
     #Agrega error c/r a promedio
-    efact_suma_CC['Error Energía c/r a promedio [%]']=100*(efact_suma_CC['Energia']-efact_suma_CC['Energía Promedio 12 Meses'])/efact_suma_CC['Energia']
-    efact_suma_CC['Error Potencia c/r a promedio [%]']=100*(efact_suma_CC['Potencia']-efact_suma_CC['Potencia Promedio 12 Meses'])/efact_suma_CC['Potencia']
-    
-    
-    
-    ### Elimino tablas que ya no necesito (están en tablas efact_suma) ###
-    del efact_1m
-    del efact_1m_CC
-    del efact_1m_Dx
-    del efact_1m_Holding
-    del efact_1m_PR
-    del efact_12M_CC
-    del efact_12M_Dx
-    del efact_12M_Holding
-    del efact_12M_PR
-    del diferencias_Dx
-    del proy_suma_Dx
-    del proy_suma_Holding
-    del proy_suma_PR
-    del i
-    del j
-    del proy
-    del Groupdx
-    
+    efact_suma_CC['Variación relativa  Energía c/r a promedio ']=(efact_suma_CC['Energia']-efact_suma_CC['Energía Promedio 12 Meses [MWh]'])/efact_suma_CC['Energia']
+    efact_suma_CC['Variación relativa Potencia c/r a promedio ']=(efact_suma_CC['Potencia']-efact_suma_CC['Potencia Promedio 12 Meses [MW]'])/efact_suma_CC['Potencia']
     
     
     #################################################################
     ########### FLAG DE DATOS CON DUDA EN SU CALIDAD ################
     #################################################################
     
-    #NIVEL HOLDING
-    
-    #Agregar comentario de error cuando se cumple condición
-        #Crea columnas con observaciones, luego serán borradas
-    efact_suma_Holding['Proy']=''
-    efact_suma_Holding['Energia_1m']=''
-    efact_suma_Holding['Energia_12m']=''
-    efact_suma_Holding['Potencia_1m']=''
-    efact_suma_Holding['Potencia_12m']=''
-    
-        #Agrega mensaje de error a observaciones creadas. Si se cumple condición agrega comentario
-        #Proyección con porcentaje de error mayor a umbral porciento
-    umbral_proy=10
-    umbral_1m_E=10
-    umbral_1m_P=10
-    
-        #Rellena columna de error de proyección cuando se cumple que error es mayor a umbral
-    efact_suma_Holding['Proy'].mask(abs(efact_suma_Holding['Error Proyección [%]'])>=umbral_proy, '|Energía alejada de proyección en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_Holding['temp']=efact_suma_Holding[efact_suma_Holding['Proy']!='']['Error Proyección [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_Holding['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_Holding['Proy']=efact_suma_Holding['Proy']+efact_suma_Holding['temp']
-        #Se elimina columna temporal
-    efact_suma_Holding.drop(['temp'],axis=1,inplace=True)
-    
-        #Rellena columna de error de mes anterior cuando se cumple que error es mayor a umbral
-    efact_suma_Holding['Energia_1m'].mask(abs(efact_suma_Holding['Error Energía c/r mes anterior [%]'])>=umbral_1m_E, '|Energía alejada de mes anterior en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_Holding['temp']=efact_suma_Holding[efact_suma_Holding['Energia_1m']!='']['Error Energía c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_Holding['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_Holding['Energia_1m']=efact_suma_Holding['Energia_1m']+efact_suma_Holding['temp']
-        #Se elimina columna temporal
-    efact_suma_Holding.drop(['temp'],axis=1,inplace=True)
-                        
-        #Se repite proceso anterior pero para columna de potencia
-    efact_suma_Holding['Potencia_1m'].mask(abs(efact_suma_Holding['Error Potencia c/r mes anterior [%]'])>=umbral_1m_P, '|Potencia alejada de mes anterior en un ', inplace=True)
-    efact_suma_Holding['temp']=efact_suma_Holding[efact_suma_Holding['Potencia_1m']!='']['Error Potencia c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-    efact_suma_Holding['temp'].fillna(value='',inplace=True)
-    efact_suma_Holding['Potencia_1m']=efact_suma_Holding['Potencia_1m']+efact_suma_Holding['temp']
-    efact_suma_Holding.drop(['temp'],axis=1,inplace=True)
-    
-    
-        #Se crea vector bool con condición en la que Energía es mayor a Promedio-2*DesvEst
-    cond1=efact_suma_Holding['Energia']>=efact_suma_Holding['Energía Promedio 12 Meses']-2*efact_suma_Holding['Desviacion Energía 12 Meses']
-        #Se crea vector bool con condición en la que Energía es menor a Promedio+2*DesvEst
-    cond2=efact_suma_Holding['Energia']<=efact_suma_Holding['Energía Promedio 12 Meses']+2*efact_suma_Holding['Desviacion Energía 12 Meses']
-        #Se rellenan filas donde se cumple cond1 y cond2, es decir donde Energía está dentro de intervalo 2*DesvEst
-    efact_suma_Holding['Energia_12m'].where((cond1) & (cond2), '|Energía alejada de promedio de 12 meses anteriores en un ', inplace=True)
-        #Se agrega error con respecto a promedio de 12 meses a Warning 
-    efact_suma_Holding['temp']=efact_suma_Holding[efact_suma_Holding['Energia_12m']!='']['Error Energía c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-        #Se rellenan nan
-    efact_suma_Holding['temp'].fillna(value='',inplace=True)
-        #Se agrega mensaje a columna principal
-    efact_suma_Holding['Energia_12m']=efact_suma_Holding['Energia_12m']+efact_suma_Holding['temp']
-        #Se elimina columna temporal
-    efact_suma_Holding.drop(['temp'],axis=1,inplace=True)
-    
-    #Se eliminan columnas bool de condición
-    del cond1
-    del cond2
-    
-        #Se repite proceso anterior pero para columna de potencia
-    cond1=efact_suma_Holding['Potencia']>=efact_suma_Holding['Potencia Promedio 12 Meses']-2*efact_suma_Holding['Desviacion Potencia 12 Meses']
-    cond2=efact_suma_Holding['Potencia']<=efact_suma_Holding['Potencia Promedio 12 Meses']+2*efact_suma_Holding['Desviacion Potencia 12 Meses']
-    efact_suma_Holding['Potencia_12m'].where((cond1) & (cond2), '|Potencia alejada de promedio de 12 meses anteriores en un ', inplace=True)
-    efact_suma_Holding['temp']=efact_suma_Holding[efact_suma_Holding['Potencia_12m']!='']['Error Potencia c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-    efact_suma_Holding['temp'].fillna(value='',inplace=True)
-    efact_suma_Holding['Potencia_12m']=efact_suma_Holding['Potencia_12m']+efact_suma_Holding['temp']
-    efact_suma_Holding.drop(['temp'],axis=1,inplace=True)
-    
-    
-    #Se eliminan columnas bool de condición y umbrales para no tener tantas variables en el explorador
-    del cond1
-    del cond2
-    del umbral_proy
-    del umbral_1m_E
-    del umbral_1m_P
-    
-        #Suma strings con errores y los pega en columna Observación original
-    efact_suma_Holding['Observación']=efact_suma_Holding['Proy']+efact_suma_Holding['Energia_1m']+efact_suma_Holding['Energia_12m']+efact_suma_Holding['Potencia_1m']+efact_suma_Holding['Potencia_12m']
-    
-        #Elimina columnas creadas
-    efact_suma_Holding.drop(['Proy', 'Energia_1m','Energia_12m', 'Potencia_1m','Potencia_12m'], axis=1, inplace=True)
-    #Warning_Holding=efact_suma_Holding[efact_suma_Holding['Observación']!='']
-    
-    #NIVEL DISTRIBUIDORA
-    #Agregar comentario de error cuando se cumple condición
-        #Crea columnas con observaciones, luego serán borradas
-    efact_suma_Dx['Proy']=''
-    efact_suma_Dx['Energia_1m']=''
-    efact_suma_Dx['Energia_12m']=''
-    efact_suma_Dx['Potencia_1m']=''
-    efact_suma_Dx['Potencia_12m']=''
-    
-        #Agrega mensaje de error a observaciones creadas. Si se cumple condición agrega comentario
-        #Proyección con porcentaje de error mayor a umbral porciento
-    umbral_proy=10
-    umbral_1m_E=10
-    umbral_1m_P=10
-    
-        #Rellena columna de error de proyección cuando se cumple que error es mayor a umbral
-    efact_suma_Dx['Proy'].mask(abs(efact_suma_Dx['Error Proyección [%]'])>=umbral_proy, '|Energía alejada de proyección en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_Dx['temp']=efact_suma_Dx[efact_suma_Dx['Proy']!='']['Error Proyección [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_Dx['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_Dx['Proy']=efact_suma_Dx['Proy']+efact_suma_Dx['temp']
-        #Se elimina columna temporal
-    efact_suma_Dx.drop(['temp'],axis=1,inplace=True)
-    
-        #Rellena columna de error de mes anterior cuando se cumple que error es mayor a umbral
-    efact_suma_Dx['Energia_1m'].mask(abs(efact_suma_Dx['Error Energía c/r mes anterior [%]'])>=umbral_1m_E, '|Energía alejada de mes anterior en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_Dx['temp']=efact_suma_Dx[efact_suma_Dx['Energia_1m']!='']['Error Energía c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_Dx['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_Dx['Energia_1m']=efact_suma_Dx['Energia_1m']+efact_suma_Dx['temp']
-        #Se elimina columna temporal
-    efact_suma_Dx.drop(['temp'],axis=1,inplace=True)
-                        
-        #Se repite proceso anterior pero para columna de potencia
-    efact_suma_Dx['Potencia_1m'].mask(abs(efact_suma_Dx['Error Potencia c/r mes anterior [%]'])>=umbral_1m_P, '|Potencia alejada de mes anterior en un ', inplace=True)
-    efact_suma_Dx['temp']=efact_suma_Dx[efact_suma_Dx['Potencia_1m']!='']['Error Potencia c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-    efact_suma_Dx['temp'].fillna(value='',inplace=True)
-    efact_suma_Dx['Potencia_1m']=efact_suma_Dx['Potencia_1m']+efact_suma_Dx['temp']
-    efact_suma_Dx.drop(['temp'],axis=1,inplace=True)
-    
-    
-        #Se crea vector bool con condición en la que Energía es mayor a Promedio-2*DesvEst
-    cond1=efact_suma_Dx['Energia']>=efact_suma_Dx['Energía Promedio 12 Meses']-2*efact_suma_Dx['Desviacion Energía 12 Meses']
-        #Se crea vector bool con condición en la que Energía es menor a Promedio+2*DesvEst
-    cond2=efact_suma_Dx['Energia']<=efact_suma_Dx['Energía Promedio 12 Meses']+2*efact_suma_Dx['Desviacion Energía 12 Meses']
-        #Se rellenan filas donde se cumple cond1 y cond2, es decir donde Energía está dentro de intervalo 2*DesvEst
-    efact_suma_Dx['Energia_12m'].where((cond1) & (cond2), '|Energía alejada de promedio de 12 meses anteriores en un ', inplace=True)
-        #Se agrega error con respecto a promedio de 12 meses a Warning 
-    efact_suma_Dx['temp']=efact_suma_Dx[efact_suma_Dx['Energia_12m']!='']['Error Energía c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-        #Se rellenan nan
-    efact_suma_Dx['temp'].fillna(value='',inplace=True)
-        #Se agrega mensaje a columna principal
-    efact_suma_Dx['Energia_12m']=efact_suma_Dx['Energia_12m']+efact_suma_Dx['temp']
-        #Se elimina columna temporal
-    efact_suma_Dx.drop(['temp'],axis=1,inplace=True)
-    
-    #Se eliminan columnas bool de condición
-    del cond1
-    del cond2
-    
-        #Se repite proceso anterior pero para columna de potencia
-    cond1=efact_suma_Dx['Potencia']>=efact_suma_Dx['Potencia Promedio 12 Meses']-2*efact_suma_Dx['Desviacion Potencia 12 Meses']
-    cond2=efact_suma_Dx['Potencia']<=efact_suma_Dx['Potencia Promedio 12 Meses']+2*efact_suma_Dx['Desviacion Potencia 12 Meses']
-    efact_suma_Dx['Potencia_12m'].where((cond1) & (cond2), '|Potencia alejada de promedio de 12 meses anteriores en un ', inplace=True)
-    efact_suma_Dx['temp']=efact_suma_Dx[efact_suma_Dx['Potencia_12m']!='']['Error Potencia c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-    efact_suma_Dx['temp'].fillna(value='',inplace=True)
-    efact_suma_Dx['Potencia_12m']=efact_suma_Dx['Potencia_12m']+efact_suma_Dx['temp']
-    efact_suma_Dx.drop(['temp'],axis=1,inplace=True)
-    
-    
-    #Se eliminan columnas bool de condición y umbrales para no tener tantas variables en el explorador
-    del cond1
-    del cond2
-    del umbral_proy
-    del umbral_1m_E
-    del umbral_1m_P
-    
-        #Suma strings con errores y los pega en columna Observación original
-    efact_suma_Dx['Observación']=efact_suma_Dx['Proy']+efact_suma_Dx['Energia_1m']+efact_suma_Dx['Energia_12m']+efact_suma_Dx['Potencia_1m']+efact_suma_Dx['Potencia_12m']
-    
-        #Elimina columnas creadas
-    efact_suma_Dx.drop(['Proy', 'Energia_1m','Energia_12m', 'Potencia_1m','Potencia_12m'], axis=1, inplace=True)
-    #Warning_Dx=efact_suma_Dx[efact_suma_Dx['Observación']!='']
-    
-    
     #NIVEL PUNTO RETIRO
-    #Agregar comentario de error cuando se cumple condición
+    
+    #Agregar comentario cuando se cumple condición
         #Crea columnas con observaciones, luego serán borradas
     efact_suma_PR['Proy']=''
     efact_suma_PR['Energia_1m']=''
@@ -667,88 +466,29 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     
         #Agrega mensaje de error a observaciones creadas. Si se cumple condición agrega comentario
         #Proyección con porcentaje de error mayor a umbral porciento
-    umbral_proy=20
-    umbral_1m_E=20
-    umbral_1m_P=20
     
-        #Rellena columna de error de proyección cuando se cumple que error es mayor a umbral 
-    efact_suma_PR['Proy'].mask(~np.isinf(efact_suma_PR['Error Proyección [%]']) & abs(efact_suma_PR['Error Proyección [%]'])>=umbral_proy, '|Energía alejada de proyección en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_PR['temp']=efact_suma_PR[efact_suma_PR['Proy']!='']['Error Proyección [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_PR['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_PR['Proy']=efact_suma_PR['Proy']+efact_suma_PR['temp']
-        #Se elimina columna temporal
-    efact_suma_PR.drop(['temp'],axis=1,inplace=True)
-        #Caso Energía cero y proyección mayor a cero
-    efact_suma_PR['Proy'].mask(np.isinf(efact_suma_PR['Error Proyección [%]']), '|Energía es 0 y proyección indica que debería haber Energía en ese punto|', inplace=True)
-    efact_suma_PR['Proy'].mask(efact_suma_PR['Proyección Energía'].isna(), '|Proyección no existe para este punto|', inplace=True)
+        #Rellena columna de error de proyección cuando se cumple que error es mayor a umbral
+    efact_suma_PR['Proy'].mask(abs(efact_suma_PR['Error relativo proyección '])>=umbral_proy_PR, '|Error relativo de Energía con respecto a proyección mayor a '+str(umbral_proy_PR)+'|' , inplace=True)
+     #Caso Energía cero y proyección mayor a cero
+    efact_suma_PR['Proy'].mask(np.isinf(efact_suma_PR['Error relativo proyección ']), '|Energía es 0 y proyección indica que es mayor a cero|', inplace=True)
+    efact_suma_PR['Proy'].mask(efact_suma_PR['Proyección Energía [MWh]'].isna(), '|Proyección no existe para este punto|', inplace=True)
     
+        #Rellena columna de variación de mes anterior cuando se cumple que error es mayor a umbral
+    efact_suma_PR['Energia_1m'].mask(abs(efact_suma_PR['Variación relativa  Energía c/r mes anterior '])>=umbral_1m_E_PR, '|Variación relativa de energía con respecto a mes anterior mayor a '+str(umbral_1m_E_PR)+'|', inplace=True)
+    efact_suma_PR['Energia_1m'].mask(efact_suma_PR['Energía Mes anterior [MWh]'].isna(), '|No hay datos de energía en mes anterior para este punto|', inplace=True)
     
-        #Rellena columna de error de mes anterior cuando se cumple que error es mayor a umbral
-    efact_suma_PR['Energia_1m'].mask(~np.isinf(efact_suma_PR['Error Energía c/r mes anterior [%]']) & abs(efact_suma_PR['Error Energía c/r mes anterior [%]'])>=umbral_1m_E, '|Energía alejada de mes anterior en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_PR['temp']=efact_suma_PR[efact_suma_PR['Energia_1m']!='']['Error Energía c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_PR['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_PR['Energia_1m']=efact_suma_PR['Energia_1m']+efact_suma_PR['temp']
-        #Se elimina columna temporal
-    efact_suma_PR.drop(['temp'],axis=1,inplace=True)
-        #Caso Energía cero y mes siguiente mayor a cero
-    efact_suma_PR['Energia_1m'].mask(np.isinf(efact_suma_PR['Error Energía c/r mes anterior [%]']), '|Energía es cero y en mes anterior era mayor a cero|', inplace=True)
-    
-    
+                     
         #Se repite proceso anterior pero para columna de potencia
-    efact_suma_PR['Potencia_1m'].mask(~np.isinf(efact_suma_PR['Error Potencia c/r mes anterior [%]']) & abs(efact_suma_PR['Error Potencia c/r mes anterior [%]'])>=umbral_1m_P, '|Potencia alejada de mes anterior en un ', inplace=True)
-    efact_suma_PR['temp']=efact_suma_PR[efact_suma_PR['Potencia_1m']!='']['Error Potencia c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-    efact_suma_PR['temp'].fillna(value='',inplace=True)
-    efact_suma_PR['Potencia_1m']=efact_suma_PR['Potencia_1m']+efact_suma_PR['temp']
-    efact_suma_PR.drop(['temp'],axis=1,inplace=True)
-    efact_suma_PR['Potencia_1m'].mask(np.isinf(efact_suma_PR['Error Potencia c/r mes anterior [%]']), '|Potencia es cero y en mes anterior era mayor a cero|', inplace=True)
+    efact_suma_PR['Potencia_1m'].mask(abs(efact_suma_PR['Variación relativa Potencia c/r mes anterior '])>=umbral_1m_P_PR, '|Variación relativa de potencia con respecto a mes anterior mayor a '+str(umbral_1m_P_PR)+'|', inplace=True)
+    efact_suma_PR['Potencia_1m'].mask(efact_suma_PR['Potencia Mes anterior [MW]'].isna(), '|No hay datos de potencia en mes anterior para este punto|', inplace=True)
     
     
-        #Se crea vector bool con condición en la que Energía es mayor a Promedio-2*DesvEst
-    cond1=efact_suma_PR['Energia']>=efact_suma_PR['Energía Promedio 12 Meses']-2*efact_suma_PR['Desviacion Energía 12 Meses']
-        #Se crea vector bool con condición en la que Energía es menor a Promedio+2*DesvEst
-    cond2=efact_suma_PR['Energia']<=efact_suma_PR['Energía Promedio 12 Meses']+2*efact_suma_PR['Desviacion Energía 12 Meses']
-        #Se rellenan filas donde se cumple cond1 y cond2, es decir donde Energía está dentro de intervalo 2*DesvEst
-    efact_suma_PR['Energia_12m'].where((np.isinf(efact_suma_PR['Error Energía c/r a promedio [%]'])) | ((cond1) & (cond2)), '|Energía alejada de promedio de 12 meses anteriores en un ', inplace=True)
-        #Se agrega error con respecto a promedio de 12 meses a Warning 
-    efact_suma_PR['temp']=efact_suma_PR[efact_suma_PR['Energia_12m']!='']['Error Energía c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-        #Se rellenan nan
-    efact_suma_PR['temp'].fillna(value='',inplace=True)
-        #Se agrega mensaje a columna principal
-    efact_suma_PR['Energia_12m']=efact_suma_PR['Energia_12m']+efact_suma_PR['temp']
-        #Se elimina columna temporal
-    efact_suma_PR.drop(['temp'],axis=1,inplace=True)
-    
-    
-    
-    #Se eliminan columnas bool de condición
-    del cond1
-    del cond2
-    
-        #Se repite proceso anterior pero para columna de potencia
-    cond1=efact_suma_PR['Potencia']>=efact_suma_PR['Potencia Promedio 12 Meses']-2*efact_suma_PR['Desviacion Potencia 12 Meses']
-    cond2=efact_suma_PR['Potencia']<=efact_suma_PR['Potencia Promedio 12 Meses']+2*efact_suma_PR['Desviacion Potencia 12 Meses']
-    efact_suma_PR['Potencia_12m'].where(np.isinf(efact_suma_PR['Error Potencia c/r a promedio [%]']) | ((cond1) & (cond2)), '|Potencia alejada de promedio de 12 meses anteriores en un ', inplace=True)
-    efact_suma_PR['temp']=efact_suma_PR[efact_suma_PR['Potencia_12m']!='']['Error Potencia c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-    efact_suma_PR['temp'].fillna(value='',inplace=True)
-    efact_suma_PR['Potencia_12m']=efact_suma_PR['Potencia_12m']+efact_suma_PR['temp']
-    efact_suma_PR.drop(['temp'],axis=1,inplace=True)
-    
-    
-    #Se eliminan columnas bool de condición y umbrales para no tener tantas variables en el explorador
-    del cond1
-    del cond2
-    del umbral_proy
-    del umbral_1m_E
-    del umbral_1m_P
-    
+        #Rellena columna de variación de mes anterior cuando se cumple que error es mayor a umbral
+    efact_suma_PR['Energia_12m'].mask(abs(efact_suma_PR['Variación relativa  Energía c/r a promedio '])>=umbral_12m_E_PR, '|Variación relativa de energía con respecto a 12 meses anteriores mayor a '+str(umbral_12m_E_PR)+'|', inplace=True)
+        
+         #Rellena columna de variación de mes anterior cuando se cumple que error es mayor a umbral
+    efact_suma_PR['Potencia_12m'].mask(abs(efact_suma_PR['Variación relativa Potencia c/r a promedio '])>=umbral_12m_E_PR, '|Variación relativa de potencia con respecto a 12 meses anteriores mayor a '+str(umbral_12m_P_PR)+'|', inplace=True)
+        
         #Suma strings con errores y los pega en columna Observación original
     efact_suma_PR['Observación']=efact_suma_PR['Proy']+efact_suma_PR['Energia_1m']+efact_suma_PR['Energia_12m']+efact_suma_PR['Potencia_1m']+efact_suma_PR['Potencia_12m']
     
@@ -756,89 +496,13 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
     efact_suma_PR.drop(['Proy', 'Energia_1m','Energia_12m', 'Potencia_1m','Potencia_12m'], axis=1, inplace=True)
     #Warning_PR=efact_suma_PR[efact_suma_PR['Observación']!='']
     
+    #Agrego unidad a Energia y potencia
+    efact_suma_Holding.rename(columns={"Energia": "Energía [MWh]","Potencia": "Potencia [MW]"},inplace=True)
+    efact_suma_Dx.rename(columns={"Energia": "Energía [MWh]","Potencia": "Potencia [MW]"},inplace=True)
+    efact_suma_PR.rename(columns={"Energia": "Energía [MWh]","Potencia": "Potencia [MW]"},inplace=True)
+    efact_suma_CC.rename(columns={"Energia": "Energía [MWh]","Potencia": "Potencia [MW]"},inplace=True)
     
     
-    
-    #NIVEL CONTRATO
-    #Agregar comentario de error cuando se cumple condición
-        #Crea columnas con observaciones, luego serán borradas
-    efact_suma_CC['Energia_1m']=''
-    efact_suma_CC['Energia_12m']=''
-    efact_suma_CC['Potencia_1m']=''
-    efact_suma_CC['Potencia_12m']=''
-    
-        #Agrega mensaje de error a observaciones creadas. Si se cumple condición agrega comentario
-    umbral_1m_E=30
-    umbral_1m_P=30
-    
-    
-        #Rellena columna de error de mes anterior cuando se cumple que error es mayor a umbral
-    efact_suma_CC['Energia_1m'].mask((~np.isinf(efact_suma_CC['Error Energía c/r mes anterior [%]'])) & (~(efact_suma_CC['Error Energía c/r mes anterior [%]']).isna()) & abs(efact_suma_CC['Error Energía c/r mes anterior [%]'])>=umbral_1m_E, '|Energía alejada de mes anterior en un ', inplace=True)
-        #Crea columna temporal que recupera porcentaje en lugares donde se cumple la condición descrita anteriormente
-        #Esto se hace porque con la función mask no se puede hacer directamente
-    efact_suma_CC['temp']=efact_suma_CC[efact_suma_CC['Energia_1m']!='']['Error Energía c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-        #Se rellenan nan en lugares donde no se cumplía la condición, así la observación no es nan cuando se suman los strings 
-    efact_suma_CC['temp'].fillna(value='',inplace=True)
-        #Se agrega porcentaje a la columna principal
-    efact_suma_CC['Energia_1m']=efact_suma_CC['Energia_1m']+efact_suma_CC['temp']
-        #Se elimina columna temporal
-    efact_suma_CC.drop(['temp'],axis=1,inplace=True)
-        #Caso Energía cero y mes siguiente mayor a cero
-    efact_suma_CC['Energia_1m'].mask(np.isinf(efact_suma_CC['Error Energía c/r mes anterior [%]']), '|Energía es cero y en mes anterior era mayor a cero|', inplace=True)
-    
-    
-        #Se repite proceso anterior pero para columna de potencia
-    efact_suma_CC['Potencia_1m'].mask(~np.isinf(efact_suma_CC['Error Potencia c/r mes anterior [%]']) & (~(efact_suma_CC['Error Potencia c/r mes anterior [%]']).isna()) & abs(efact_suma_CC['Error Potencia c/r mes anterior [%]'])>=umbral_1m_P, '|Potencia alejada de mes anterior en un ', inplace=True)
-    efact_suma_CC['temp']=efact_suma_CC[efact_suma_CC['Potencia_1m']!='']['Error Potencia c/r mes anterior [%]'].to_frame().applymap(int).applymap(str)+'[%]|'
-    efact_suma_CC['temp'].fillna(value='',inplace=True)
-    efact_suma_CC['Potencia_1m']=efact_suma_CC['Potencia_1m']+efact_suma_CC['temp']
-    efact_suma_CC.drop(['temp'],axis=1,inplace=True)
-    efact_suma_CC['Potencia_1m'].mask(np.isinf(efact_suma_CC['Error Potencia c/r mes anterior [%]']), '|Potencia es cero y en mes anterior era mayor a cero|', inplace=True)
-    
-    
-        #Se crea vector bool con condición en la que Energía es mayor a Promedio-2*DesvEst
-    cond1=efact_suma_CC['Energia']>=efact_suma_CC['Energía Promedio 12 Meses']-2*efact_suma_CC['Desviacion Energía 12 Meses']
-        #Se crea vector bool con condición en la que Energía es menor a Promedio+2*DesvEst
-    cond2=efact_suma_CC['Energia']<=efact_suma_CC['Energía Promedio 12 Meses']+2*efact_suma_CC['Desviacion Energía 12 Meses']
-        #Se rellenan filas donde se cumple cond1 y cond2, es decir donde Energía está dentro de intervalo 2*DesvEst
-    efact_suma_CC['Energia_12m'].where((efact_suma_CC['Error Energía c/r a promedio [%]']).isna() | (np.isinf(efact_suma_CC['Error Energía c/r a promedio [%]'])) | ((cond1) & (cond2)), '|Energía alejada de promedio de 12 meses anteriores en un ', inplace=True)
-        #Se agrega error con respecto a promedio de 12 meses a Warning 
-    efact_suma_CC['temp']=efact_suma_CC[efact_suma_CC['Energia_12m']!='']['Error Energía c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-        #Se rellenan nan
-    efact_suma_CC['temp'].fillna(value='',inplace=True)
-        #Se agrega mensaje a columna principal
-    efact_suma_CC['Energia_12m']=efact_suma_CC['Energia_12m']+efact_suma_CC['temp']
-        #Se elimina columna temporal
-    efact_suma_CC.drop(['temp'],axis=1,inplace=True)
-    
-    
-    
-    #Se eliminan columnas bool de condición
-    del cond1
-    del cond2
-    
-        #Se repite proceso anterior pero para columna de potencia
-    cond1=efact_suma_CC['Potencia']>=efact_suma_CC['Potencia Promedio 12 Meses']-2*efact_suma_CC['Desviacion Potencia 12 Meses']
-    cond2=efact_suma_CC['Potencia']<=efact_suma_CC['Potencia Promedio 12 Meses']+2*efact_suma_CC['Desviacion Potencia 12 Meses']
-    efact_suma_CC['Potencia_12m'].where((efact_suma_CC['Error Potencia c/r a promedio [%]']).isna() | np.isinf(efact_suma_CC['Error Potencia c/r a promedio [%]']) | ((cond1) & (cond2)), '|Potencia alejada de promedio de 12 meses anteriores en un ', inplace=True)
-    efact_suma_CC['temp']=efact_suma_CC[efact_suma_CC['Potencia_12m']!='']['Error Potencia c/r a promedio [%]'].to_frame().applymap(int).applymap(str)+'[%], lo cual está fuera de invervalo de 2 veces la desviación estándar|'
-    efact_suma_CC['temp'].fillna(value='',inplace=True)
-    efact_suma_CC['Potencia_12m']=efact_suma_CC['Potencia_12m']+efact_suma_CC['temp']
-    efact_suma_CC.drop(['temp'],axis=1,inplace=True)
-    
-    
-    #Se eliminan columnas bool de condición y umbrales para no tener tantas variables en el explorador
-    del cond1
-    del cond2
-    del umbral_1m_E
-    del umbral_1m_P
-    
-        #Suma strings con errores y los pega en columna Observación original
-    efact_suma_CC['Observación']=efact_suma_CC['Energia_1m']+efact_suma_CC['Energia_12m']+efact_suma_CC['Potencia_1m']+efact_suma_CC['Potencia_12m']
-    
-        #Elimina columnas creadas
-    efact_suma_CC.drop(['Energia_1m','Energia_12m', 'Potencia_1m','Potencia_12m'], axis=1, inplace=True)
-    #Warning_CC=efact_suma_CC[efact_suma_CC['Observación']!='']
     
     NombreArchivo='Revisión_mes_'+str(Fecha_mes)+'.xlsx'
     
@@ -847,3 +511,7 @@ def Comparador(ConectorDB,efact_corregido,efact_historico,proy):
         efact_suma_Dx.to_excel(writer, sheet_name='Distribuidora')
         efact_suma_PR.to_excel(writer, sheet_name='Punto Retiro')
         efact_suma_CC.to_excel(writer, sheet_name='Codigo Contrato')
+    
+    
+    
+    
