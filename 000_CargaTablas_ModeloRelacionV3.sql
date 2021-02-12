@@ -1,5 +1,5 @@
 use pnp_2
---/* 19:04
+/* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
 GO
@@ -193,7 +193,7 @@ select distinct version from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.CEN_Efact
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
 IF OBJECT_ID('tempefactV0', 'U') IS NOT NULL DROP TABLE tempefactV0
 GO
---drop table if exists tempefact					
+
 select  t1.idcen,VE.IdVersion,t1.fecha
 		,case	when t1.Dx in('CGE Distribución','CGED') then 18 
 				when t1.Dx in('Enel Distribución','CHILECTRA') then 10 
@@ -715,4 +715,7 @@ from temptrasp t1
 left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
 
 IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
+
+insert into DolarFijacion
+select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),* from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.dolarFijacion
 --*/

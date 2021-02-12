@@ -24,21 +24,21 @@ ConectorDB='Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;T
             #conn.commit()
             #IdVersion=pd.read_sql_query("select idversion from versionefact  where Descripcion='"+VersionDescripcion+"'",conn)
 
-#Para octubre  2020
-IdVersion=18
+#Para diciembre  2020
+IdVersion=22
 conn = pyodbc.connect(ConectorDB)
 cursor = conn.cursor()
+efact_corregido= pd.read_sql_query('''select * from efact where IdVersion=22 order by Fecha;''',conn)#Esto en realidad es efact_corregido
 efact_historico= pd.read_sql_query('''select * from efact where IdVersion=16 Union select * from efact where IdVersion=11
     Union select * from efact where IdVersion=2 Union select * from efact where IdVersion=18
     Union select * from efact where IdVersion=20 Union select * from efact where IdVersion=22 order by Fecha;''',conn)
 proy= pd.read_sql_query('''select * from demanda where Version='2007ProyV1' order by Mes;''',conn) 
     #IMPORTAR DATOS
-path = 'C:/fvalenci/CNE/PNP/PNP_2007_10_FPEC/Input/CEN/Entrega_Revisión_EFacDx_2010.v02.xlsx'
+path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFacDx_2012.v01.xlsx'
 
 Efact_error,Efact=Validador(ConectorDB,path,IdVersion)#
 Efact_corregido=CorrectorEfact(ConectorDB,IdVersion,Efact)#
-CargaEfactDB(ConectorDB,Efact_corregido)
-efact_corregido= pd.read_sql_query('''select * from efact where IdVersion=18 order by Fecha;''',conn)#Esto en realidad es efact_corregido
+#CargaEfactDB(ConectorDB,Efact_corregido)
 Comparador(ConectorDB,efact_corregido,efact_historico,proy)
 
 """
@@ -49,4 +49,16 @@ MENSAJES NO DEBEN CONTENER JUICIOS DE VALOR
 QUE VALORES EN PORCENTAJE APAREZCAN COMO NÚMERO
 ELIMINAR PABRA ERROR CUANDO SE COMPRARAN DATOS HISTÓRICOS
 CORREGIR p015 PARA QUE VERIFIQUE VIGENCIA CONTRATO.
+"""
+
+"""
+#Para noviembre  2020
+IdVersion=20
+
+    #IMPORTAR DATOS
+path = 'C:/fvalenci/CNE/PNP/PNP_2007_11-12_FPEC/Input/CEN/Entrega_Revisión_EFacDx_2011.v01.xlsx'
+
+Efact_error,Efact=Validador(ConectorDB,path,IdVersion)#
+Efact_corregido=CorrectorEfact(ConectorDB,IdVersion,Efact)#
+CargaEfactDB(ConectorDB,Efact_corregido)#
 """
