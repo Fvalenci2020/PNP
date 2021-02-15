@@ -51,18 +51,9 @@ def Validador(ConectorDB,path,IdVersion):
         #Agrego Id a contrato y su vigencia
     Datos=pd.merge(Datos,contrato.iloc[:,[0,1,-2,-1]],left_on='CodigoContrato',right_on='CodigoContrato',how = 'left')
     Datos['VigenciaFin']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
-    Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
-        
-       #Agregar columnas con flag
-          #Crea fila de flag para IdDistribuidora. Cuando IdDistribuidora es nan, flag=1
-    
-      #Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaFin'], format='%Y-%m-%d')
     Datos['VigenciaInicio']=pd.to_datetime(Datos['VigenciaInicio'], format='%Y-%m-%d')
         
-        
        #Agregar columnas con flag
-          #Crea fila de flag para IdDistribuidora
-    conn = pyodbc.connect(ConectorDB)
         #Cuando IdDistribuidora es nan, flag=1
     Datos['flag distribuidora']=1
         #Reemplaza datos cuando la condición es False
@@ -83,9 +74,7 @@ def Validador(ConectorDB,path,IdVersion):
     Datos['flag codigocontrato Vigencia']=0
         #Reemplaza datos cuando la condición es False
     Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio < Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 1, inplace=True,)#tiene error
-     #################### ACÁ SE DEBE AGREGAR ANÁLISIS DE VIGENCIA DE CONTRATO   
     Datos['flag codigocontrato Vigencia'].mask((np.isnat(Datos.VigenciaInicio)) | (np.isnat(Datos.VigenciaFin)), 1, inplace=True,)#tiene error
-        
     
         #Agregar comentario de error cuando flag igual a 1
      #Crea columnas con observaciones, luego serán borradas
@@ -118,9 +107,6 @@ def Validador(ConectorDB,path,IdVersion):
     conn.close()
     del conn
     return Efact_error,Efact    
-###########################################################################
-        #return Efact_error,Efact    
-    ###########################################################################
 
 #PROCEDIMIENTO DE CORRECCIÓN DE DATOS PARA QUE PUEDA CARGARSE EN SQL.
 ###########################################################################
@@ -191,8 +177,7 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
     #mask= ((efact.Fecha=='2020-08-01')&(efact.IdDistribuidora==33) & (efact.IdGeneradora==21) & (efact.IdCodigoContrato==624))
     #mask2= ((Efact_corregido.IdDistribuidora==33) & (Efact_corregido.IdGeneradora==21) & (Efact_corregido.IdCodigoContrato==624))
     #Puntofaltante=efact[mask]
-    #Puntofaltante2=Efact_corregido[mask2] 
-    
+    #Puntofaltante2=Efact_corregido[mask2]
     
     #Agrega columna con tipo de despacho
         #Crea columna con datos del despacho
@@ -210,8 +195,7 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
     Efact_corregido['IdTipoDespacho'].where(~((Efact_corregido.IdDistribuidora==12) | (Efact_corregido.IdDistribuidora==13) | (Efact_corregido.IdDistribuidora==15)) , 5, inplace=True,)
         #Caso 6 Reconversión energética
     Efact_corregido['IdTipoDespacho'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 6, inplace=True,)    
-    
-    
+      
     #Crea columna con la id de la versión
     Efact_corregido['IdVersion']=IdVersion #Este podría ser cualquier número, por convención 15 es V1 y 16 V2
     
@@ -221,8 +205,6 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
     del conn
     #Crea Tabla Efact sin errores en observación
     return Efact_corregido[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdTipoDespacho','Energía [kWh]','Potencia [kW]','Observación']]
-
-###########################################################################
 
 #PROCEDIMIENTO DE CARGA DE EFACT A DB
 ###########################################################################
