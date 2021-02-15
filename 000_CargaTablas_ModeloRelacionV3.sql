@@ -721,10 +721,10 @@ select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),* from [GTD-NOT019\SQLEXPRES
 
 insert into Estabilizacion
 select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),*,'' from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Estabilizacion
---*/
+
 IF OBJECT_ID('tempResultEst', 'U') IS NOT NULL DROP TABLE tempResultEst
 GO
-select	t1.idversionEstabilizacion,t1.idcen,t1.idversionNoEst IdVersionPreciosDef,t1.idversionEst IdVersionPreciosPNP
+select	t1.idversionEstabilizacion,t1.idcen,t1.idversionNoEst IdVersion_PreciosDef,t1.idversionEst IdVersion_PreciosPNP
 		,case	when t1.Dx in('CGE Distribución','CGED') then 18 
 				when t1.Dx in('Enel Distribución','CHILECTRA') then 10 
 				when t1.Dx in('ELECDA SING','ELECDA SIC') then 3
@@ -760,23 +760,11 @@ update tempResultEst set IdTipoDespacho=4 where IdDistribuidora=45--para Mataqui
 update tempResultEst set IdTipoDespacho=5 where IdDistribuidora in (12,13,15) --para filiales Enel se utilizan contratos del holding
 update tempResultEst set IdTipoDespacho=1 where idCodigoContrato <>0 and IdDistribuidora not in (45,12,13,15)
 
-DELETE FROM tempResultEst WHERE IDPUNTORETIRO IS NULL AND IDVERSIONpreciosdef IN (119,120)
+DELETE FROM tempResultEst WHERE IDPUNTORETIRO IS NULL AND IdVersion_PreciosDef IN (119,120)
 
-select top 10 * from tempResultEst
+insert into EstabilizacionDetalle
+select idversionEstabilizacion,idcen,IdVersion_PreciosDef,IdVersion_PreciosPNP,IdDistribuidora,idgeneradora,IdCodigoContrato,IdPuntoRetiro,IdTipoDespacho,energia,potencia,fechaefact_PrecioDef,IdVersionEFact_PrecioDef,PNP_MesIndexacion_PrecioDef,PNP_VersionIndex_PrecioDef,PNP_Version_PrecioDef,EPC_PrecioDef,PPC_PrecioDef,ERec_Peso_PrecioDef,PRec_Peso_PrecioDef,fechaefact_PrecioPNP,IdVersionEFact_PrecioPNP,PNP_MesIndexacion_PrecioPNP,PNP_VersionIndex_PrecioPNP,PNP_Version_PrecioPNP,EPC_PrecioPNP,PPC_PRecioPNP,ERec_Peso_PrecioPNP,PRec_Peso_PrecioPNP,VariacionIPC,Interes,FactorAjusteE,FactorAjusteP,DolarEstabilizacion,DifEnergiaRecPeso,DifPotenciaRecPeso,DifEnergiaRecPesoEst,DifPotenciaRecPesoEst,DifEnergiaRecDolarEst,DifPotenciaRecDolarEst
+from tempResultEst
 
-
-
---insert into recaudaciondetalle
---select	idversion,max(idcen),IdVersionEfact,fechaEfact,IdDistribuidora,idgeneradora,IdCodigoContrato,IdPuntoRetiro,IdTipoDespacho,sum(energia),sum(potencia)
---		,IdSistemaZonal,FechaPZ,VersionPZ,FEPE,FEPP,IdBarraNacionalFR,PeriodoFR,FactorFR,PNP_VersionIndex
---		,PNP_MesIndexacion,PNP_Version,PNELP,PNPLP,PNCP_Mes,PNCP_Version,PNCP_IdNudo,CETCP,PNECP_USD,PNPCP_USD
---		,sum(EPC),sum(PPC),sum(ERec_USD),sum(PRec_USD),Dolar,sum(ERec_Peso),sum(PRec_Peso)
---from tempResultEst
---where idversion!=0
---group by idversion,IdVersionEfact,fechaEfact,IdDistribuidora,idgeneradora,IdCodigoContrato,IdPuntoRetiro
---		,IdTipoDespacho,FechaPZ,VersionPZ,IdSistemaZonal,FEPE,FEPP,IdBarraNacionalFR,PeriodoFR,FactorFR,PNP_VersionIndex
---		,PNP_MesIndexacion,PNP_Version,PNELP,PNPLP,PNCP_Mes,PNCP_Version,PNCP_IdNudo,CETCP,PNECP_USD,PNPCP_USD
---		,Dolar
-
---drop table tempResultEst
+drop table tempResultEst
 --*/

@@ -42,9 +42,9 @@ where t1.idversion in (select IdVersionContratosDefinitiva from VersionEstabiliz
 group by T1.idversion,t1.IdEfact,t1.fechaefact,t1.IdVersionEFact,t1.PNP_VersionIndex,t1.PNP_MesIndexacion,t1.PNP_Version,T1.IdDistribuidora,T1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdSistemaZonal,t1.idtipodespacho
 
 --COMPARAR RESULTADOS
---IF OBJECT_ID('Resultado_Estabilizacion', 'U') IS NOT NULL DROP TABLE Resultado_Estabilizacion
---delete from Resultado_Estabilizacion WHERE IdVersionEstabilizacion=@IdVersionEstabilizacion
---insert into Resultado_Estabilizacion
+--IF OBJECT_ID('EstabilizacionDetalle', 'U') IS NOT NULL DROP TABLE EstabilizacionDetalle
+--delete from EstabilizacionDetalle WHERE IdVersionEstabilizacion=@IdVersionEstabilizacion
+--insert into EstabilizacionDetalle
 SELECT	@IdVersionEstabilizacion IdVersionEstabilizacion,
 		t1.IdEfact,t1.IdVersionPreciosDef,t2.IdVersionPreciosPNP,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.idtipodespacho,t1.Energia,t1.Potencia,
 		t1.fechaefact fechaefact_PrecioDef,t1.IdVersionEFact IdVersionEFact_PrecioDef,t1.PNP_VersionIndex PNP_VersionIndex_PrecioDef,t1.PNP_MesIndexacion PNP_MesIndexacion_PrecioDef,t1.PNP_Version	PNP_Version_PrecioDef,t1.EPC EPC_PrecioDef,t1.PPC PPC_PrecioDef,T1.ERec_Peso ERec_Peso_PrecioDef,T1.PRec_Peso PRec_Peso_PrecioDef,
