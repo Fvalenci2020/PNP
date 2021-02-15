@@ -722,3 +722,61 @@ select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),* from [GTD-NOT019\SQLEXPRES
 insert into Estabilizacion
 select iD= ROW_NUMBER() OVER(ORDER BY(SELECT NULL)),*,'' from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Estabilizacion
 --*/
+IF OBJECT_ID('tempResultEst', 'U') IS NOT NULL DROP TABLE tempResultEst
+GO
+select	t1.idversionEstabilizacion,t1.idcen,t1.idversionNoEst IdVersionPreciosDef,t1.idversionEst IdVersionPreciosPNP
+		,case	when t1.Dx in('CGE Distribución','CGED') then 18 
+				when t1.Dx in('Enel Distribución','CHILECTRA') then 10 
+				when t1.Dx in('ELECDA SING','ELECDA SIC') then 3
+				when t1.Dx in('LUZANDES') then 15
+				else D.IdDistribuidora end IdDistribuidora 
+		,case when G.idgeneradora is null then 0 else G.idgeneradora end idgeneradora
+		,case	when t1.CodigoContrato IN ('Contrato Corto Plazo_Coelcha_ENDESA','Contrato Corto Plazo_Frontel_ENDESA','Contrato Corto Plazo_COOPERSOL_E-CL') then 0 
+				when t1.CodigoContrato IN ('DÉFICIT_Coopelan') then 0 
+				ELSE CC.IdCodigoContrato END IdCodigoContrato
+		,t1.CodigoContrato2 CodigoContrato
+		,PR.IdPuntoRetiro,0 IdTipoDespacho,t1.energia,t1.potencia
+		,t1.FechaEfact    fechaefact_PrecioDef,VE1.IdVersion IdVersionEFact_PrecioDef,t1.versionPNP    PNP_VersionIndex_PrecioDef,t1.fechaPNP    PNP_MesIndexacion_PrecioDef,'Mes' PNP_Version_PrecioDef,t1.EnergiaPC    EPC_PrecioDef,t1.PotenciaPC    PPC_PrecioDef,t1.EnergiaREcPeso    ERec_Peso_PrecioDef,t1.PotenciaRecPeso    PRec_Peso_PrecioDef
+		,t1.FechaEfactEst fechaefact_PrecioPNP,VE2.IdVersion IdVersionEFact_PrecioPNP,t1.VersionPNPEst PNP_VersionIndex_PrecioPNP,t1.FEchaPNPEst PNP_MesIndexacion_PrecioPNP,'ITD' PNP_Version_PrecioPNP,t1.EnergiaPCEst EPC_PrecioPNP,t1.PotenciaPCEst PPC_PRecioPNP,t1.EnergiaREcPesoEst ERec_Peso_PrecioPNP,t1.PotenciaRecPesoEst PRec_Peso_PrecioPNP
+		,t1.VariacionIPC,t1.Interes,t1.FactorAjusteE,t1.FactorAjusteP,t1.DolarEstabilizacion
+		,t1.DifEnergiaRecPeso,t1.DifPotenciaRecPeso,t1.DifEnergiaRecPesoEst,t1.DifPotenciaRecPesoEst,t1.DifEnergiaRecDolarEst,t1.DifPotenciaRecDolarEst
+		--,t1.fecha
+		--,t1.versionPNP PNP_VersionIndex,t1.FechaPNP PNP_MesIndexacion,t1.TipoPNP PNP_Version,Pe PNELP,PP PNPLP
+		--,t1.mes_pncp PNCP_Mes,PNCP.Version PNCP_Version,case when t1.mes_pncp is null then 0 else fr.IdBarraNacional end PNCP_IdNudo
+		--,t1.CETDolar CETCP,t1.PrecioNudoEnergiaDolar PNECP_USD,t1.PrecioNudoPotenciaDolar PNPCP_USD
+		--,t1.EnergiaPC EPC,t1.PotenciaPC PPC,t1.EnergiaRecDolar ERec_USD,t1.PotenciaRecDolar PRec_USD,t1.Dolar,t1.EnergiaRecPeso ERec_Peso,t1.PotenciaRecPeso PRec_Peso
+into tempResultEst
+from (	select *,REPLACE(CodigoContrato,'CGE Distribución','CGE Distribucion') CodigoContrato2 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Resultado_Estabilizacion) t1
+left join VersionEfact VE1 on VE1.descripcion=t1.VersionEfact
+left join VersionEfact VE2 on VE2.descripcion=t1.VersionEfactEst
+left join distribuidora D on D.NombreDistribuidora=t1.DX
+left join generadora G on G.NombreGeneradora=t1.Gx
+left join codigocontrato CC on CC.CodigoContrato=t1.CodigoContrato2
+left join puntoretiro PR on PR.PuntoRetiro=t1.PuntoRetiro
+
+update tempResultEst set IdTipoDespacho=2 where CodigoContrato IN ('Contrato Corto Plazo_Coelcha_ENDESA','Contrato Corto Plazo_Frontel_ENDESA','Contrato Corto Plazo_COOPERSOL_E-CL') 
+update tempResultEst set IdTipoDespacho=3 where CodigoContrato IN ('DÉFICIT_Coopelan')
+update tempResultEst set IdTipoDespacho=4 where IdDistribuidora=45--para Mataquito se asocia Despacho mediante traspaso de excedentes
+update tempResultEst set IdTipoDespacho=5 where IdDistribuidora in (12,13,15) --para filiales Enel se utilizan contratos del holding
+update tempResultEst set IdTipoDespacho=1 where idCodigoContrato <>0 and IdDistribuidora not in (45,12,13,15)
+
+DELETE FROM tempResultEst WHERE IDPUNTORETIRO IS NULL AND IDVERSIONpreciosdef IN (119,120)
+
+select top 10 * from tempResultEst
+
+
+
+--insert into recaudaciondetalle
+--select	idversion,max(idcen),IdVersionEfact,fechaEfact,IdDistribuidora,idgeneradora,IdCodigoContrato,IdPuntoRetiro,IdTipoDespacho,sum(energia),sum(potencia)
+--		,IdSistemaZonal,FechaPZ,VersionPZ,FEPE,FEPP,IdBarraNacionalFR,PeriodoFR,FactorFR,PNP_VersionIndex
+--		,PNP_MesIndexacion,PNP_Version,PNELP,PNPLP,PNCP_Mes,PNCP_Version,PNCP_IdNudo,CETCP,PNECP_USD,PNPCP_USD
+--		,sum(EPC),sum(PPC),sum(ERec_USD),sum(PRec_USD),Dolar,sum(ERec_Peso),sum(PRec_Peso)
+--from tempResultEst
+--where idversion!=0
+--group by idversion,IdVersionEfact,fechaEfact,IdDistribuidora,idgeneradora,IdCodigoContrato,IdPuntoRetiro
+--		,IdTipoDespacho,FechaPZ,VersionPZ,IdSistemaZonal,FEPE,FEPP,IdBarraNacionalFR,PeriodoFR,FactorFR,PNP_VersionIndex
+--		,PNP_MesIndexacion,PNP_Version,PNELP,PNPLP,PNCP_Mes,PNCP_Version,PNCP_IdNudo,CETCP,PNECP_USD,PNPCP_USD
+--		,Dolar
+
+--drop table tempResultEst
+--*/
