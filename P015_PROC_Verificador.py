@@ -102,10 +102,11 @@ def Validador(ConectorDB,path,IdVersion):
         #Reemplaza datos cuando la condición es False
     Datos['flag codigocontrato Vigencia']=1
         #Reemplaza datos cuando la condición es False
-    Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio < Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+    #Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio < Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+    Datos['flag codigocontrato Vigencia'].mask((np.isnat(Datos.VigenciaInicio)) & ((Datos.VigenciaInicio<Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha)), 0, inplace=True,)#tiene error
+    
  #################### ACÁ SE DEBE AGREGAR ANÁLISIS DE VIGENCIA DE CONTRATO   
-
-    Datos['flag codigocontrato Vigencia'].mask((Datos.VigenciaInicio<Datos.Fecha) & (Datos.VigenciaFin>Datos.Fecha), 0, inplace=True,)#tiene error
+    
     
     #Agregar comentario de error cuando flag igual a 1
         #Crea columnas con observaciones, luego serán borradas
