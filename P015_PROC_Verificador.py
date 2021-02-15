@@ -96,13 +96,11 @@ def Validador(ConectorDB,path,IdVersion):
     Datos['Observación5']=''
         
             #Agrega mensaje de error a observaciones creadas. Si flag es 1 agrega error.
-    Datos['Observación1'].where(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
-    Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
-    Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
-    Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
-     #Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
-    
-    Datos['Observación5'].where(Datos['flag codigocontrato Vigencia']==0, '-Error Código Contrato Sin Vigencia', inplace=True,)
+    Datos['Observación1'].mask(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
+    Datos['Observación2'].mask(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
+    Datos['Observación3'].mask(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
+    Datos['Observación4'].mask(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
+    Datos['Observación5'].mask(((Datos['flag codigocontrato Vigencia']==0) & (Datos['flag codigocontrato']==1)), '-Error Código Contrato Sin Vigencia', inplace=True,)
         
         #Suma strings con errores y los pega en columna Observación original
     Datos['Observación']=Datos['Observación1']+Datos['Observación2']+Datos['Observación3']+Datos['Observación4']+Datos['Observación5']
