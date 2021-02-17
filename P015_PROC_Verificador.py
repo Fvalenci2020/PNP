@@ -85,10 +85,10 @@ def Validador(ConectorDB,path,IdVersion):
     Datos['Observación5']=''
         
             #Agrega mensaje de error a observaciones creadas. Si flag es 1 agrega error.
-    Datos['Observación1'].mask(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
-    Datos['Observación2'].mask(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
-    Datos['Observación3'].mask(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
-    Datos['Observación4'].mask(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
+    Datos['Observación1'].where(Datos['flag distribuidora']==0, '-Error nombre de Distribuidora', inplace=True,)
+    Datos['Observación2'].where(Datos['flag generadora']==0, '-Error nombre de Generadora', inplace=True,)
+    Datos['Observación3'].where(Datos['flag puntoretiro']==0, '-Error nombre de Punto Retiro', inplace=True,)
+    Datos['Observación4'].where(Datos['flag codigocontrato']==0, '-Error nombre de Código Contrato', inplace=True,)
     Datos['Observación5'].mask(((Datos['flag codigocontrato Vigencia']==0) & (Datos['flag codigocontrato']==1)), '-Error Código Contrato Sin Vigencia', inplace=True,)
         
         #Suma strings con errores y los pega en columna Observación original
@@ -103,7 +103,8 @@ def Validador(ConectorDB,path,IdVersion):
     #UTILIZAR IDVERSION CREADO MÁS ARRIBA
     Efact=Datos[['IdData','IdVersion','Fecha','IdDistribuidora','IdGeneradora','IdCodigoContrato','IdPuntoRetiro','Distribuidora','Suministrador','CodigoContrato','PuntoRetiro','IdDespacho','Energía [kWh]','Potencia [kW]','Observación']]
     Efact_error=Efact[Efact['Observación']!='']
-    Efact_error.to_excel(r"Efact_error.xlsx", index=False,header=True,encoding='latin_1')
+    NombreArchivo='Efact_error_'+str(IdVersion)+'.xlsx'
+    Efact_error.to_excel(NombreArchivo, index=False,header=True,encoding='latin_1')
     conn.close()
     del conn
     return Efact_error,Efact    
@@ -171,8 +172,8 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
     Efact_corregido['IdCodigoContrato'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 0, inplace=True,)    
     Efact_corregido['IdCodigoContrato'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 0, inplace=True,)    
         #Caso punto retiro en blanco
-    Efact_corregido['IdPuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') , 194, inplace=True,)   
-    Efact_corregido['PuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') ,'Quirihue 023' , inplace=True,)    
+    #Efact_corregido['IdPuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') , 194, inplace=True,)   
+    #Efact_corregido['PuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') ,'Quirihue 023' , inplace=True,)    
         #Busca punto faltante en efact mes 07. El punto faltante es	Quirihue 023
     #mask= ((efact.Fecha=='2020-08-01')&(efact.IdDistribuidora==33) & (efact.IdGeneradora==21) & (efact.IdCodigoContrato==624))
     #mask2= ((Efact_corregido.IdDistribuidora==33) & (Efact_corregido.IdGeneradora==21) & (Efact_corregido.IdCodigoContrato==624))
