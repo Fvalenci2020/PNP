@@ -1,6 +1,6 @@
 --PROCEDIMIENTO PARA INDEXACION DE CONTRATOS.
 
-/*
+--/*
 alter PROCEDURE [014_PROC_INDEXACONTRATO]
 					@VersionIndex		varchar(255),
 					@MesIndexacion		date,
@@ -13,17 +13,16 @@ AS
 --*/
 
 --PARA EJECUCIÓN LOCAL
---/*
-use pnp_2
-declare @VersionIndex		varchar(255)='ITPV1'--version del mes que toma la referencia de los factores de indexación, es equivalente al mes sobre el cual se están indexando los contratos.
-declare @MesIndexacion		date='2020-04-01'--mes que toma la referencia de los factores de indexación, es equivalente al mes sobre el cual se están indexando los contratos.
-declare @Version			varchar(255)='Mes'--indica si son precios del contratos PNP o contratos definitiva. Cuando es ITD, se fuerzan precios de contratos futuros que estén activos hasta 6 meses después de mes indexación
+/*
+use pnp_3
+declare @VersionIndex		varchar(255)='Carla1'--version del mes que toma la referencia de los factores de indexación, es equivalente al mes sobre el cual se están indexando los contratos.
+declare @MesIndexacion		date='2020-10-01'--mes que toma la referencia de los factores de indexación, es equivalente al mes sobre el cual se están indexando los contratos.
+declare @Version			varchar(255)='Mes'--indica si son precios del contratos PNP o contratos definitiva. Cuando es ITD, se fuerzan precios de contratos futuros que estén activos hasta 6 meses depsués de mes indexación
 --Cuando se realiza la indexación para el mes a ser utilizado para el modelo PNP, se debe indicar el mes de indexación (para el caso de enero 2021, sería octubre 2020 y tipo pnp=ITD, entonces cuando se transfiere  a la tabla "PNP" se le coloca el mes de referencia.
 declare @TipoIndexacion			varchar(255)='V1'--indica elementos de IndexadoresContratos para indexar los contratos. se utiliza en caso de simulaciones de indexadores.
-
 declare @VersionFijacion	varchar(255)='ITPV1'--version del mes de fijación, para comparación de límite del 10%.
-declare @MesFijacion		date='2020-04-01'--mes de fijación, para comparación de límite del 10%.
-declare @FECHAPNCP			date='2020-04-01'--Fecha del PNCP utilizado.
+declare @MesFijacion		date='2020-10-01'--mes de fijación, para comparación de límite del 10%.
+declare @FECHAPNCP			date='2020-10-01'--Fecha del PNCP utilizado.
 
 --Debería entregar como resultado la tabla "PNP", es decir precios para contratos
 --Version	IdPNP	Fecha	Version	RExBases	DecPNudo	Modalidad	Licitacion	TipoBloque	BLOQUE	Distribuidora	PtoOferta	Generadora	PtoCompra	PE	PP	CET_USD	PE_Index_USD	PP_Index_USD	Observacion
@@ -46,8 +45,8 @@ select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version Version
 				when t6.Valor is not null and t5.Valor is not null and t9.valor is not null then t6.Valor/t9.Valor 
 				when t6.Valor is not null and t5.Valor is not null and t9.valor is null  then t6.Valor/t5.Valor end FactorIndexacion		
 		,case	when Tipoindex='P' then t6.Valor/t5.Valor*t4.Ponderador*t3.Precio 
-				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null and t9.valor is not null  then t6.Valor/t9.Valor*t4.Ponderador*t1.PrecioEnergia 
-				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null  then t6.Valor/t5.Valor*t4.Ponderador*t1.PrecioEnergia end PrecioIndexadoPonderado
+				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null and t9.valor is not null then t6.Valor/t9.Valor*t4.Ponderador*t1.PrecioEnergia 
+				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null							then t6.Valor/t5.Valor*t4.Ponderador*t1.PrecioEnergia end PrecioIndexadoPonderado
 		,case	when t6.Valor is null or t5.Valor is null then 1 
 				else 0 end FlagInd	
 		,case	when t9.valor is not null or t1.Observacion is not null then concat(t1.Observacion,t9.Observacion) 
@@ -55,8 +54,8 @@ select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version Version
 from LicitacionGx t1--Gx,lictación contiene precio ofertado
 left join PrecioNudoLicitacion t3 on t3.IdDecPNudo=t1.IdDecrPNudo and t3.Tipo='Pp' and t3.TipoDecreto=t1.Tipodecreto--precios Decreto PN, se usa los de potencia
 left join LicitacionGxIndexacion t4 on t4.IdLicitacionGx=t1.IdLicitacionGx-- relación Licitación-Gx indica info de indexación
-left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesReferencia) and t4.[index]=t5.Tipo--extrae indexadores base
-left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesIndexacion) and t4.[index]=t6.Tipo--extrae indexadores del mes
+left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesReferencia) and t4.[index]=t5.Tipo and t5.Version=@TipoIndexacion--extrae indexadores base
+left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesIndexacion) and t4.[index]=t6.Tipo and t6.Version=@TipoIndexacion--extrae indexadores del mes
 left join LicitacionGxIndexEsp t9 on t9.IdLicitacionGx =t1.IdLicitacionGx and t9.tipo=t5.tipo--indexación situaciones especiales
 where	t1.VigenciaInicio<=@MesIndexacion and @MesIndexacion<=t1.VigenciaFin--que contrato esté activo
 		and @Version='Mes'
@@ -84,8 +83,8 @@ select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version Version
 from LicitacionGx t1--Gx,lictación contiene precio ofertado
 left join PrecioNudoLicitacion t3 on t3.IdDecPNudo=t1.IdDecrPNudo and t3.Tipo='Pp' and t3.TipoDecreto=t1.Tipodecreto--precios Decreto PN, se usa los de potencia
 left join LicitacionGxIndexacion t4 on t4.IdLicitacionGx=t1.IdLicitacionGx-- relación Licitación-Gx indica info de indexación
-left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesReferencia) and t4.[index]=t5.Tipo--extrae indexadores base
-left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesFijacion) and t4.[index]=t6.Tipo--extrae indexadores del mes de la última fijación
+left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesReferencia) and t4.[index]=t5.Tipo and t5.Version=@TipoIndexacion--extrae indexadores base
+left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesFijacion) and t4.[index]=t6.Tipo and t6.Version=@TipoIndexacion--extrae indexadores del mes de la última fijación
 left join LicitacionGxIndexEsp t9 on t9.IdLicitacionGx =t1.IdLicitacionGx and t9.tipo=t5.tipo--indexación situaciones especiales
 where	dateadd(month,-6,t1.VigenciaInicio)<=@MesIndexacion and @MesIndexacion<=t1.VigenciaFin--que contrato esté activo en periodo de Decreto PNP
 		and @Version='ITD'
@@ -261,7 +260,7 @@ select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version [Version
 		,t3.Valor/t2.Valor*CET0 ValorCET
 from CET t1
 left join IndexadoresContratos t2 on t2.fecha=dateadd(month,(-t1.rezago),t1.MesReferencia) and t2.Tipo=t1.[Index] and t2.Version=@TipoIndexacion
-left join IndexadoresContratos t3 on t3.fecha=dateadd(month,(-t1.rezago),@MesIndexacion) and t3.Tipo=t1.[Index] and t2.Version=@TipoIndexacion
+left join IndexadoresContratos t3 on t3.fecha=dateadd(month,(-t1.rezago),@MesIndexacion) and t3.Tipo=t1.[Index] and t3.Version=@TipoIndexacion
 where @version='Mes'
 
 	--INDEXACIÓN CONTRATO PARA Version='ITD'
@@ -272,7 +271,7 @@ select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version [Version
 		,t3.Valor/t2.Valor*CET0 ValorCET
 from CET t1
 left join IndexadoresContratos t2 on t2.fecha=dateadd(month,(-t1.rezago),t1.MesReferencia) and t2.Tipo=t1.[Index] and t2.Version=@TipoIndexacion
-left join IndexadoresContratos t3 on t3.fecha=dateadd(month,(-t1.rezago),@MesFijacion) and t3.Tipo=t1.[Index] and t2.Version=@TipoIndexacion
+left join IndexadoresContratos t3 on t3.fecha=dateadd(month,(-t1.rezago),@MesFijacion) and t3.Tipo=t1.[Index] and t3.Version=@TipoIndexacion
 where @version='ITD'
 
 --select * from IndexacionCET where MesIndexacion=@MesIndexacion and versionindex=@VersionIndex and Version=@Version

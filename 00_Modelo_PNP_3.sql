@@ -1,83 +1,91 @@
+USE master;
+GO
+ALTER DATABASE [PNP_3] 
+SET SINGLE_USER 
+WITH ROLLBACK IMMEDIATE;
+GO
+DROP DATABASE [PNP_3];
+CREATE DATABASE [PNP_3]
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_accessadmin')      
      EXEC (N'CREATE SCHEMA db_accessadmin')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_backupoperator')      
      EXEC (N'CREATE SCHEMA db_backupoperator')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_datareader')      
      EXEC (N'CREATE SCHEMA db_datareader')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_datawriter')      
      EXEC (N'CREATE SCHEMA db_datawriter')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_ddladmin')      
      EXEC (N'CREATE SCHEMA db_ddladmin')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_denydatareader')      
      EXEC (N'CREATE SCHEMA db_denydatareader')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_denydatawriter')      
      EXEC (N'CREATE SCHEMA db_denydatawriter')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_owner')      
      EXEC (N'CREATE SCHEMA db_owner')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'db_securityadmin')      
      EXEC (N'CREATE SCHEMA db_securityadmin')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'dbo')      
      EXEC (N'CREATE SCHEMA dbo')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'guest')      
      EXEC (N'CREATE SCHEMA guest')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'INFORMATION_SCHEMA')      
      EXEC (N'CREATE SCHEMA INFORMATION_SCHEMA')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
  IF NOT EXISTS(SELECT * FROM sys.schemas WHERE [name] = N'sys')      
      EXEC (N'CREATE SCHEMA sys')                                   
  GO                                                               
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'barranacional'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -149,7 +157,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.barranacional',
+        N'MS_SSMA_SOURCE', N'PNP_3.barranacional',
         N'SCHEMA', N'dbo',
         N'TABLE', N'barranacional'
 END TRY
@@ -159,7 +167,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cet'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -275,7 +283,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.cet',
+        N'MS_SSMA_SOURCE', N'PNP_3.cet',
         N'SCHEMA', N'dbo',
         N'TABLE', N'cet'
 END TRY
@@ -285,7 +293,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cetcp'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -360,7 +368,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.cetcp',
+        N'MS_SSMA_SOURCE', N'PNP_3.cetcp',
         N'SCHEMA', N'dbo',
         N'TABLE', N'cetcp'
 END TRY
@@ -370,7 +378,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cmgpromedio'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -444,7 +452,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.cmgpromedio',
+        N'MS_SSMA_SOURCE', N'PNP_3.cmgpromedio',
         N'SCHEMA', N'dbo',
         N'TABLE', N'cmgpromedio'
 END TRY
@@ -454,7 +462,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'codigocontrato'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -579,7 +587,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.codigocontrato',
+        N'MS_SSMA_SOURCE', N'PNP_3.codigocontrato',
         N'SCHEMA', N'dbo',
         N'TABLE', N'codigocontrato'
 END TRY
@@ -589,7 +597,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'decreto'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -674,7 +682,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.decreto',
+        N'MS_SSMA_SOURCE', N'PNP_3.decreto',
         N'SCHEMA', N'dbo',
         N'TABLE', N'decreto'
 END TRY
@@ -684,7 +692,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'demanda'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -802,7 +810,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.demanda',
+        N'MS_SSMA_SOURCE', N'PNP_3.demanda',
         N'SCHEMA', N'dbo',
         N'TABLE', N'demanda'
 END TRY
@@ -812,7 +820,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'difxcompras'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -934,7 +942,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.difxcompras',
+        N'MS_SSMA_SOURCE', N'PNP_3.difxcompras',
         N'SCHEMA', N'dbo',
         N'TABLE', N'difxcompras'
 END TRY
@@ -944,7 +952,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'distribuidora'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1016,7 +1024,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.distribuidora',
+        N'MS_SSMA_SOURCE', N'PNP_3.distribuidora',
         N'SCHEMA', N'dbo',
         N'TABLE', N'distribuidora'
 END TRY
@@ -1026,7 +1034,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'dolarfijacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1100,7 +1108,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.dolarfijacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.dolarfijacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'dolarfijacion'
 END TRY
@@ -1110,7 +1118,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanual'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1192,7 +1200,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.eadjanual',
+        N'MS_SSMA_SOURCE', N'PNP_3.eadjanual',
         N'SCHEMA', N'dbo',
         N'TABLE', N'eadjanual'
 END TRY
@@ -1202,7 +1210,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanualdistrmensual'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1278,7 +1286,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.eadjanualdistrmensual',
+        N'MS_SSMA_SOURCE', N'PNP_3.eadjanualdistrmensual',
         N'SCHEMA', N'dbo',
         N'TABLE', N'eadjanualdistrmensual'
 END TRY
@@ -1288,7 +1296,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'efact'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1399,7 +1407,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.efact',
+        N'MS_SSMA_SOURCE', N'PNP_3.efact',
         N'SCHEMA', N'dbo',
         N'TABLE', N'efact'
 END TRY
@@ -1409,7 +1417,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'estabilizacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1479,7 +1487,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.estabilizacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.estabilizacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'estabilizacion'
 END TRY
@@ -1489,7 +1497,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'estabilizaciondetalle'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1546,8 +1554,8 @@ CREATE TABLE
 
    [IdVersionEstabilizacion] varchar(45)  NOT NULL,
    [IdEfact] int  NULL,
-   [IdVersionPreciosDef] int  NULL,
-   [IdVersionPreciosPNP] int  NULL,
+   [IdVersion_PreciosDef] int  NULL,
+   [IdVersion_PreciosPNP] int  NULL,
    [IdDistribuidora] int  NULL,
    [IdGeneradora] int  NULL,
    [IdCodigoContrato] int  NULL,
@@ -1565,8 +1573,8 @@ CREATE TABLE
    *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
    */
 
-   [VersionEfact_PrecioDef] varchar(45)  NULL,
-   [FechaPNP_PrecioDef] date  NULL,
+   [IdVersionEfact_PrecioDef] varchar(45)  NULL,
+   [PNP_MesIndex_PrecioDef] date  NULL,
 
    /*
    *   SSMA warning messages:
@@ -1576,12 +1584,22 @@ CREATE TABLE
    *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
    */
 
-   [VersionPNP_PrecioDef] varchar(45)  NULL,
+   [PNP_VersionIndex_PrecioDef] varchar(45)  NULL,
+
+   /*
+   *   SSMA warning messages:
+   *   M2SS0183: The following SQL clause was ignored during conversion: COLLATE latin1_bin.
+
+   *   SSMA informational messages:
+   *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
+   */
+
+   [PNP_Version_PrecioDef] varchar(45)  NULL,
    [EPC_PrecioDef] float  NULL,
    [PPC_PrecioDef] float  NULL,
    [ERec_Peso_PrecioDef] float  NULL,
    [PRec_Peso_PrecioDef] float  NULL,
-   [Fechaefact_PrecioPNP] date  NULL,
+   [FechaEfact_PrecioPNP] date  NULL,
 
    /*
    *   SSMA warning messages:
@@ -1591,8 +1609,8 @@ CREATE TABLE
    *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
    */
 
-   [VersionEfact_PrecioPNP] varchar(45)  NULL,
-   [FechaPNP_PrecioPNP] date  NULL,
+   [IdVersionEfact_PrecioPNP] varchar(45)  NULL,
+   [PNP_MesIndex_PrecioPNP] date  NULL,
 
    /*
    *   SSMA warning messages:
@@ -1602,7 +1620,17 @@ CREATE TABLE
    *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
    */
 
-   [VersionPNP_PrecioPNP] varchar(45)  NULL,
+   [PNP_VersionIndex_PrecioPNP] varchar(45)  NULL,
+
+   /*
+   *   SSMA warning messages:
+   *   M2SS0183: The following SQL clause was ignored during conversion: COLLATE latin1_bin.
+
+   *   SSMA informational messages:
+   *   M2SS0055: Data type was converted to VARCHAR according to character set mapping for latin1 character set
+   */
+
+   [PNP_Version_PrecioPNP] varchar(45)  NULL,
    [EPC_PrecioPNP] float  NULL,
    [PPC_PrecioPNP] float  NULL,
    [ERec_Peso_PrecioPNP] float  NULL,
@@ -1611,7 +1639,7 @@ CREATE TABLE
    [Interes] float  NULL,
    [FactorAjusteE] float  NULL,
    [FactorAjusteP] float  NULL,
-   [DolarDefinitivoPromedioMes] float  NULL,
+   [DolarEstabilizacion] float  NULL,
    [DifERec_Peso] float  NULL,
    [DifPRec_Peso] float  NULL,
    [DifERec_Peso_Estabilizado] float  NULL,
@@ -1623,7 +1651,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.estabilizaciondetalle',
+        N'MS_SSMA_SOURCE', N'PNP_3.estabilizaciondetalle',
         N'SCHEMA', N'dbo',
         N'TABLE', N'estabilizaciondetalle'
 END TRY
@@ -1633,7 +1661,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factormodulacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1717,7 +1745,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.factormodulacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.factormodulacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'factormodulacion'
 END TRY
@@ -1727,7 +1755,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factorreferenciacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1823,7 +1851,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.factorreferenciacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.factorreferenciacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'factorreferenciacion'
 END TRY
@@ -1833,7 +1861,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'generadora'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -1905,7 +1933,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.generadora',
+        N'MS_SSMA_SOURCE', N'PNP_3.generadora',
         N'SCHEMA', N'dbo',
         N'TABLE', N'generadora'
 END TRY
@@ -1915,7 +1943,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncet'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2058,7 +2086,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncet',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncet',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncet'
 END TRY
@@ -2068,7 +2096,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncombustible'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2123,7 +2151,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncombustible',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncombustible',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncombustible'
 END TRY
@@ -2133,7 +2161,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontrato'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2322,7 +2350,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncontrato',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncontrato',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncontrato'
 END TRY
@@ -2332,7 +2360,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontratodetalle'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2518,7 +2546,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncontratodetalle',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncontratodetalle',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncontratodetalle'
 END TRY
@@ -2528,7 +2556,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontratofm'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2722,7 +2750,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncontratofm',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncontratofm',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncontratofm'
 END TRY
@@ -2732,7 +2760,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncpi'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2786,7 +2814,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacioncpi',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacioncpi',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacioncpi'
 END TRY
@@ -2796,7 +2824,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexaciondolar'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2850,7 +2878,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexaciondolar',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexaciondolar',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexaciondolar'
 END TRY
@@ -2860,7 +2888,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacionipc'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -2924,7 +2952,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexacionipc',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexacionipc',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexacionipc'
 END TRY
@@ -2934,7 +2962,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexadorescontratos'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3007,7 +3035,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.indexadorescontratos',
+        N'MS_SSMA_SOURCE', N'PNP_3.indexadorescontratos',
         N'SCHEMA', N'dbo',
         N'TABLE', N'indexadorescontratos'
 END TRY
@@ -3017,7 +3045,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3089,7 +3117,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitacion'
 END TRY
@@ -3099,7 +3127,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciondx'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3186,7 +3214,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitaciondx',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitaciondx',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitaciondx'
 END TRY
@@ -3196,7 +3224,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongx'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3356,7 +3384,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitaciongx',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitaciongx',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitaciongx'
 END TRY
@@ -3366,7 +3394,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxdxptocompra'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3440,7 +3468,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitaciongxdxptocompra',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitaciongxdxptocompra',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitaciongxdxptocompra'
 END TRY
@@ -3450,7 +3478,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxindexacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3534,7 +3562,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitaciongxindexacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitaciongxindexacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitaciongxindexacion'
 END TRY
@@ -3544,7 +3572,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxindexesp'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3618,7 +3646,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.licitaciongxindexesp',
+        N'MS_SSMA_SOURCE', N'PNP_3.licitaciongxindexesp',
         N'SCHEMA', N'dbo',
         N'TABLE', N'licitaciongxindexesp'
 END TRY
@@ -3628,7 +3656,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'perdidazonal'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3722,7 +3750,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.perdidazonal',
+        N'MS_SSMA_SOURCE', N'PNP_3.perdidazonal',
         N'SCHEMA', N'dbo',
         N'TABLE', N'perdidazonal'
 END TRY
@@ -3732,7 +3760,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pncp'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3819,7 +3847,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.pncp',
+        N'MS_SSMA_SOURCE', N'PNP_3.pncp',
         N'SCHEMA', N'dbo',
         N'TABLE', N'pncp'
 END TRY
@@ -3829,7 +3857,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pncpconcet'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -3932,7 +3960,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.pncpconcet',
+        N'MS_SSMA_SOURCE', N'PNP_3.pncpconcet',
         N'SCHEMA', N'dbo',
         N'TABLE', N'pncpconcet'
 END TRY
@@ -3942,7 +3970,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnp'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4089,7 +4117,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.pnp',
+        N'MS_SSMA_SOURCE', N'PNP_3.pnp',
         N'SCHEMA', N'dbo',
         N'TABLE', N'pnp'
 END TRY
@@ -4099,7 +4127,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnpindex'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4195,7 +4223,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.pnpindex',
+        N'MS_SSMA_SOURCE', N'PNP_3.pnpindex',
         N'SCHEMA', N'dbo',
         N'TABLE', N'pnpindex'
 END TRY
@@ -4205,7 +4233,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnptraspexc'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4308,7 +4336,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.pnptraspexc',
+        N'MS_SSMA_SOURCE', N'PNP_3.pnptraspexc',
         N'SCHEMA', N'dbo',
         N'TABLE', N'pnptraspexc'
 END TRY
@@ -4318,7 +4346,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'precionudolicitacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4421,7 +4449,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.precionudolicitacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.precionudolicitacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'precionudolicitacion'
 END TRY
@@ -4431,7 +4459,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'ptoretirosistema'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4485,7 +4513,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.ptoretirosistema',
+        N'MS_SSMA_SOURCE', N'PNP_3.ptoretirosistema',
         N'SCHEMA', N'dbo',
         N'TABLE', N'ptoretirosistema'
 END TRY
@@ -4495,7 +4523,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'puntoretiro'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4567,7 +4595,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.puntoretiro',
+        N'MS_SSMA_SOURCE', N'PNP_3.puntoretiro',
         N'SCHEMA', N'dbo',
         N'TABLE', N'puntoretiro'
 END TRY
@@ -4577,7 +4605,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'recaudaciondetalle'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4710,7 +4738,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.recaudaciondetalle',
+        N'MS_SSMA_SOURCE', N'PNP_3.recaudaciondetalle',
         N'SCHEMA', N'dbo',
         N'TABLE', N'recaudaciondetalle'
 END TRY
@@ -4720,7 +4748,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'sistemazonal'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4792,7 +4820,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.sistemazonal',
+        N'MS_SSMA_SOURCE', N'PNP_3.sistemazonal',
         N'SCHEMA', N'dbo',
         N'TABLE', N'sistemazonal'
 END TRY
@@ -4802,7 +4830,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'tipocombustible'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4884,7 +4912,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.tipocombustible',
+        N'MS_SSMA_SOURCE', N'PNP_3.tipocombustible',
         N'SCHEMA', N'dbo',
         N'TABLE', N'tipocombustible'
 END TRY
@@ -4894,7 +4922,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'tipodespacho'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -4956,7 +4984,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.tipodespacho',
+        N'MS_SSMA_SOURCE', N'PNP_3.tipodespacho',
         N'SCHEMA', N'dbo',
         N'TABLE', N'tipodespacho'
 END TRY
@@ -4966,7 +4994,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionefact'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -5028,7 +5056,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.versionefact',
+        N'MS_SSMA_SOURCE', N'PNP_3.versionefact',
         N'SCHEMA', N'dbo',
         N'TABLE', N'versionefact'
 END TRY
@@ -5038,7 +5066,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionestabilizacion'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -5102,7 +5130,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.versionestabilizacion',
+        N'MS_SSMA_SOURCE', N'PNP_3.versionestabilizacion',
         N'SCHEMA', N'dbo',
         N'TABLE', N'versionestabilizacion'
 END TRY
@@ -5112,7 +5140,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionrec'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -5174,7 +5202,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.versionrec',
+        N'MS_SSMA_SOURCE', N'PNP_3.versionrec',
         N'SCHEMA', N'dbo',
         N'TABLE', N'versionrec'
 END TRY
@@ -5184,7 +5212,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionrecdetalle'  AND sc.name = N'dbo'  AND type in (N'U'))
 BEGIN
@@ -5269,7 +5297,7 @@ WITH (DATA_COMPRESSION = NONE)
 GO
 BEGIN TRY
     EXEC sp_addextendedproperty
-        N'MS_SSMA_SOURCE', N'pnp_3.versionrecdetalle',
+        N'MS_SSMA_SOURCE', N'PNP_3.versionrecdetalle',
         N'SCHEMA', N'dbo',
         N'TABLE', N'versionrecdetalle'
 END TRY
@@ -5279,7 +5307,7 @@ BEGIN CATCH
 END CATCH
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_barranacional_IdBarraNacional'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[barranacional] DROP CONSTRAINT [PK_barranacional_IdBarraNacional]
@@ -5295,7 +5323,7 @@ ALTER TABLE [dbo].[barranacional]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_cet_IdLicitacionDx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[cet] DROP CONSTRAINT [PK_cet_IdLicitacionDx]
@@ -5311,7 +5339,7 @@ ALTER TABLE [dbo].[cet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_cetcp_MesIndexacion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[cetcp] DROP CONSTRAINT [PK_cetcp_MesIndexacion]
@@ -5327,7 +5355,7 @@ ALTER TABLE [dbo].[cetcp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_cmgpromedio_VersionCMg'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[cmgpromedio] DROP CONSTRAINT [PK_cmgpromedio_VersionCMg]
@@ -5343,7 +5371,7 @@ ALTER TABLE [dbo].[cmgpromedio]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_codigocontrato_IdCodigoContrato'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[codigocontrato] DROP CONSTRAINT [PK_codigocontrato_IdCodigoContrato]
@@ -5359,7 +5387,7 @@ ALTER TABLE [dbo].[codigocontrato]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_decreto_IdDecreto'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[decreto] DROP CONSTRAINT [PK_decreto_IdDecreto]
@@ -5375,7 +5403,7 @@ ALTER TABLE [dbo].[decreto]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_demanda_IdDemanda'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[demanda] DROP CONSTRAINT [PK_demanda_IdDemanda]
@@ -5391,7 +5419,7 @@ ALTER TABLE [dbo].[demanda]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_difxcompras_IdDifxCompras'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[difxcompras] DROP CONSTRAINT [PK_difxcompras_IdDifxCompras]
@@ -5407,7 +5435,7 @@ ALTER TABLE [dbo].[difxcompras]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_distribuidora_IdDistribuidora'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[distribuidora] DROP CONSTRAINT [PK_distribuidora_IdDistribuidora]
@@ -5423,7 +5451,7 @@ ALTER TABLE [dbo].[distribuidora]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_dolarfijacion_IdDolarFijacion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[dolarfijacion] DROP CONSTRAINT [PK_dolarfijacion_IdDolarFijacion]
@@ -5439,7 +5467,7 @@ ALTER TABLE [dbo].[dolarfijacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_eadjanualdistrmensual_IdCodigoContrato'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[eadjanualdistrmensual] DROP CONSTRAINT [PK_eadjanualdistrmensual_IdCodigoContrato]
@@ -5455,7 +5483,7 @@ ALTER TABLE [dbo].[eadjanualdistrmensual]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_efact_IdEfact'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[efact] DROP CONSTRAINT [PK_efact_IdEfact]
@@ -5471,7 +5499,7 @@ ALTER TABLE [dbo].[efact]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_estabilizacion_IdEstabilizacion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[estabilizacion] DROP CONSTRAINT [PK_estabilizacion_IdEstabilizacion]
@@ -5487,7 +5515,7 @@ ALTER TABLE [dbo].[estabilizacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_factormodulacion_IdDecreto'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[factormodulacion] DROP CONSTRAINT [PK_factormodulacion_IdDecreto]
@@ -5503,7 +5531,7 @@ ALTER TABLE [dbo].[factormodulacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_factorreferenciacion_IdPuntoRetiro'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[factorreferenciacion] DROP CONSTRAINT [PK_factorreferenciacion_IdPuntoRetiro]
@@ -5519,7 +5547,7 @@ ALTER TABLE [dbo].[factorreferenciacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_generadora_IdGeneradora'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[generadora] DROP CONSTRAINT [PK_generadora_IdGeneradora]
@@ -5535,7 +5563,7 @@ ALTER TABLE [dbo].[generadora]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexacioncet_IdLicitacionDx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexacioncet] DROP CONSTRAINT [PK_indexacioncet_IdLicitacionDx]
@@ -5551,7 +5579,7 @@ ALTER TABLE [dbo].[indexacioncet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexacioncombustible_IdIndexC'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexacioncombustible] DROP CONSTRAINT [PK_indexacioncombustible_IdIndexC]
@@ -5567,7 +5595,7 @@ ALTER TABLE [dbo].[indexacioncombustible]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexacioncontratofm_VersionIndex'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexacioncontratofm] DROP CONSTRAINT [PK_indexacioncontratofm_VersionIndex]
@@ -5583,7 +5611,7 @@ ALTER TABLE [dbo].[indexacioncontratofm]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexacioncpi_IdCPI'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexacioncpi] DROP CONSTRAINT [PK_indexacioncpi_IdCPI]
@@ -5599,7 +5627,7 @@ ALTER TABLE [dbo].[indexacioncpi]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexaciondolar_IdDolar'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexaciondolar] DROP CONSTRAINT [PK_indexaciondolar_IdDolar]
@@ -5615,7 +5643,7 @@ ALTER TABLE [dbo].[indexaciondolar]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexacionipc_IdIPC'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexacionipc] DROP CONSTRAINT [PK_indexacionipc_IdIPC]
@@ -5631,7 +5659,7 @@ ALTER TABLE [dbo].[indexacionipc]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_indexadorescontratos_Version'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[indexadorescontratos] DROP CONSTRAINT [PK_indexadorescontratos_Version]
@@ -5647,7 +5675,7 @@ ALTER TABLE [dbo].[indexadorescontratos]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitacion_IdLicitacion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitacion] DROP CONSTRAINT [PK_licitacion_IdLicitacion]
@@ -5663,7 +5691,7 @@ ALTER TABLE [dbo].[licitacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitaciondx_IdLicitacionDx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitaciondx] DROP CONSTRAINT [PK_licitaciondx_IdLicitacionDx]
@@ -5679,7 +5707,7 @@ ALTER TABLE [dbo].[licitaciondx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitaciongx_IdLicitacionGx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitaciongx] DROP CONSTRAINT [PK_licitaciongx_IdLicitacionGx]
@@ -5695,7 +5723,7 @@ ALTER TABLE [dbo].[licitaciongx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitaciongxdxptocompra_IdPtoCompra'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitaciongxdxptocompra] DROP CONSTRAINT [PK_licitaciongxdxptocompra_IdPtoCompra]
@@ -5711,7 +5739,7 @@ ALTER TABLE [dbo].[licitaciongxdxptocompra]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitaciongxindexacion_IdLicitacionGx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitaciongxindexacion] DROP CONSTRAINT [PK_licitaciongxindexacion_IdLicitacionGx]
@@ -5727,7 +5755,7 @@ ALTER TABLE [dbo].[licitaciongxindexacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_licitaciongxindexesp_IdLicitacionGx'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[licitaciongxindexesp] DROP CONSTRAINT [PK_licitaciongxindexesp_IdLicitacionGx]
@@ -5743,7 +5771,7 @@ ALTER TABLE [dbo].[licitaciongxindexesp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_perdidazonal_Fecha'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[perdidazonal] DROP CONSTRAINT [PK_perdidazonal_Fecha]
@@ -5759,7 +5787,7 @@ ALTER TABLE [dbo].[perdidazonal]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_pncp_MES'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[pncp] DROP CONSTRAINT [PK_pncp_MES]
@@ -5775,7 +5803,7 @@ ALTER TABLE [dbo].[pncp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_pnp_IdPNP'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[pnp] DROP CONSTRAINT [PK_pnp_IdPNP]
@@ -5791,7 +5819,7 @@ ALTER TABLE [dbo].[pnp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_pnpindex_VersionIndex'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[pnpindex] DROP CONSTRAINT [PK_pnpindex_VersionIndex]
@@ -5807,7 +5835,7 @@ ALTER TABLE [dbo].[pnpindex]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_pnptraspexc_VersionPNP'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[pnptraspexc] DROP CONSTRAINT [PK_pnptraspexc_VersionPNP]
@@ -5823,7 +5851,7 @@ ALTER TABLE [dbo].[pnptraspexc]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_precionudolicitacion_IdDecPNudo'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[precionudolicitacion] DROP CONSTRAINT [PK_precionudolicitacion_IdDecPNudo]
@@ -5839,7 +5867,7 @@ ALTER TABLE [dbo].[precionudolicitacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_ptoretirosistema_IdPuntoRetiro'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[ptoretirosistema] DROP CONSTRAINT [PK_ptoretirosistema_IdPuntoRetiro]
@@ -5855,7 +5883,7 @@ ALTER TABLE [dbo].[ptoretirosistema]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_puntoretiro_IdPuntoRetiro'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[puntoretiro] DROP CONSTRAINT [PK_puntoretiro_IdPuntoRetiro]
@@ -5871,7 +5899,7 @@ ALTER TABLE [dbo].[puntoretiro]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_recaudaciondetalle_IdVersion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[recaudaciondetalle] DROP CONSTRAINT [PK_recaudaciondetalle_IdVersion]
@@ -5887,7 +5915,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_sistemazonal_IdSistemaZonal'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[sistemazonal] DROP CONSTRAINT [PK_sistemazonal_IdSistemaZonal]
@@ -5903,7 +5931,7 @@ ALTER TABLE [dbo].[sistemazonal]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_tipocombustible_IdTipoCombustible'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[tipocombustible] DROP CONSTRAINT [PK_tipocombustible_IdTipoCombustible]
@@ -5919,7 +5947,7 @@ ALTER TABLE [dbo].[tipocombustible]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_tipodespacho_IdTipoDEspacho'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[tipodespacho] DROP CONSTRAINT [PK_tipodespacho_IdTipoDEspacho]
@@ -5935,7 +5963,7 @@ ALTER TABLE [dbo].[tipodespacho]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_versionefact_IdVersion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[versionefact] DROP CONSTRAINT [PK_versionefact_IdVersion]
@@ -5951,7 +5979,7 @@ ALTER TABLE [dbo].[versionefact]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_versionestabilizacion_IdVersionEstabilizacion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[versionestabilizacion] DROP CONSTRAINT [PK_versionestabilizacion_IdVersionEstabilizacion]
@@ -5967,7 +5995,7 @@ ALTER TABLE [dbo].[versionestabilizacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_versionrec_IdVersion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[versionrec] DROP CONSTRAINT [PK_versionrec_IdVersion]
@@ -5983,7 +6011,7 @@ ALTER TABLE [dbo].[versionrec]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'PK_versionrecdetalle_IdVersion'  AND sc.name = N'dbo'  AND type in (N'PK'))
 ALTER TABLE [dbo].[versionrecdetalle] DROP CONSTRAINT [PK_versionrecdetalle_IdVersion]
@@ -5999,7 +6027,7 @@ ALTER TABLE [dbo].[versionrecdetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cet$IdLicitacionDx_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[cet] DROP CONSTRAINT [cet$IdLicitacionDx_UNIQUE]
@@ -6015,7 +6043,7 @@ ALTER TABLE [dbo].[cet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'codigocontrato$Licitacion_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[codigocontrato] DROP CONSTRAINT [codigocontrato$Licitacion_UNIQUE]
@@ -6031,7 +6059,7 @@ ALTER TABLE [dbo].[codigocontrato]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'decreto$Nombre_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[decreto] DROP CONSTRAINT [decreto$Nombre_UNIQUE]
@@ -6047,7 +6075,7 @@ ALTER TABLE [dbo].[decreto]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'demanda$Version_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[demanda] DROP CONSTRAINT [demanda$Version_UNIQUE]
@@ -6063,7 +6091,7 @@ ALTER TABLE [dbo].[demanda]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'difxcompras$IdCodigoContrato_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[difxcompras] DROP CONSTRAINT [difxcompras$IdCodigoContrato_UNIQUE]
@@ -6092,7 +6120,7 @@ ALTER TABLE [dbo].[difxcompras]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanual$IdCodigoContrato_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[eadjanual] DROP CONSTRAINT [eadjanual$IdCodigoContrato_UNIQUE]
@@ -6108,7 +6136,7 @@ ALTER TABLE [dbo].[eadjanual]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanualdistrmensual$IdCodigoContrato_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[eadjanualdistrmensual] DROP CONSTRAINT [eadjanualdistrmensual$IdCodigoContrato_UNIQUE]
@@ -6124,7 +6152,7 @@ ALTER TABLE [dbo].[eadjanualdistrmensual]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'efact$IdVersion_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[efact] DROP CONSTRAINT [efact$IdVersion_UNIQUE]
@@ -6140,7 +6168,7 @@ ALTER TABLE [dbo].[efact]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factormodulacion$IdDecreto_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[factormodulacion] DROP CONSTRAINT [factormodulacion$IdDecreto_UNIQUE]
@@ -6156,7 +6184,7 @@ ALTER TABLE [dbo].[factormodulacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factorreferenciacion$IdPuntoRetiro_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[factorreferenciacion] DROP CONSTRAINT [factorreferenciacion$IdPuntoRetiro_UNIQUE]
@@ -6172,7 +6200,7 @@ ALTER TABLE [dbo].[factorreferenciacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncet$IdLicitacionDx_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[indexacioncet] DROP CONSTRAINT [indexacioncet$IdLicitacionDx_UNIQUE]
@@ -6188,7 +6216,7 @@ ALTER TABLE [dbo].[indexacioncet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncombustible$Fecha_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[indexacioncombustible] DROP CONSTRAINT [indexacioncombustible$Fecha_UNIQUE]
@@ -6204,7 +6232,7 @@ ALTER TABLE [dbo].[indexacioncombustible]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncpi$Fecha_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[indexacioncpi] DROP CONSTRAINT [indexacioncpi$Fecha_UNIQUE]
@@ -6220,7 +6248,7 @@ ALTER TABLE [dbo].[indexacioncpi]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexaciondolar$Fecha_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[indexaciondolar] DROP CONSTRAINT [indexaciondolar$Fecha_UNIQUE]
@@ -6236,7 +6264,7 @@ ALTER TABLE [dbo].[indexaciondolar]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacionipc$Fecha_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[indexacionipc] DROP CONSTRAINT [indexacionipc$Fecha_UNIQUE]
@@ -6252,7 +6280,7 @@ ALTER TABLE [dbo].[indexacionipc]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciondx$IdLicitacion_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[licitaciondx] DROP CONSTRAINT [licitaciondx$IdLicitacion_UNIQUE]
@@ -6268,7 +6296,7 @@ ALTER TABLE [dbo].[licitaciondx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongx$IdLicitacion_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[licitaciongx] DROP CONSTRAINT [licitaciongx$IdLicitacion_UNIQUE]
@@ -6284,7 +6312,7 @@ ALTER TABLE [dbo].[licitaciongx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxdxptocompra$IdLicitacionDx_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[licitaciongxdxptocompra] DROP CONSTRAINT [licitaciongxdxptocompra$IdLicitacionDx_UNIQUE]
@@ -6300,7 +6328,7 @@ ALTER TABLE [dbo].[licitaciongxdxptocompra]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxindexacion$IdGeneradora_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[licitaciongxindexacion] DROP CONSTRAINT [licitaciongxindexacion$IdGeneradora_UNIQUE]
@@ -6316,7 +6344,7 @@ ALTER TABLE [dbo].[licitaciongxindexacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'perdidazonal$Fecha_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[perdidazonal] DROP CONSTRAINT [perdidazonal$Fecha_UNIQUE]
@@ -6332,7 +6360,7 @@ ALTER TABLE [dbo].[perdidazonal]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnp$VersionIndex_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[pnp] DROP CONSTRAINT [pnp$VersionIndex_UNIQUE]
@@ -6348,7 +6376,7 @@ ALTER TABLE [dbo].[pnp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnpindex$VersionIndex_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[pnpindex] DROP CONSTRAINT [pnpindex$VersionIndex_UNIQUE]
@@ -6364,7 +6392,7 @@ ALTER TABLE [dbo].[pnpindex]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'precionudolicitacion$IdDecPNudo_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[precionudolicitacion] DROP CONSTRAINT [precionudolicitacion$IdDecPNudo_UNIQUE]
@@ -6380,36 +6408,7 @@ ALTER TABLE [dbo].[precionudolicitacion]
 GO
 
 
-USE pnp_3
-GO
-IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'ptoretirosistema$IdPuntoRetiro_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
-ALTER TABLE [dbo].[ptoretirosistema] DROP CONSTRAINT [ptoretirosistema$IdPuntoRetiro_UNIQUE]
- GO
-
-
-
-ALTER TABLE [dbo].[ptoretirosistema]
- ADD CONSTRAINT [ptoretirosistema$IdPuntoRetiro_UNIQUE]
- UNIQUE 
-   NONCLUSTERED ([IdPuntoRetiro] ASC)
-
-GO
-
-IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'ptoretirosistema$Ano_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
-ALTER TABLE [dbo].[ptoretirosistema] DROP CONSTRAINT [ptoretirosistema$Ano_UNIQUE]
- GO
-
-
-
-ALTER TABLE [dbo].[ptoretirosistema]
- ADD CONSTRAINT [ptoretirosistema$Ano_UNIQUE]
- UNIQUE 
-   NONCLUSTERED ([Ano] ASC)
-
-GO
-
-
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'recaudaciondetalle$IdVersionEFact_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[recaudaciondetalle] DROP CONSTRAINT [recaudaciondetalle$IdVersionEFact_UNIQUE]
@@ -6425,7 +6424,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionrecdetalle$Registro_UNIQUE'  AND sc.name = N'dbo'  AND type in (N'UQ'))
 ALTER TABLE [dbo].[versionrecdetalle] DROP CONSTRAINT [versionrecdetalle$Registro_UNIQUE]
@@ -6441,7 +6440,7 @@ ALTER TABLE [dbo].[versionrecdetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6459,7 +6458,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6477,7 +6476,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6495,7 +6494,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6513,7 +6512,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6531,7 +6530,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6549,7 +6548,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6567,7 +6566,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6585,7 +6584,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6603,7 +6602,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6621,7 +6620,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6639,7 +6638,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6657,7 +6656,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6675,7 +6674,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6693,7 +6692,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6711,7 +6710,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6729,7 +6728,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6747,7 +6746,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6765,7 +6764,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6783,7 +6782,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6801,7 +6800,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6819,7 +6818,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6837,7 +6836,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6855,7 +6854,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6873,7 +6872,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6891,7 +6890,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6909,7 +6908,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6929,7 +6928,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6947,7 +6946,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6965,7 +6964,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -6983,7 +6982,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7001,7 +7000,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7019,7 +7018,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7037,7 +7036,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7055,7 +7054,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7073,7 +7072,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7091,7 +7090,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7109,7 +7108,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7127,7 +7126,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7145,7 +7144,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7163,25 +7162,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
-GO
-IF EXISTS (
-       SELECT * FROM sys.objects  so JOIN sys.indexes si
-       ON so.object_id = si.object_id
-       JOIN sys.schemas sc
-       ON so.schema_id = sc.schema_id
-       WHERE so.name = N'pnp'  AND sc.name = N'dbo'  AND si.name = N'fk_IndexacionContratoFM_BarraNacional2_idx' AND so.type in (N'U'))
-   DROP INDEX [fk_IndexacionContratoFM_BarraNacional2_idx] ON [dbo].[pnp] 
-GO
-CREATE NONCLUSTERED INDEX [fk_IndexacionContratoFM_BarraNacional2_idx] ON [dbo].[pnp]
-(
-   [IdBarraNacional] ASC
-)
-WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF) ON [PRIMARY] 
-GO
-GO
-
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7199,7 +7180,25 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
+GO
+IF EXISTS (
+       SELECT * FROM sys.objects  so JOIN sys.indexes si
+       ON so.object_id = si.object_id
+       JOIN sys.schemas sc
+       ON so.schema_id = sc.schema_id
+       WHERE so.name = N'pnp'  AND sc.name = N'dbo'  AND si.name = N'fk_IndexacionContratoFM_BarraNacional2_idx' AND so.type in (N'U'))
+   DROP INDEX [fk_IndexacionContratoFM_BarraNacional2_idx] ON [dbo].[pnp] 
+GO
+CREATE NONCLUSTERED INDEX [fk_IndexacionContratoFM_BarraNacional2_idx] ON [dbo].[pnp]
+(
+   [IdBarraNacional] ASC
+)
+WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF) ON [PRIMARY] 
+GO
+GO
+
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7217,7 +7216,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7235,7 +7234,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7253,7 +7252,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7271,7 +7270,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7289,7 +7288,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7307,7 +7306,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7325,7 +7324,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7343,7 +7342,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7361,7 +7360,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7379,7 +7378,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7397,7 +7396,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7415,7 +7414,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7433,7 +7432,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7451,7 +7450,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7469,7 +7468,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7491,7 +7490,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7511,7 +7510,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7529,7 +7528,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7547,7 +7546,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7567,7 +7566,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7589,7 +7588,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7607,7 +7606,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7625,7 +7624,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7643,7 +7642,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7663,7 +7662,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7683,7 +7682,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7701,7 +7700,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (
        SELECT * FROM sys.objects  so JOIN sys.indexes si
@@ -7719,7 +7718,7 @@ WITH (SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, IGNORE_DUP_KEY = OFF, ONLINE = 
 GO
 GO
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cet$fk_CET_Generadora1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[cet] DROP CONSTRAINT [cet$fk_CET_Generadora1]
@@ -7732,7 +7731,7 @@ ALTER TABLE [dbo].[cet]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7749,14 +7748,14 @@ ALTER TABLE [dbo].[cet]
  FOREIGN KEY 
    ([IdLicitacionDx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciondx]     ([IdLicitacionDx])
+   [PNP_3].[dbo].[licitaciondx]     ([IdLicitacionDx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cetcp$fk_CETCP_Distribuidora2'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[cetcp] DROP CONSTRAINT [cetcp$fk_CETCP_Distribuidora2]
@@ -7769,7 +7768,7 @@ ALTER TABLE [dbo].[cetcp]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7786,14 +7785,14 @@ ALTER TABLE [dbo].[cetcp]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'cmgpromedio$fk_CMGPromedio_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[cmgpromedio] DROP CONSTRAINT [cmgpromedio$fk_CMGPromedio_BarraNacional1]
@@ -7806,14 +7805,14 @@ ALTER TABLE [dbo].[cmgpromedio]
  FOREIGN KEY 
    ([IdBarraNacional])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'codigocontrato$fk_CodigoContrato_Distribuidora1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[codigocontrato] DROP CONSTRAINT [codigocontrato$fk_CodigoContrato_Distribuidora1]
@@ -7826,7 +7825,7 @@ ALTER TABLE [dbo].[codigocontrato]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7843,7 +7842,7 @@ ALTER TABLE [dbo].[codigocontrato]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7860,14 +7859,14 @@ ALTER TABLE [dbo].[codigocontrato]
  FOREIGN KEY 
    ([IdLicitacion])
  REFERENCES 
-   [pnp_3].[dbo].[licitacion]     ([IdLicitacion])
+   [PNP_3].[dbo].[licitacion]     ([IdLicitacion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'demanda$fk_Demanda_Distribuidora1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[demanda] DROP CONSTRAINT [demanda$fk_Demanda_Distribuidora1]
@@ -7880,7 +7879,7 @@ ALTER TABLE [dbo].[demanda]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7897,7 +7896,7 @@ ALTER TABLE [dbo].[demanda]
  FOREIGN KEY 
    ([IdPuntoRetiro])
  REFERENCES 
-   [pnp_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
+   [PNP_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7914,14 +7913,14 @@ ALTER TABLE [dbo].[demanda]
  FOREIGN KEY 
    ([IdSistemaZonal])
  REFERENCES 
-   [pnp_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
+   [PNP_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'difxcompras$fk_DifxCompras_CodigoContrato1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[difxcompras] DROP CONSTRAINT [difxcompras$fk_DifxCompras_CodigoContrato1]
@@ -7934,7 +7933,7 @@ ALTER TABLE [dbo].[difxcompras]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7951,7 +7950,7 @@ ALTER TABLE [dbo].[difxcompras]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7968,7 +7967,7 @@ ALTER TABLE [dbo].[difxcompras]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -7985,14 +7984,14 @@ ALTER TABLE [dbo].[difxcompras]
  FOREIGN KEY 
    ([IdSistemaZonal])
  REFERENCES 
-   [pnp_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
+   [PNP_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanual$fk_EAdjAnual_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[eadjanual] DROP CONSTRAINT [eadjanual$fk_EAdjAnual_BarraNacional1]
@@ -8005,7 +8004,7 @@ ALTER TABLE [dbo].[eadjanual]
  FOREIGN KEY 
    ([IdPtoCompra])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8022,14 +8021,14 @@ ALTER TABLE [dbo].[eadjanual]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'eadjanualdistrmensual$fk_EAdjAnualDistrMensual_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[eadjanualdistrmensual] DROP CONSTRAINT [eadjanualdistrmensual$fk_EAdjAnualDistrMensual_BarraNacional1]
@@ -8042,7 +8041,7 @@ ALTER TABLE [dbo].[eadjanualdistrmensual]
  FOREIGN KEY 
    ([IdPtoCompra])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8059,14 +8058,14 @@ ALTER TABLE [dbo].[eadjanualdistrmensual]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'efact$fk_EFACT_CodigoContrato1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[efact] DROP CONSTRAINT [efact$fk_EFACT_CodigoContrato1]
@@ -8079,7 +8078,7 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8096,7 +8095,7 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8113,7 +8112,7 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8130,7 +8129,7 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdPuntoRetiro])
  REFERENCES 
-   [pnp_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
+   [PNP_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8147,7 +8146,7 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdTipoDespacho])
  REFERENCES 
-   [pnp_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
+   [PNP_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8164,14 +8163,14 @@ ALTER TABLE [dbo].[efact]
  FOREIGN KEY 
    ([IdVersion])
  REFERENCES 
-   [pnp_3].[dbo].[versionefact]     ([IdVersion])
+   [PNP_3].[dbo].[versionefact]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'estabilizaciondetalle$fk_EstabilizacionDetalle_TipoDespacho1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[estabilizaciondetalle] DROP CONSTRAINT [estabilizaciondetalle$fk_EstabilizacionDetalle_TipoDespacho1]
@@ -8184,7 +8183,7 @@ ALTER TABLE [dbo].[estabilizaciondetalle]
  FOREIGN KEY 
    ([IdTipoDEspacho])
  REFERENCES 
-   [pnp_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
+   [PNP_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8201,14 +8200,14 @@ ALTER TABLE [dbo].[estabilizaciondetalle]
  FOREIGN KEY 
    ([IdVersionEstabilizacion])
  REFERENCES 
-   [pnp_3].[dbo].[versionestabilizacion]     ([IdVersionEstabilizacion])
+   [PNP_3].[dbo].[versionestabilizacion]     ([IdVersionEstabilizacion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factormodulacion$fk_FactorModulacion_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[factormodulacion] DROP CONSTRAINT [factormodulacion$fk_FactorModulacion_BarraNacional1]
@@ -8221,7 +8220,7 @@ ALTER TABLE [dbo].[factormodulacion]
  FOREIGN KEY 
    ([IdBarraNacional])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8238,14 +8237,14 @@ ALTER TABLE [dbo].[factormodulacion]
  FOREIGN KEY 
    ([IdDecreto])
  REFERENCES 
-   [pnp_3].[dbo].[decreto]     ([IdDecreto])
+   [PNP_3].[dbo].[decreto]     ([IdDecreto])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'factorreferenciacion$fk_FactorReferenciacion_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[factorreferenciacion] DROP CONSTRAINT [factorreferenciacion$fk_FactorReferenciacion_BarraNacional1]
@@ -8258,7 +8257,7 @@ ALTER TABLE [dbo].[factorreferenciacion]
  FOREIGN KEY 
    ([IdBarraNacional])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8275,14 +8274,14 @@ ALTER TABLE [dbo].[factorreferenciacion]
  FOREIGN KEY 
    ([IdPuntoRetiro])
  REFERENCES 
-   [pnp_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
+   [PNP_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncet$fk_CETIndexacion_CET1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[indexacioncet] DROP CONSTRAINT [indexacioncet$fk_CETIndexacion_CET1]
@@ -8295,14 +8294,14 @@ ALTER TABLE [dbo].[indexacioncet]
  FOREIGN KEY 
    ([IdLicitacionDx], [IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[cet]     ([IdLicitacionDx], [IdGeneradora])
+   [PNP_3].[dbo].[cet]     ([IdLicitacionDx], [IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncombustible$fk_IndexacionCombustible_TipoCombustible1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[indexacioncombustible] DROP CONSTRAINT [indexacioncombustible$fk_IndexacionCombustible_TipoCombustible1]
@@ -8315,14 +8314,14 @@ ALTER TABLE [dbo].[indexacioncombustible]
  FOREIGN KEY 
    ([IdTipoCombustible])
  REFERENCES 
-   [pnp_3].[dbo].[tipocombustible]     ([IdTipoCombustible])
+   [PNP_3].[dbo].[tipocombustible]     ([IdTipoCombustible])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontrato$fk_IndexacionContratoDetalle_LicitacionGx10'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[indexacioncontrato] DROP CONSTRAINT [indexacioncontrato$fk_IndexacionContratoDetalle_LicitacionGx10]
@@ -8335,14 +8334,14 @@ ALTER TABLE [dbo].[indexacioncontrato]
  FOREIGN KEY 
    ([IdLicitacionGx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
+   [PNP_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontratodetalle$fk_IndexacionContratoDetalle_LicitacionGx1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[indexacioncontratodetalle] DROP CONSTRAINT [indexacioncontratodetalle$fk_IndexacionContratoDetalle_LicitacionGx1]
@@ -8355,14 +8354,14 @@ ALTER TABLE [dbo].[indexacioncontratodetalle]
  FOREIGN KEY 
    ([IdLicitacionGx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
+   [PNP_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'indexacioncontratofm$fk_IndexacionContratoFM_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[indexacioncontratofm] DROP CONSTRAINT [indexacioncontratofm$fk_IndexacionContratoFM_BarraNacional1]
@@ -8375,7 +8374,7 @@ ALTER TABLE [dbo].[indexacioncontratofm]
  FOREIGN KEY 
    ([IdPtoOferta])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8392,7 +8391,7 @@ ALTER TABLE [dbo].[indexacioncontratofm]
  FOREIGN KEY 
    ([IdBarraNacional])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8409,14 +8408,14 @@ ALTER TABLE [dbo].[indexacioncontratofm]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciondx$fk_LicitacionDx_Licitacion1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[licitaciondx] DROP CONSTRAINT [licitaciondx$fk_LicitacionDx_Licitacion1]
@@ -8429,7 +8428,7 @@ ALTER TABLE [dbo].[licitaciondx]
  FOREIGN KEY 
    ([IdLicitacion])
  REFERENCES 
-   [pnp_3].[dbo].[licitacion]     ([IdLicitacion])
+   [PNP_3].[dbo].[licitacion]     ([IdLicitacion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8446,14 +8445,14 @@ ALTER TABLE [dbo].[licitaciondx]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongx$fk_LicitacionGx_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[licitaciongx] DROP CONSTRAINT [licitaciongx$fk_LicitacionGx_BarraNacional1]
@@ -8466,7 +8465,7 @@ ALTER TABLE [dbo].[licitaciongx]
  FOREIGN KEY 
    ([IdPtoOferta])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8483,7 +8482,7 @@ ALTER TABLE [dbo].[licitaciongx]
  FOREIGN KEY 
    ([IdDecrPNudo])
  REFERENCES 
-   [pnp_3].[dbo].[decreto]     ([IdDecreto])
+   [PNP_3].[dbo].[decreto]     ([IdDecreto])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8500,7 +8499,7 @@ ALTER TABLE [dbo].[licitaciongx]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8517,14 +8516,14 @@ ALTER TABLE [dbo].[licitaciongx]
  FOREIGN KEY 
    ([IdLicitacion])
  REFERENCES 
-   [pnp_3].[dbo].[licitacion]     ([IdLicitacion])
+   [PNP_3].[dbo].[licitacion]     ([IdLicitacion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxdxptocompra$fk_LicitacionDxGxPtoCompra_LicitacionDx1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[licitaciongxdxptocompra] DROP CONSTRAINT [licitaciongxdxptocompra$fk_LicitacionDxGxPtoCompra_LicitacionDx1]
@@ -8537,7 +8536,7 @@ ALTER TABLE [dbo].[licitaciongxdxptocompra]
  FOREIGN KEY 
    ([IdLicitacionDx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciondx]     ([IdLicitacionDx])
+   [PNP_3].[dbo].[licitaciondx]     ([IdLicitacionDx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8554,7 +8553,7 @@ ALTER TABLE [dbo].[licitaciongxdxptocompra]
  FOREIGN KEY 
    ([IdLicitacionGx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
+   [PNP_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8571,14 +8570,14 @@ ALTER TABLE [dbo].[licitaciongxdxptocompra]
  FOREIGN KEY 
    ([IdPtoCompra])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxindexacion$fk_LicitacionGxIndexacion_LicitacionGx1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[licitaciongxindexacion] DROP CONSTRAINT [licitaciongxindexacion$fk_LicitacionGxIndexacion_LicitacionGx1]
@@ -8591,14 +8590,14 @@ ALTER TABLE [dbo].[licitaciongxindexacion]
  FOREIGN KEY 
    ([IdLicitacionGx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
+   [PNP_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'licitaciongxindexesp$fk_LicitacionGxIndexEsp_LicitacionGx1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[licitaciongxindexesp] DROP CONSTRAINT [licitaciongxindexesp$fk_LicitacionGxIndexEsp_LicitacionGx1]
@@ -8611,14 +8610,14 @@ ALTER TABLE [dbo].[licitaciongxindexesp]
  FOREIGN KEY 
    ([IdLicitacionGx])
  REFERENCES 
-   [pnp_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
+   [PNP_3].[dbo].[licitaciongx]     ([IdLicitacionGx])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'perdidazonal$fk_PerdidaZonal_SistemaZonal1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[perdidazonal] DROP CONSTRAINT [perdidazonal$fk_PerdidaZonal_SistemaZonal1]
@@ -8631,14 +8630,14 @@ ALTER TABLE [dbo].[perdidazonal]
  FOREIGN KEY 
    ([IdSistemaZonal])
  REFERENCES 
-   [pnp_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
+   [PNP_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pncp$fk_PNCP_BarraNacional1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[pncp] DROP CONSTRAINT [pncp$fk_PNCP_BarraNacional1]
@@ -8651,14 +8650,14 @@ ALTER TABLE [dbo].[pncp]
  FOREIGN KEY 
    ([IdNudo])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pncpconcet$fk_PNCPconCET_CETCP1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[pncpconcet] DROP CONSTRAINT [pncpconcet$fk_PNCPconCET_CETCP1]
@@ -8671,7 +8670,7 @@ ALTER TABLE [dbo].[pncpconcet]
  FOREIGN KEY 
    ([MesIndexacion], [VersionIndex], [VersionPNP], [IdGeneradora], [IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[cetcp]     ([MesIndexacion], [VersionIndex], [Version], [IdGeneradora], [IdDistribuidora])
+   [PNP_3].[dbo].[cetcp]     ([MesIndexacion], [VersionIndex], [Version], [IdGeneradora], [IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8688,7 +8687,7 @@ ALTER TABLE [dbo].[pncpconcet]
  FOREIGN KEY 
    ([MES_PNCP], [VersionPNCP], [IdNudo])
  REFERENCES 
-   [pnp_3].[dbo].[pncp]     ([MES], [Version], [IdNudo])
+   [PNP_3].[dbo].[pncp]     ([MES], [Version], [IdNudo])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8705,7 +8704,7 @@ ALTER TABLE [dbo].[pncpconcet]
  FOREIGN KEY 
    ([IdVersionEfact])
  REFERENCES 
-   [pnp_3].[dbo].[versionefact]     ([IdVersion])
+   [PNP_3].[dbo].[versionefact]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8722,14 +8721,14 @@ ALTER TABLE [dbo].[pncpconcet]
  FOREIGN KEY 
    ([IdVersion])
  REFERENCES 
-   [pnp_3].[dbo].[versionrec]     ([IdVersion])
+   [PNP_3].[dbo].[versionrec]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnp$fk_IndexacionContratoFM_BarraNacional20'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[pnp] DROP CONSTRAINT [pnp$fk_IndexacionContratoFM_BarraNacional20]
@@ -8742,7 +8741,7 @@ ALTER TABLE [dbo].[pnp]
  FOREIGN KEY 
    ([IdBarraNacional])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8759,14 +8758,14 @@ ALTER TABLE [dbo].[pnp]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnpindex$fk_IndexacionContratoFM_BarraNacional200'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[pnpindex] DROP CONSTRAINT [pnpindex$fk_IndexacionContratoFM_BarraNacional200]
@@ -8779,7 +8778,7 @@ ALTER TABLE [dbo].[pnpindex]
  FOREIGN KEY 
    ([IdPtoOferta])
  REFERENCES 
-   [pnp_3].[dbo].[barranacional]     ([IdBarraNacional])
+   [PNP_3].[dbo].[barranacional]     ([IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8796,14 +8795,14 @@ ALTER TABLE [dbo].[pnpindex]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'pnptraspexc$fk_PNPTraspExc_CMGPromedio1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[pnptraspexc] DROP CONSTRAINT [pnptraspexc$fk_PNPTraspExc_CMGPromedio1]
@@ -8816,7 +8815,7 @@ ALTER TABLE [dbo].[pnptraspexc]
  FOREIGN KEY 
    ([VersionCMg], [FechaCMG], [IdPtoCompra])
  REFERENCES 
-   [pnp_3].[dbo].[cmgpromedio]     ([VersionCMg], [Fecha], [IdBarraNacional])
+   [PNP_3].[dbo].[cmgpromedio]     ([VersionCMg], [Fecha], [IdBarraNacional])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8833,14 +8832,14 @@ ALTER TABLE [dbo].[pnptraspexc]
  FOREIGN KEY 
    ([VersionPNP], [Fecha], [Version], [IdCodigoContrato], [IdPtoOferta])
  REFERENCES 
-   [pnp_3].[dbo].[pnpindex]     ([VersionIndex], [MesIndexacion], [Version], [IdCodigoContrato], [IdPtoOferta])
+   [PNP_3].[dbo].[pnpindex]     ([VersionIndex], [MesIndexacion], [Version], [IdCodigoContrato], [IdPtoOferta])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'precionudolicitacion$fk_PrecioNudoLicitacion_Decreto1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[precionudolicitacion] DROP CONSTRAINT [precionudolicitacion$fk_PrecioNudoLicitacion_Decreto1]
@@ -8853,14 +8852,14 @@ ALTER TABLE [dbo].[precionudolicitacion]
  FOREIGN KEY 
    ([IdDecPNudo])
  REFERENCES 
-   [pnp_3].[dbo].[decreto]     ([IdDecreto])
+   [PNP_3].[dbo].[decreto]     ([IdDecreto])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'ptoretirosistema$fk_PtoRetiroSistema_PuntoRetiro1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[ptoretirosistema] DROP CONSTRAINT [ptoretirosistema$fk_PtoRetiroSistema_PuntoRetiro1]
@@ -8873,7 +8872,7 @@ ALTER TABLE [dbo].[ptoretirosistema]
  FOREIGN KEY 
    ([IdPuntoRetiro])
  REFERENCES 
-   [pnp_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
+   [PNP_3].[dbo].[puntoretiro]     ([IdPuntoRetiro])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8890,14 +8889,14 @@ ALTER TABLE [dbo].[ptoretirosistema]
  FOREIGN KEY 
    ([IdSistemaZonal])
  REFERENCES 
-   [pnp_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
+   [PNP_3].[dbo].[sistemazonal]     ([IdSistemaZonal])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'recaudaciondetalle$fk_EfactPNP_CodigoContrato1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[recaudaciondetalle] DROP CONSTRAINT [recaudaciondetalle$fk_EfactPNP_CodigoContrato1]
@@ -8910,7 +8909,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdCodigoContrato])
  REFERENCES 
-   [pnp_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
+   [PNP_3].[dbo].[codigocontrato]     ([IdCodigoContrato])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8927,7 +8926,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdDistribuidora])
  REFERENCES 
-   [pnp_3].[dbo].[distribuidora]     ([IdDistribuidora])
+   [PNP_3].[dbo].[distribuidora]     ([IdDistribuidora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8944,7 +8943,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdGeneradora])
  REFERENCES 
-   [pnp_3].[dbo].[generadora]     ([IdGeneradora])
+   [PNP_3].[dbo].[generadora]     ([IdGeneradora])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8965,7 +8964,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([FechaPZ], [VersionPZ], [IdSistemaZonal])
  REFERENCES 
-   [pnp_3].[dbo].[perdidazonal]     ([Fecha], [Version], [IdSistemaZonal])
+   [PNP_3].[dbo].[perdidazonal]     ([Fecha], [Version], [IdSistemaZonal])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -8984,7 +8983,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdTipoDespacho])
  REFERENCES 
-   [pnp_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
+   [PNP_3].[dbo].[tipodespacho]     ([IdTipoDEspacho])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -9001,7 +9000,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdVersion])
  REFERENCES 
-   [pnp_3].[dbo].[versionrec]     ([IdVersion])
+   [PNP_3].[dbo].[versionrec]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -9018,7 +9017,7 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([IdPuntoRetiro], [IdBarraNacionalFR], [PeriodoFR])
  REFERENCES 
-   [pnp_3].[dbo].[factorreferenciacion]     ([IdPuntoRetiro], [IdBarraNacional], [Periodo])
+   [PNP_3].[dbo].[factorreferenciacion]     ([IdPuntoRetiro], [IdBarraNacional], [Periodo])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -9035,14 +9034,14 @@ ALTER TABLE [dbo].[recaudaciondetalle]
  FOREIGN KEY 
    ([PNCP_Mes], [PNCP_Version], [PNCP_IdNudo])
  REFERENCES 
-   [pnp_3].[dbo].[pncp]     ([MES], [Version], [IdNudo])
+   [PNP_3].[dbo].[pncp]     ([MES], [Version], [IdNudo])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionestabilizacion$fk_VersionEstabilizacion_VersionRec1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[versionestabilizacion] DROP CONSTRAINT [versionestabilizacion$fk_VersionEstabilizacion_VersionRec1]
@@ -9055,7 +9054,7 @@ ALTER TABLE [dbo].[versionestabilizacion]
  FOREIGN KEY 
    ([IdVersionContratosDefinitiva])
  REFERENCES 
-   [pnp_3].[dbo].[versionrec]     ([IdVersion])
+   [PNP_3].[dbo].[versionrec]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
@@ -9072,14 +9071,14 @@ ALTER TABLE [dbo].[versionestabilizacion]
  FOREIGN KEY 
    ([IdVersionContratosPNP])
  REFERENCES 
-   [pnp_3].[dbo].[versionrec]     ([IdVersion])
+   [PNP_3].[dbo].[versionrec]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 IF EXISTS (SELECT * FROM sys.objects so JOIN sys.schemas sc ON so.schema_id = sc.schema_id WHERE so.name = N'versionrecdetalle$fk_VersionErecDetalle_VersionERec1'  AND sc.name = N'dbo'  AND type in (N'F'))
 ALTER TABLE [dbo].[versionrecdetalle] DROP CONSTRAINT [versionrecdetalle$fk_VersionErecDetalle_VersionERec1]
@@ -9092,14 +9091,14 @@ ALTER TABLE [dbo].[versionrecdetalle]
  FOREIGN KEY 
    ([IdVersion])
  REFERENCES 
-   [pnp_3].[dbo].[versionrec]     ([IdVersion])
+   [PNP_3].[dbo].[versionrec]     ([IdVersion])
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[barranacional]
  ADD DEFAULT NULL FOR [BarraNAcional]
@@ -9110,7 +9109,7 @@ ALTER TABLE  [dbo].[barranacional]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[cet]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -9149,14 +9148,14 @@ ALTER TABLE  [dbo].[cet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[cetcp]
  ADD DEFAULT NULL FOR [CET]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[cmgpromedio]
  ADD DEFAULT NULL FOR [CMG_Peso]
@@ -9167,7 +9166,7 @@ ALTER TABLE  [dbo].[cmgpromedio]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[codigocontrato]
  ADD DEFAULT NULL FOR [Distribuidora]
@@ -9182,7 +9181,7 @@ ALTER TABLE  [dbo].[codigocontrato]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[decreto]
  ADD DEFAULT NULL FOR [Nombre]
@@ -9209,7 +9208,7 @@ ALTER TABLE  [dbo].[decreto]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[demanda]
  ADD DEFAULT NULL FOR [Distribuidora]
@@ -9240,7 +9239,7 @@ ALTER TABLE  [dbo].[demanda]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[difxcompras]
  ADD DEFAULT NULL FOR [Distribuidora]
@@ -9283,7 +9282,7 @@ ALTER TABLE  [dbo].[difxcompras]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[distribuidora]
  ADD DEFAULT NULL FOR [NombreDistribuidora]
@@ -9294,7 +9293,7 @@ ALTER TABLE  [dbo].[distribuidora]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[dolarfijacion]
  ADD DEFAULT NULL FOR [VersionDolarFijacion]
@@ -9313,7 +9312,7 @@ ALTER TABLE  [dbo].[dolarfijacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[eadjanual]
  ADD DEFAULT NULL FOR [IdPtoCompra]
@@ -9332,7 +9331,7 @@ ALTER TABLE  [dbo].[eadjanual]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[eadjanualdistrmensual]
  ADD DEFAULT NULL FOR [PtoCompra]
@@ -9347,7 +9346,7 @@ ALTER TABLE  [dbo].[eadjanualdistrmensual]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[efact]
  ADD DEFAULT NULL FOR [Fecha]
@@ -9382,7 +9381,7 @@ ALTER TABLE  [dbo].[efact]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[estabilizacion]
  ADD DEFAULT NULL FOR [Ano]
@@ -9421,18 +9420,18 @@ ALTER TABLE  [dbo].[estabilizacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[estabilizaciondetalle]
  ADD DEFAULT NULL FOR [IdEfact]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [IdVersionPreciosDef]
+ ADD DEFAULT NULL FOR [IdVersion_PreciosDef]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [IdVersionPreciosPNP]
+ ADD DEFAULT NULL FOR [IdVersion_PreciosPNP]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
@@ -9464,15 +9463,19 @@ ALTER TABLE  [dbo].[estabilizaciondetalle]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [VersionEfact_PrecioDef]
+ ADD DEFAULT NULL FOR [IdVersionEfact_PrecioDef]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [FechaPNP_PrecioDef]
+ ADD DEFAULT NULL FOR [PNP_MesIndex_PrecioDef]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [VersionPNP_PrecioDef]
+ ADD DEFAULT NULL FOR [PNP_VersionIndex_PrecioDef]
+GO
+
+ALTER TABLE  [dbo].[estabilizaciondetalle]
+ ADD DEFAULT NULL FOR [PNP_Version_PrecioDef]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
@@ -9492,19 +9495,23 @@ ALTER TABLE  [dbo].[estabilizaciondetalle]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [Fechaefact_PrecioPNP]
+ ADD DEFAULT NULL FOR [FechaEfact_PrecioPNP]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [VersionEfact_PrecioPNP]
+ ADD DEFAULT NULL FOR [IdVersionEfact_PrecioPNP]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [FechaPNP_PrecioPNP]
+ ADD DEFAULT NULL FOR [PNP_MesIndex_PrecioPNP]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [VersionPNP_PrecioPNP]
+ ADD DEFAULT NULL FOR [PNP_VersionIndex_PrecioPNP]
+GO
+
+ALTER TABLE  [dbo].[estabilizaciondetalle]
+ ADD DEFAULT NULL FOR [PNP_Version_PrecioPNP]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
@@ -9540,7 +9547,7 @@ ALTER TABLE  [dbo].[estabilizaciondetalle]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
- ADD DEFAULT NULL FOR [DolarDefinitivoPromedioMes]
+ ADD DEFAULT NULL FOR [DolarEstabilizacion]
 GO
 
 ALTER TABLE  [dbo].[estabilizaciondetalle]
@@ -9568,7 +9575,7 @@ ALTER TABLE  [dbo].[estabilizaciondetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[factormodulacion]
  ADD DEFAULT NULL FOR [BarraNacional]
@@ -9583,7 +9590,7 @@ ALTER TABLE  [dbo].[factormodulacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[factorreferenciacion]
  ADD DEFAULT NULL FOR [PuntoRetiro]
@@ -9602,7 +9609,7 @@ ALTER TABLE  [dbo].[factorreferenciacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[generadora]
  ADD DEFAULT NULL FOR [NombreGeneradora]
@@ -9613,7 +9620,7 @@ ALTER TABLE  [dbo].[generadora]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncet]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -9676,7 +9683,7 @@ ALTER TABLE  [dbo].[indexacioncet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncombustible]
  ADD DEFAULT NULL FOR [Fecha]
@@ -9687,7 +9694,7 @@ ALTER TABLE  [dbo].[indexacioncombustible]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncontrato]
  ADD DEFAULT NULL FOR [MesIndexacion]
@@ -9802,7 +9809,7 @@ ALTER TABLE  [dbo].[indexacioncontrato]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncontratodetalle]
  ADD DEFAULT NULL FOR [MesIndexacion]
@@ -9905,7 +9912,7 @@ ALTER TABLE  [dbo].[indexacioncontratodetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncontratofm]
  ADD DEFAULT NULL FOR [CodigoContrato]
@@ -9988,7 +9995,7 @@ ALTER TABLE  [dbo].[indexacioncontratofm]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacioncpi]
  ADD DEFAULT NULL FOR [Fecha]
@@ -9999,7 +10006,7 @@ ALTER TABLE  [dbo].[indexacioncpi]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexaciondolar]
  ADD DEFAULT NULL FOR [Fecha]
@@ -10010,7 +10017,7 @@ ALTER TABLE  [dbo].[indexaciondolar]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexacionipc]
  ADD DEFAULT NULL FOR [Fecha]
@@ -10025,14 +10032,14 @@ ALTER TABLE  [dbo].[indexacionipc]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[indexadorescontratos]
  ADD DEFAULT NULL FOR [Valor]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitacion]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -10043,7 +10050,7 @@ ALTER TABLE  [dbo].[licitacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitaciondx]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -10058,7 +10065,7 @@ ALTER TABLE  [dbo].[licitaciondx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitaciongx]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -10117,7 +10124,7 @@ ALTER TABLE  [dbo].[licitaciongx]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitaciongxdxptocompra]
  ADD DEFAULT NULL FOR [PtoCompra]
@@ -10128,7 +10135,7 @@ ALTER TABLE  [dbo].[licitaciongxdxptocompra]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitaciongxindexacion]
  ADD DEFAULT NULL FOR [Rezago]
@@ -10143,7 +10150,7 @@ ALTER TABLE  [dbo].[licitaciongxindexacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[licitaciongxindexesp]
  ADD DEFAULT NULL FOR [Fecha]
@@ -10158,7 +10165,7 @@ ALTER TABLE  [dbo].[licitaciongxindexesp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[perdidazonal]
  ADD DEFAULT NULL FOR [SistemaZonal]
@@ -10173,14 +10180,14 @@ ALTER TABLE  [dbo].[perdidazonal]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[pncp]
  ADD DEFAULT NULL FOR [Observacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[pncpconcet]
  ADD DEFAULT NULL FOR [FechaEfact]
@@ -10207,7 +10214,7 @@ ALTER TABLE  [dbo].[pncpconcet]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[pnp]
  ADD DEFAULT NULL FOR [Licitacion]
@@ -10246,7 +10253,7 @@ ALTER TABLE  [dbo].[pnp]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[pnpindex]
  ADD DEFAULT NULL FOR [Cet_USD]
@@ -10265,7 +10272,7 @@ ALTER TABLE  [dbo].[pnpindex]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[pnptraspexc]
  ADD DEFAULT NULL FOR [CET_USD]
@@ -10300,7 +10307,7 @@ ALTER TABLE  [dbo].[pnptraspexc]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[precionudolicitacion]
  ADD DEFAULT NULL FOR [Unidad]
@@ -10315,7 +10322,7 @@ ALTER TABLE  [dbo].[precionudolicitacion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[puntoretiro]
  ADD DEFAULT NULL FOR [PuntoRetiro]
@@ -10326,7 +10333,7 @@ ALTER TABLE  [dbo].[puntoretiro]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[recaudaciondetalle]
  ADD DEFAULT NULL FOR [FechaEFact]
@@ -10401,7 +10408,7 @@ ALTER TABLE  [dbo].[recaudaciondetalle]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[sistemazonal]
  ADD DEFAULT NULL FOR [SistemaZonal]
@@ -10412,7 +10419,7 @@ ALTER TABLE  [dbo].[sistemazonal]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[tipocombustible]
  ADD DEFAULT NULL FOR [TipoCombustible]
@@ -10427,35 +10434,35 @@ ALTER TABLE  [dbo].[tipocombustible]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[tipodespacho]
  ADD DEFAULT NULL FOR [Descripcion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[versionefact]
  ADD DEFAULT NULL FOR [Descripcion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[versionestabilizacion]
  ADD DEFAULT NULL FOR [Fecha]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[versionrec]
  ADD DEFAULT NULL FOR [Descripcion]
 GO
 
 
-USE pnp_3
+USE PNP_3
 GO
 ALTER TABLE  [dbo].[versionrecdetalle]
  ADD DEFAULT NULL FOR [ValorTexto]

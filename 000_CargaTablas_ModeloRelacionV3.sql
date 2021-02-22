@@ -1,4 +1,4 @@
-use pnp_2
+use pnp_3
 /* 19:04
 --ejecutar solamente 1 vez
 --exec sp_addlinkedserver @server='GTD-NOT019\SQLEXPRESS'
@@ -20,6 +20,7 @@ insert into sistemazonal select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Sistema
 	insert into TipoDespacho values(3,'Déficit')
 	insert into TipoDespacho values(4,'Traspaso Excedentes')
 	insert into TipoDespacho values(5,'Dx con contratos Holding')
+	insert into TipoDespacho values(6,'Reconversión energética')
 
 	insert into decreto values(1,'283/2005','','','','','')
 	insert into decreto values(2,'147/2006','','','','','')
@@ -510,48 +511,6 @@ drop table tempRecD
 insert into [dbo].[versionestabilizacion]
 select * from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.[versionestabilizacion] where idversionest is not null
 
-select	IdVersionEstabilizacion,idcen IdEfact,IdVersionNoEst IdVersionConstratosDefinitiva,idversionEst IdVersionContratosPNP
-		,case	when t1.Dx in('CGE Distribución','CGED') then 18 
-				when t1.Dx in('Enel Distribución','CHILECTRA') then 10 
-				when t1.Dx in('ELECDA SING','ELECDA SIC') then 3
-				when t1.Dx in('LUZANDES') then 15
-				else D.IdDistribuidora end IdDistribuidora
-		,case when G.idgeneradora is null then 0 else G.idgeneradora end idgeneradora
-		,case	when t1.CodigoContrato IN ('Contrato Corto Plazo_Coelcha_ENDESA','Contrato Corto Plazo_Frontel_ENDESA','Contrato Corto Plazo_COOPERSOL_E-CL') then 0 
-				when t1.CodigoContrato IN ('DÉFICIT_Coopelan') then 0 
-				ELSE CC.IdCodigoContrato END IdCodigoContrato
-		,t1.CodigoContrato2 CodigoContrato
-		,PR.IdPuntoRetiro,t1.energia,t1.potencia,0 IdTipoDespacho
-		,fechaefact		Fechaefact_ContrDef		,VersionEfact VersionEfact_ContrDef		,FechaPNP FechaPNP_ContrDef		,VersionPNP VersionPNP_ContrDef,EnergiaPC EPC_ContrDef	,PotenciaPC PPC_ContrDef		,EnergiaRecPeso ERec_Peso_ContrDef	,PotenciaRecPeso PRec_Peso_ContrDef
-		,fechaefactEst	Fechaefact_ContrPNP		,VersionEfactEst VersionEfact_ContrPNP	,FechaPNPEst FechaPNP_ContrPNP	,VersionPNP VersionPNP_ContrPNP,EnergiaPCEst EPC_ContrPNP	,PotenciaPCEst PPC_ContrPNP	,EnergiaRecPesoEst ERec_Peso_ContrPNP,PotenciaRecPesoEst PRec_Peso_ContrPNP
-		,VariacionIPC,Interes,FactorAjusteE,FactorAjusteP,DolarEstabilizacion DolarDefinitivoPromedioMes
-		,DifEnergiaRecPeso DifERec_Peso				,DifPotenciaRecPeso DifPRec_Peso
-		,DifEnergiaRecPesoEst DifERec_Peso_Estabilizado	,DifPotenciaRecPesoEst DifPRec_Peso_Estabilizado
-		,DifEnergiaRecDolarEst DifERec_Dolar_Estabilizado,DifPotenciaRecDolarEst DifPRec_Dolar_Estabilizado
-into EstDTemp
-from (select *,REPLACE(CodigoContrato,'CGE Distribución','CGE Distribucion') CodigoContrato2 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Resultado_Estabilizacion) t1
-left join distribuidora D on D.NombreDistribuidora=t1.DX
-left join generadora G on G.NombreGeneradora=t1.Gx
-left join codigocontrato CC on CC.CodigoContrato=t1.CodigoContrato2
-left join puntoretiro PR on PR.PuntoRetiro=t1.PuntoRetiro
-
-update EstDTemp set IdTipoDespacho=2 where CodigoContrato IN ('Contrato Corto Plazo_Coelcha_ENDESA','Contrato Corto Plazo_Frontel_ENDESA','Contrato Corto Plazo_COOPERSOL_E-CL') 
-update EstDTemp set IdTipoDespacho=3 where CodigoContrato IN ('DÉFICIT_Coopelan')
-update EstDTemp set IdTipoDespacho=4 where IdDistribuidora=45--para Mataquito se asocia Despacho mediante traspaso de excedentes
-update EstDTemp set IdTipoDespacho=5 where IdDistribuidora in (12,13,15) --para filiales Enel se utilizan contratos del holding
-update EstDTemp set IdTipoDespacho=1 where idCodigoContrato <>0 and IdDistribuidora not in (45,12,13,15)
-
-insert into EstabilizacionDetalle
-select	IdVersionEstabilizacion,IdEfact,IdVersionConstratosDefinitiva,IdVersionContratosPNP,IdDistribuidora,idgeneradora	
-		IdCodigoContrato,IdPuntoRetiro,energia,potencia,IdTipoDespacho,Fechaefact_ContrDef,VersionEfact_ContrDef
-		,FechaPNP_ContrDef,VersionPNP_ContrDef,EPC_ContrDef,PPC_ContrDef,ERec_Peso_ContrDef,PRec_Peso_ContrDef,Fechaefact_ContrPNP
-		,VersionEfact_ContrPNP,FechaPNP_ContrPNP,VersionPNP_ContrPNP,EPC_ContrPNP,PPC_ContrPNP,ERec_Peso_ContrPNP,PRec_Peso_ContrPNP
-		,VariacionIPC,Interes,FactorAjusteE,FactorAjusteP,DolarDefinitivoPromedioMes,DifERec_Peso,DifPRec_Peso
-		,DifERec_Peso_Estabilizado,DifPRec_Peso_Estabilizado,DifERec_Dolar_Estabilizado,DifPRec_Dolar_Estabilizado
-from EstDTemp
-
-drop table EstDTemp
-
 insert into PtoRetiroSistema
 select distinct * from (
 select case	when t1.PuntoRetiro='Abanico 13.8' then 30
@@ -587,7 +546,7 @@ select case	when t1.PuntoRetiro='Abanico 13.8' then 30
 from [GTD-NOT019\SQLEXPRESS].pnp_1.[dbo].[PtoRetiroSistema] t1
 left join puntoretiro  t2 on t1.puntoretiro=t2.PuntoRetiro
 left join sistemazonal t3 on t1.sistemazonal=t3.SistemaZonal
-where t1.puntoretiro not in ('Los Molles 13.2','Maitenes 012','Paposo 13.2','Salado 023')
+where t1.puntoretiro not in ('Los Molles 13.2','Maitenes 012','Paposo 13.2','Salado 023','Pirque 015')
 ) t
 
 insert into CETCP
@@ -675,14 +634,13 @@ select	distinct versionpnp,fecha,[version]
 into temppnp
 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.pnp t1
 left join barranacional t2 on t1.ptooferta=t2.BarraNAcional
-where pe_index_usd is not null
+where pe_index_usd is not null and t1.distribuidora !='MATAQUITO'
 
 insert into pnpIndex
 select	versionpnp VersionIndex,fecha MesIndexacion,version,t2.idcodigocontrato,t1.IdBarraNacional IdPtoOferta,t1.CET_USD,t1.PE_Index_USD,t1.PP_Index_USD,t1.observacion
 from temppnp t1
 left join codigocontrato t2 on t1.CodigoContrato=t2.CodigoContrato
 where t1.CodigoContrato not in ('EMEL-SIC 2006/01_BB1_BB_CGE Distribucion_ENDESA','EMEL-SIC 2006/01-2_BB_Sur_BB_CGE Distribucion_AES GENER','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Abengoa','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_Norvind','SIC 2013/03_2 (Enelsa)_BS4_BB_CGE Distribucion_El Campesino')
-and t1.distribuidora !='MATAQUITO'
 
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
 
@@ -691,7 +649,6 @@ insert into pnpindex
 select VersionIndex,MesIndexacion,Version, 186 IdCodigoContrato,IdPtoOferta,Cet_USD,PrecioEnergia,PrecioPotencia,CONCAT(Observacion,'. Se agrega 20210211 porque no existen') Observacion
 from pnpindex where MesIndexacion='2020-10-01' and VersionIndex='FPEC_2010V1'
 and IdCodigoContrato=185
-
 
 --PNPTraspExc
 IF OBJECT_ID('temptrasp', 'U') IS NOT NULL DROP TABLE temptrasp
@@ -740,11 +697,6 @@ select	t1.idversionEstabilizacion,t1.idcen,t1.idversionNoEst IdVersion_PreciosDe
 		,t1.FechaEfactEst fechaefact_PrecioPNP,VE2.IdVersion IdVersionEFact_PrecioPNP,t1.VersionPNPEst PNP_VersionIndex_PrecioPNP,t1.FEchaPNPEst PNP_MesIndexacion_PrecioPNP,'ITD' PNP_Version_PrecioPNP,t1.EnergiaPCEst EPC_PrecioPNP,t1.PotenciaPCEst PPC_PRecioPNP,t1.EnergiaREcPesoEst ERec_Peso_PrecioPNP,t1.PotenciaRecPesoEst PRec_Peso_PrecioPNP
 		,t1.VariacionIPC,t1.Interes,t1.FactorAjusteE,t1.FactorAjusteP,t1.DolarEstabilizacion
 		,t1.DifEnergiaRecPeso,t1.DifPotenciaRecPeso,t1.DifEnergiaRecPesoEst,t1.DifPotenciaRecPesoEst,t1.DifEnergiaRecDolarEst,t1.DifPotenciaRecDolarEst
-		--,t1.fecha
-		--,t1.versionPNP PNP_VersionIndex,t1.FechaPNP PNP_MesIndexacion,t1.TipoPNP PNP_Version,Pe PNELP,PP PNPLP
-		--,t1.mes_pncp PNCP_Mes,PNCP.Version PNCP_Version,case when t1.mes_pncp is null then 0 else fr.IdBarraNacional end PNCP_IdNudo
-		--,t1.CETDolar CETCP,t1.PrecioNudoEnergiaDolar PNECP_USD,t1.PrecioNudoPotenciaDolar PNPCP_USD
-		--,t1.EnergiaPC EPC,t1.PotenciaPC PPC,t1.EnergiaRecDolar ERec_USD,t1.PotenciaRecDolar PRec_USD,t1.Dolar,t1.EnergiaRecPeso ERec_Peso,t1.PotenciaRecPeso PRec_Peso
 into tempResultEst
 from (	select *,REPLACE(CodigoContrato,'CGE Distribución','CGE Distribucion') CodigoContrato2 from [GTD-NOT019\SQLEXPRESS].pnp_1.dbo.Resultado_Estabilizacion) t1
 left join VersionEfact VE1 on VE1.descripcion=t1.VersionEfact
@@ -767,4 +719,6 @@ select idversionEstabilizacion,idcen,IdVersion_PreciosDef,IdVersion_PreciosPNP,I
 from tempResultEst
 
 drop table tempResultEst
+
 --*/
+

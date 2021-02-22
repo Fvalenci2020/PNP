@@ -1,12 +1,12 @@
---/*
+/*
 alter procedure [011_PROC_RECAUDACION]
 					@idversion int
 as
 --*/
 --DECLARACION VARIABLES, SOLAMENTE PARA REALIZACIÓN DE PRUEBAS ANTES DE PROCEDIMIENTO.
-/*
-use pnp_2
-declare @idVersion varchar(15)	set @idVersion=141
+--/*
+use pnp_3
+declare @idVersion varchar(15)	set @idVersion=137
 --*/
 
 declare @VersionEFACT int	select @VersionEFACT=idversion from versionefact where Descripcion in (
