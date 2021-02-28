@@ -1,96 +1,91 @@
-use pnp_1
+use pnp_3
 
 --PROTOTIPO DE DESPACHO DE CONTRATOS
 
 --pendientes cómo trabajar con contratos de corto plazo.
 --pendiente de trabajar despacho de mataquito y su particularidad.
 
+--DEFINIFICÓN DATOS DE CÁLCULO
+DECLARE @VersionD VARCHAR(45)='2007ProyV1' --segundo semestre 2020
+DECLARE @VersionPZ VARCHAR(45)='Estimado' 
+DECLARE @PeriodoFR VARCHAR(45)='Segundo Semestre 2020'
+DECLARE @Ano int=2020
 
---CARGA DE DATOS DE ENTRADA
+--Demanda_Dx_PtoCompra.
+--/*
+IF OBJECT_ID('Demanda_Dx_PtoCompra', 'U') IS NOT NULL DROP TABLE Demanda_Dx_PtoCompra
 
-/*
-	--Carga de CodigoContrato
-Delete from CodigoContrato
-BULK INSERT CodigoContrato
-FROM 'C:/fvalenci/CNE/PNP/PNP_2101/Tablas_Entrada/CodigoContrato_2101_V1.csv'
-WITH (FORMAT = 'CSV', FIELDQUOTE = '"',CODEPAGE = 'ACP',FIELDTERMINATOR = ';',ROWTERMINATOR = '\n',TABLOCK)
-
-	--Carga de EAdjAnual
-Delete from EAdjAnual
-BULK INSERT EAdjAnual
-FROM 'C:/fvalenci/CNE/PNP/PNP_2101/Tablas_Entrada/EAdjAnual_2101_V1.csv'
-WITH (FORMAT = 'CSV', FIELDQUOTE = '"',CODEPAGE = 'ACP',FIELDTERMINATOR = ';',ROWTERMINATOR = '\n',TABLOCK)
-
-	--Carga de EAdjAnualDistrMensual
-Delete from EAdjAnualDistrMensual
-BULK INSERT EAdjAnualDistrMensual
-FROM 'C:/fvalenci/CNE/PNP/PNP_2101/Tablas_Entrada/EAdjAnualDistrMensual_2101_V1.csv'
-WITH (FORMAT = 'CSV', FIELDQUOTE = '"',CODEPAGE = 'ACP',FIELDTERMINATOR = ';',ROWTERMINATOR = '\n',TABLOCK)
---*/
-
---Cálculo Demanda en punto de compra detallada.
-/*
-Drop table if exists DemandaPtoCompraDetalle
-select t1.VersionDemanda,t1.NombreDistribuidora Distribuidora,t1.Mes,t1.SistemaZonal,t1.VersionPerd,t1.PeriodoFR,t1.BarraNacional,sum(EnergiaPC) EnergiaPC
-into DemandaPtoCompraDetalle
+select VersionDemanda,IdDistribuidora,Mes,IdSistemaZonal,VersionPZ,PeriodoFR,IdBarraNacional,sum(EnergiaPC) EnergiaPC
+into Demanda_Dx_PtoCompra
 from(
-SELECT	t1.Version VersionDemanda,t1.NombreDistribuidora,t1.Mes,t1.SistemaZonal,t2.Version VersionPerd,t3.Periodo PeriodoFR,t3.BarraNacional
-		,Demanda_MWh*t2.Factor*t3.Factor*1000 EnergiaPC
-FROM DEMANDA T1--5064
-LEFT JOIN PerdidaZonal T2 ON T1.SistemaZonal=T2.Sistema and t1.Mes=t2.Fecha--2532
-Left join	FactoresFR t3 on t3.PuntoRetiro=t1.PuntoRetiro--8082
-WHERE	T1.Version='2007ProyV1' 
-		AND T2.Version='Estimado' and t2.TipoFactor='FEPE'--Solamente tiene estimación de 6 meses de Energia
-		and t3.Periodo='Segundo Semestre 2020') t1--8052
-group by t1.VersionDemanda,t1.NombreDistribuidora,t1.Mes,t1.SistemaZonal,t1.VersionPerd,t1.PeriodoFR,t1.BarraNacional--852
-
---Actualizar nombres de barras nacionales y nombrede Distribuidoras
-update DemandaPtoCompraDetalle set BarraNacional='Barro Blanco 220' WHERE BarraNacional='RAHUE 220'
-update DemandaPtoCompraDetalle set Distribuidora='CGE Distribucion' where Distribuidora like '%CGE%'
+SELECT	t1.Version VersionDemanda,t1.IdDistribuidora,t1.Mes,t1.IdSistemaZonal,t2.Version VersionPZ,t3.Periodo PeriodoFR,t3.IdBarraNacional,Demanda*t2.Factor*t3.Factor*1000 EnergiaPC
+FROM DEMANDA T1
+LEFT JOIN PerdidaZonal T2 ON T1.IdSistemaZonal=T2.IdSistemaZonal and t1.Mes=t2.Fecha
+Left join	factorreferenciacion t3 on t3.IdPuntoRetiro=t1.IdPuntoRetiro
+WHERE	T1.Version=@VERSIOND
+		AND T2.Version=@VersionPZ and t2.TipoFactor='FEPE'
+		and t3.Periodo=@PeriodoFR
+		) t1
+group by VersionDemanda,IdDistribuidora,Mes,IdSistemaZonal,VersionPZ,PeriodoFR,IdBarraNacional
 --*/
 
---Demanda real por distribuidora
-/*
-Drop table if exists DdaDxPtoCompra
-select versiondemanda,distribuidora, mes,sum(EnergiaPC) EnergiaPC
-into DdaDxPtoCompra
-from DemandaPtoCompraDetalle
-group by versiondemanda,distribuidora, mes
+--Demanda_Dx.
+--/*
+IF OBJECT_ID('Demanda_Dx', 'U') IS NOT NULL DROP TABLE Demanda_Dx
+
+select VersionDemanda,IdDistribuidora,Mes,sum(EnergiaPC) EnergiaPC
+into Demanda_Dx
+from Demanda_Dx_PtoCompra
+group by VersionDemanda,IdDistribuidora,Mes
+--select * from Demanda_Dx
 --*/
---Agrupar DemandaPtoCompraDetalle
-/*
-Drop table if exists DemandaPtoCompra
-select t1.versiondemanda,t1.distribuidora,t1.mes,t1.barranacional,sum(t1.EnergiaPC) EnergiaPC,sum(t1.EnergiaPC)/t2.EnergiaPC FactPtoCompra
-into DemandaPtoCompra
-from DemandaPtoCompraDetalle t1
-left join DdaDxPtoCompra t2 on t2.versiondemanda=t1.versiondemanda and t2.distribuidora=t1.distribuidora and t2.mes=t1.mes
-group by t1.versiondemanda,t1.distribuidora,t1.mes,t1.barranacional,t2.EnergiaPC
+--Demanda_Dx_PtoCompra con Factor % de Energia por pto de compra sobre mes-Dx
+--/*
+IF OBJECT_ID('Demanda_Dx_PtoCompra_F', 'U') IS NOT NULL DROP TABLE Demanda_Dx_PtoCompra_F
+
+select t1.versiondemanda,t1.IdDistribuidora,t1.mes,t1.IdBarraNacional,sum(t1.EnergiaPC) EnergiaPC,sum(t1.EnergiaPC)/t2.EnergiaPC FactPtoCompra
+into Demanda_Dx_PtoCompra_F
+from Demanda_Dx_PtoCompra t1
+left join Demanda_Dx t2 on t2.versiondemanda=t1.versiondemanda and t2.iddistribuidora=t1.IdDistribuidora and t2.mes=t1.mes
+group by t1.versiondemanda,t1.IdDistribuidora,t1.mes,t1.IdBarraNacional,t2.EnergiaPC
+--select * from Demanda_Dx_PtoCompra_F
 --*/
 
 --Participación Energía por Modalidad
-/*
-Drop table if exists EnergiaModalidad
-select	t1.ano,t1.distribuidora
+--/*
+IF OBJECT_ID('EModalidad', 'U') IS NOT NULL DROP TABLE EModalidad
+
+select	t1.ano,t1.IdDistribuidora
 		,case when t2.EnergiaAnual is null then 0 else t2.EnergiaAnual/(t1.EnergiaAnual+t2.EnergiaAnual) end FactorERe704
-into EnergiaModalidad 
-from (select  t2.modalidad,ano,Distribuidora,sum(t1.EnergiaAnual) EnergiaAnual
-							from EAdjAnual t1 inner join codigocontrato t2 on t1.idcodigocontrato=t2.idcodigocontrato
-							where ano=2020 and  modalidad='DS 4' group by t2.modalidad,ano,Distribuidora) t1
-				left join (select  t2.modalidad,ano,Distribuidora,sum(t1.EnergiaAnual) EnergiaAnual
-							from EAdjAnual t1 inner join codigocontrato t2 on t1.idcodigocontrato=t2.idcodigocontrato
-							where ano=2020 and  modalidad='RE 704' group by t2.modalidad,ano,Distribuidora) t2 
-							on t1.ano=t2.ano and t1.distribuidora=t2.distribuidora
+into EModalidad 
+from	(	select t3.Modalidad,t1.Ano,t2.IdDistribuidora,sum(EnergiaAnual) EnergiaAnual
+				from EAdjAnual t1
+				inner join codigocontrato t2 on t1.IdCodigoContrato=t2.IdCodigoContrato
+				inner join licitaciongx t3 on t2.IdGeneradora=t3.IdGeneradora and t2.IdLicitacion=t3.IdLicitacion
+				where t1.Ano=@Ano and Modalidad='DS 4'
+				group by t3.Modalidad,t1.Ano,t2.IdDistribuidora
+		) t1
+left join (	select t3.Modalidad,t1.Ano,t2.IdDistribuidora,sum(EnergiaAnual) EnergiaAnual
+				from EAdjAnual t1
+				inner join codigocontrato t2 on t1.IdCodigoContrato=t2.IdCodigoContrato
+				inner join licitaciongx t3 on t2.IdGeneradora=t3.IdGeneradora and t2.IdLicitacion=t3.IdLicitacion
+				where t1.Ano=@Ano and Modalidad='Re 704'
+				group by t3.Modalidad,t1.Ano,t2.IdDistribuidora
+		) t2 
+		on t1.ano=t2.ano and t1.IdDistribuidora=t2.IdDistribuidora
 --*/
 
 --Energía AdjudicadaMensual
-/*
-Drop table if exists EAdjMensualDxTB
-select Modalidad,Distribuidora,TipoBloque,fecha,sum(EnergiaMensual)*1000 EAdjMensual
-into EAdjMensualDxTB
+--/*
+IF OBJECT_ID('EAdjMensDxTB', 'U') IS NOT NULL DROP TABLE EAdjMensDxTB
+
+select Modalidad,Distribuidora,t2.TipoBloque,fecha,sum(EnergiaMensual)*1000 EAdjMensual
+into EAdjMensDxTB
 from EAdjAnualDistrMensual t1
-inner join CodigoContrato t2 on t1.idcodigocontrato=t2.idcodigocontrato
-where YEAR(fecha)=2020 and month(fecha)>=6
-group by  Modalidad,Distribuidora,TipoBloque,fecha
+inner join codigocontrato t2 on t1.IdCodigoContrato=t2.IdCodigoContrato
+inner join licitaciongx t3 on t2.IdGeneradora=t3.IdGeneradora and t2.IdLicitacion=t3.IdLicitacion
+where YEAR(fecha)=@Ano and fecha in (select distinct Mes from demanda where Version=@VersionD)
+group by  t3.Modalidad,t2.Distribuidora,t2.TipoBloque,fecha
 --*/
 
 --Determinacion de participación de Re704BB en despacho
@@ -170,7 +165,7 @@ order by t1.idcodigocontrato
 --*/
 
 --Despacho contratos Re704
---/*
+/*
 Drop table if exists DespachoTemp
 select t1.VersionDemanda,t1.Mes
 	,t2.VersionIndex,t2.Version,t2.IDCodigoContrato,t2.CodigoContrato,t2.Licitacion,t2.TipoBloque,t2.PtoOferta,t1.Distribuidora,t2.Generadora,t1.BarraNacional
@@ -217,7 +212,7 @@ group by t2.Modalidad,t2.Distribuidora,t1.IdCodigoContrato,t1.Ano,t3.EnergiaAnua
 --*/
 
 --Despacho contratos DS 4
---/*
+/*
 insert into DespachoTemp
 select t1.VersionDemanda,t1.Mes
 	,t2.VersionIndex,t2.Version,t2.IDCodigoContrato,t2.CodigoContrato,t2.Licitacion,t2.TipoBloque,t2.PtoOferta,t1.Distribuidora,t2.Generadora,t1.BarraNacional
@@ -237,7 +232,7 @@ left join EAdjCCAnual t7 on t7.idcodigocontrato=t2.IDCodigoContrato and t7.ano=y
 where t3.modalidad='DS 4'
 --*/
 
-select * from DespachoTemp
+--select * from DespachoTemp
 --select * from EAdjCCAnual where ano=2020 and Distribuidora='CEC'
 --select * from CodigoContrato where IDCodigoContrato in (6,7)
 --select * from CodigoContratoFM where IDCodigoContrato=960--2015/02_BS4C_BB_Socoepa_Aela Generación S.A.
