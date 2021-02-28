@@ -1,26 +1,14 @@
---/*
-create procedure [011_PROC_RECAUDACION]
+/*
+alter procedure [011_PROC_RECAUDACION]
 					@idversion int
 as
 --*/
 --DECLARACION VARIABLES, SOLAMENTE PARA REALIZACIÓN DE PRUEBAS ANTES DE PROCEDIMIENTO.
-/*
-use pnp_2
-declare @idVersionRef varchar(15)	set @idVersionRef=118;--Para crear versión y extraer antecedentes Efact
-declare @idVersion varchar(15)	set @idVersion=135
-select @idVersionRef,@idVersion NuevoID
-
-delete from PNCPconCET where Idversion=@IdVersion
-delete from RecaudacionDetalle where idversion=@idversion
-delete from versionrecdetalle where IdVersion=@idVersion
-delete from versionrec where IdVersion=@idVersion
-
---DECLARACIÓN DE VARIABLES PARA UTILIZAR DENTRO DEL PROCEDIMIENTO
-	--crear version de prueba
-insert into versionrec select  @idVersion,Descripcion from versionrec where IdVersion=@idVersionRef
-insert into versionrecdetalle select @idVersion,Registro,ValorTexto,ValorFecha,ValorInt,ValorFloat,Descripcion from versionrecdetalle where IdVersion=@idVersionRef
---select * from versionrecdetalle where IdVersion=@idVersion
+--/*
+use pnp_3
+declare @idVersion varchar(15)	set @idVersion=137
 --*/
+
 declare @VersionEFACT int	select @VersionEFACT=idversion from versionefact where Descripcion in (
 													select ValorTexto from versionrecdetalle where idversion=@idVersion and registro='VersionEfact');--Para crear versión y extraer antecedentes Efact
 DECLARE @FECHAEFACT DATE 				select @FECHAEFACT=valorfecha from versionrecdetalle where idversion=@idVersion and Registro='FECHAEFACT';--MES PARA REALIZAR VALIDACIÓN, DEBE EXISTIR EN CEN_Efact
@@ -51,12 +39,13 @@ select t1.[IdEfact],t1.[IdVersion] IdversionEfact,t1.[Fecha] FechaEfact,t1.[IdDi
 into tempefact
 from efact t1
 where t1.IdVersion=@versionefact and t1.Fecha=@FECHAEFACT
-
+--select * from tempefact
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
 select * 
 into temppnp
 from pnp 
 where VersionIndex=@VersionPNP and MesIndexacion=@FECHAPNP and Version=@TipoPNP
+--select * from temppnp
 
 --BORRADO VERSION DE TRABAJO
 delete from RecaudacionDetalle where idversion=@idversion
@@ -65,7 +54,7 @@ delete from RecaudacionDetalle where idversion=@idversion
 	--PENDIENTE
 
 --RECAUDACION PARA ENERGÍAS DE LICITACION IdTipoDespacho IN(1,5) --"Licitacion" Y "Dx con contratos Holding"
-insert into RecaudacionDetalle 
+insert into RecaudacionDetalle
 SELECT	@idVersion idVersion,t1.IdEfact,t1.IdversionEfact,t1.FechaEfact,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.IdTipoDespacho,t1.Energia,t1.Potencia
 		,t2.IdSistemaZonal,t3.Fecha FechaPZ,t3.Version VersionPZ,t3.Factor FEPE, t4.Factor FEPP
 		,t5.IdBarraNacional,t5.Periodo,t5.Factor FactorR
@@ -172,12 +161,12 @@ WHERE IdTipoDespacho in(4)
 IF OBJECT_ID('tempefact', 'U') IS NOT NULL DROP TABLE tempefact
 IF OBJECT_ID('temppnp', 'U') IS NOT NULL DROP TABLE temppnp
 IF OBJECT_ID('ContratoCPTemp', 'U') IS NOT NULL DROP TABLE ContratoCPTempemptrasp
-
+--*/
 --RESULTADOS
-
+--/*
 select idversion,FechaEfact,idVersionEfact,sum(EPC) EPC,sum(PPC) PPC,sum(ERec_Peso) ERec_Peso,sum(PRec_Peso) PRec_Peso
 from Recaudaciondetalle
---where idversion in (@idversion,@idVersionRef)
+where idversion in (@idversion)
 group by FechaEfact,idVersionEfact,idversion
 order by idversion,idversionefact,FechaEfact
 --*/
