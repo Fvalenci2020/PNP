@@ -11,6 +11,25 @@ DECLARE @VersionPZ VARCHAR(45)='Estimado'
 DECLARE @PeriodoFR VARCHAR(45)='Segundo Semestre 2020'
 DECLARE @Ano int=2020
 
+--Definición Vector de precios PNP
+IF OBJECT_ID('TempPNP', 'U') IS NOT NULL DROP TABLE TempPNP
+select * 
+into TempPNP
+from pnp
+where VersionIndex in ('2101V3','FPEC_2010V1','FPEC_2011-12V1')
+
+--Definición de demanda para despacho licitación
+IF OBJECT_ID('TempDEMANDA', 'U') IS NOT NULL DROP TABLE TempDEMANDA
+SELECT	*
+into TempDemanda
+FROM DEMANDA T1
+WHERE	T1.Version=@VERSIOND
+and IdDistribuidora not in (45,12,13,15,20)
+										--12	EEC
+										--13	TIL TIL
+										--15	LUZ ANDES
+										--20	COOPERSOL
+										--45	Mataquito
 --Demanda_Dx_PtoCompra.
 --/*
 IF OBJECT_ID('Demanda_Dx_PtoCompra', 'U') IS NOT NULL DROP TABLE Demanda_Dx_PtoCompra
@@ -19,14 +38,14 @@ select VersionDemanda,IdDistribuidora,Mes,IdSistemaZonal,VersionPZ,PeriodoFR,IdB
 into Demanda_Dx_PtoCompra
 from(
 SELECT	t1.Version VersionDemanda,t1.IdDistribuidora,t1.Mes,t1.IdSistemaZonal,t2.Version VersionPZ,t3.Periodo PeriodoFR,t3.IdBarraNacional,Demanda*t2.Factor*t3.Factor*1000 EnergiaPC
-FROM DEMANDA T1
+FROM TempDEMANDA  T1
 LEFT JOIN PerdidaZonal T2 ON T1.IdSistemaZonal=T2.IdSistemaZonal and t1.Mes=t2.Fecha
 Left join	factorreferenciacion t3 on t3.IdPuntoRetiro=t1.IdPuntoRetiro
-WHERE	T1.Version=@VERSIOND
-		AND T2.Version=@VersionPZ and t2.TipoFactor='FEPE'
+WHERE	T2.Version=@VersionPZ and t2.TipoFactor='FEPE'
 		and t3.Periodo=@PeriodoFR
 		) t1
 group by VersionDemanda,IdDistribuidora,Mes,IdSistemaZonal,VersionPZ,PeriodoFR,IdBarraNacional
+
 --*/
 
 --Demanda_Dx.
@@ -73,119 +92,134 @@ left join (	select t3.Modalidad,t1.Ano,t2.IdDistribuidora,sum(EnergiaAnual) Ener
 				group by t3.Modalidad,t1.Ano,t2.IdDistribuidora
 		) t2 
 		on t1.ano=t2.ano and t1.IdDistribuidora=t2.IdDistribuidora
+--select * from EModalidad
 --*/
 
 --Energía AdjudicadaMensual
 --/*
 IF OBJECT_ID('EAdjMensDxTB', 'U') IS NOT NULL DROP TABLE EAdjMensDxTB
 
-select Modalidad,Distribuidora,t2.TipoBloque,fecha,sum(EnergiaMensual)*1000 EAdjMensual
+select Modalidad,IdDistribuidora,t2.TipoBloque,fecha,sum(EnergiaMensual)*1000 EAdjMensual
 into EAdjMensDxTB
 from EAdjAnualDistrMensual t1
 inner join codigocontrato t2 on t1.IdCodigoContrato=t2.IdCodigoContrato
 inner join licitaciongx t3 on t2.IdGeneradora=t3.IdGeneradora and t2.IdLicitacion=t3.IdLicitacion
-where YEAR(fecha)=@Ano and fecha in (select distinct Mes from demanda where Version=@VersionD)
-group by  t3.Modalidad,t2.Distribuidora,t2.TipoBloque,fecha
+where YEAR(fecha)=@Ano and fecha in (select distinct Mes from tempdemanda)
+group by  t3.Modalidad,t2.idDistribuidora,t2.TipoBloque,fecha
+--select * from EAdjMensDxTB
 --*/
-
 --Determinacion de participación de Re704BB en despacho
-/*
-Drop table if exists DespMod
-select t1.versiondemanda,t1.distribuidora,t1.mes,t2.modalidad,Concat('Re704',t2.TipoBloque) Asignacion,t1.EnergiaPC
+--/*
+IF OBJECT_ID('DespMod', 'U') IS NOT NULL DROP TABLE DespMod
+
+select t1.versiondemanda,t1.IdDistribuidora,t1.mes,t2.modalidad,Concat('Re704',t2.TipoBloque) Asignacion,t1.EnergiaPC
 		,t3.FactorERe704 FactorMod
 		,t1.EnergiaPC*t3.FactorERe704 EnergiaPCMod,EadjMensual
 		,case when t1.EnergiaPC*t3.FactorERe704<=EadjMensual then t1.EnergiaPC*t3.FactorERe704 else EadjMensual  end EDespachada
 		,case when t1.EnergiaPC*t3.FactorERe704 <=EadjMensual then 1 else EadjMensual/(t1.EnergiaPC*t3.FactorERe704) end [Desp%]
 into DespMod
-from DdaDxPtoCompra t1
-inner join EAdjMensualDxTB t2 on t1.distribuidora=t2.distribuidora and t1.mes=t2.fecha and t2.TipoBloque='BB'
-left join EnergiaModalidad t3 on t1.distribuidora=t3.distribuidora and year(t1.mes)=t3.ano
-
+from Demanda_Dx t1
+inner join EAdjMensDxTB t2 on t1.iddistribuidora=t2.iddistribuidora and t1.mes=t2.fecha and t2.TipoBloque='BB'
+left join EModalidad t3 on t1.IdDistribuidora=t3.IdDistribuidora and year(t1.mes)=t3.ano
+--select * from DespMod
+--*/
+--/*
 --Determinacion de participación de Re704BV en despacho
 insert into DespMod
-select t1.versiondemanda,t1.distribuidora,t1.mes,t2.modalidad,concat('Re704',t2.TipoBloque) Asignacion,t1.EnergiaPC
+select t1.versiondemanda,t1.iddistribuidora,t1.mes,t2.modalidad,concat('Re704',t2.TipoBloque) Asignacion,t1.EnergiaPC
 		,t3.FactorERe704,t1.EnergiaPC*t3.FactorERe704 EnergiaPCRe704,t2.EadjMensual
 		,case	when t1.EnergiaPC*t3.FactorERe704-t4.EDespachada<=t2.EadjMensual then t1.EnergiaPC*t3.FactorERe704-t4.EDespachada 
 				else t2.EadjMensual  end EDespachada		
 		,case	when t1.EnergiaPC*t3.FactorERe704-t4.EDespachada=0 then 0
 				when t1.EnergiaPC*t3.FactorERe704-t4.EDespachada<=t2.EadjMensual then 1 
 				else t2.EadjMensual/(t1.EnergiaPC*t3.FactorERe704-t4.EDespachada) end [Desp%]
-from DdaDxPtoCompra t1
-inner join EAdjMensualDxTB t2 on t1.distribuidora=t2.distribuidora and t1.mes=t2.fecha and t2.TipoBloque='BV'
-left join EnergiaModalidad t3 on t1.distribuidora=t3.distribuidora and year(t1.mes)=t3.ano
-left join DespMod t4 on t4.versiondemanda=t1.versiondemanda and t4.distribuidora=t1.distribuidora and t1.mes=t4.mes
+from Demanda_Dx t1
+inner join EAdjMensDxTB t2 on t1.iddistribuidora=t2.iddistribuidora and t1.mes=t2.fecha and t2.TipoBloque='BV'
+left join EModalidad t3 on t1.iddistribuidora=t3.iddistribuidora and year(t1.mes)=t3.ano
+left join DespMod t4 on t4.versiondemanda=t1.versiondemanda and t4.iddistribuidora=t1.iddistribuidora and t1.mes=t4.mes
 --*/
-
 --Energía Disponibles después de despacho de Re704
-/*
-drop table if exists Edisp704
-select	versiondemanda,distribuidora,mes,'Re704' Asignacion
+--/*
+IF OBJECT_ID('EdispRe704', 'U') IS NOT NULL DROP TABLE EdispRe704
+
+select	versiondemanda,iddistribuidora,mes,'Re704' Asignacion
 		,1-sum([Desp%]) [Desp%Disp]
 		,case when sum([Desp%])=0 then 0 else (1-sum([Desp%]))*sum(EDespachada)/sum([Desp%]) end EDisponible
-into Edisp704
+into EdispRe704
 from DespMod
-group by versiondemanda,distribuidora,mes
+group by versiondemanda,IdDistribuidora,mes
 having sum([Desp%])<1
-
+--*/
+--/*
 --Ver Energía Despachada que viene de RE704 para ser despachada por DS4
 insert into DespMod
-select t1.versiondemanda,t1.distribuidora,t1.mes,'DS 4' modalidad, Asignacion,t1.EDisponible
+select t1.versiondemanda,t1.IdDistribuidora,t1.mes,'DS 4' modalidad, Asignacion,t1.EDisponible
 		,1 FactorMod
 		,t1.EDisponible EnergiaPCMod
 		,t1.EDisponible EadjMensual
 		,t1.EDisponible EDespachada
 		,1 [Desp%]
-from Edisp704 t1
-left join EnergiaModalidad t3 on t1.distribuidora=t3.distribuidora and year(t1.mes)=t3.ano
-
+from EdispRe704 t1
+left join EModalidad t3 on t1.iddistribuidora=t3.IdDistribuidora and year(t1.mes)=t3.ano
+--*/
+--/*
 --Ver Energía para ser despachada por DS4 a nivel Dx
 insert into DespMod
-select t1.versiondemanda,t1.distribuidora,t1.mes,'DS 4' Modalidad,'DS 4' Asignacion,t1.EnergiaPC
+select t1.versiondemanda,t1.IdDistribuidora,t1.mes,'DS 4' Modalidad,'DS 4' Asignacion,t1.EnergiaPC
 		,(1-t3.FactorERe704) FactorMod
 		,t1.EnergiaPC*(1-t3.FactorERe704) EnergiaPCMod
 		,t1.EnergiaPC*(1-t3.FactorERe704) EadjMensual
 		,t1.EnergiaPC*(1-t3.FactorERe704)  EDespachada
 		,1 [Desp%]
-from DdaDxPtoCompra t1
-inner join EnergiaModalidad t3 on t1.distribuidora=t3.distribuidora and year(t1.mes)=t3.ano
+from Demanda_Dx t1
+inner join EModalidad t3 on t1.iddistribuidora=t3.IdDistribuidora and year(t1.mes)=t3.ano
 --*/
 
 --Energía AdjudicadaMensual Re704
-/*
-Drop table if exists EAdjMensualDxTBCC
-select	t2.Modalidad,t2.Distribuidora,t1.idcodigocontrato,t2.TipoBloque,t1.fecha,EnergiaMensual*1000 EAdjMensual
+--/*
+IF OBJECT_ID('EAdjMensDxTB_CC', 'U') IS NOT NULL DROP TABLE EAdjMensDxTB_CC
+
+select	t4.Modalidad,t2.IdDistribuidora,t1.idcodigocontrato,t2.TipoBloque,t1.fecha,EnergiaMensual*1000 EAdjMensual
 		,t3.EadjMensual EadjMensualDxTB
 		,EnergiaMensual*1000/t3.EadjMensual FactEAdjMensual
-into EAdjMensualDxTBCC
+into EAdjMensDxTB_CC
 from (select idcodigocontrato,Fecha,sum(EnergiaMensual) EnergiaMensual from EAdjAnualDistrMensual t1 group by idcodigocontrato,Fecha) t1
 inner join CodigoContrato t2 on t1.idcodigocontrato=t2.idcodigocontrato
-left join EAdjMensualDxTB t3 on t3.distribuidora=t2.distribuidora and t1.fecha=t3.fecha and t2.TipoBloque=t3.Tipobloque
-where YEAR(t1.fecha)=2020 and month(t1.fecha)>=6
+inner join licitaciongx t4 on t2.IdGeneradora=t4.IdGeneradora and t2.IdLicitacion=t4.IdLicitacion
+left join EAdjMensDxTB t3 on t3.IdDistribuidora=t2.IdDistribuidora and t1.fecha=t3.fecha and t2.TipoBloque=t3.Tipobloque
+where YEAR(t1.fecha)=@Ano and t1.fecha in (select distinct Mes from tempdemanda)
 order by t1.idcodigocontrato
 --*/
-
 --Despacho contratos Re704
-/*
-Drop table if exists DespachoTemp
-select t1.VersionDemanda,t1.Mes
-	,t2.VersionIndex,t2.Version,t2.IDCodigoContrato,t2.CodigoContrato,t2.Licitacion,t2.TipoBloque,t2.PtoOferta,t1.Distribuidora,t2.Generadora,t1.BarraNacional
-	,t3.modalidad
-	,t1.EnergiaPC
-	,t2.Pe, t2.Pp
-	,t4.Asignacion,t4.FactorMod,t4.EDespachada,t4.[Desp%]
-	,t5.FactEAdjMensual
-	,t1.FactPtoCompra
-	,t4.EDespachada*t5.FactEAdjMensual*t1.FactPtoCompra EDespPtoCompra
-into DespachoTemp
-from DemandaPtoCompra t1
-left join CodigoContratoFM t2 on t1.mes=t2.MesIndexacion and t1.Distribuidora=t2.Distribuidora and t1.BarraNacional=t2.BarraNacional and VersionIndex='ITPV1'
-left join CodigoContrato t3 on t3.idcodigocontrato=t2.IDCodigoContrato
-left join DespMod t4 on t4.versiondemanda=t1.Versiondemanda and t4.Distribuidora=t1.Distribuidora and t4.mes=t1.mes and t4.modalidad=t3.modalidad and t4.Asignacion=concat('Re704',t2.tipobloque)
-left join EAdjMensualDxTBCC t5 on t5.idcodigocontrato=t2.IDCodigoContrato and t5.fecha=t1.Mes
-left join DdaDxPtoCompra t6 on t6.versiondemanda=t1.versiondemanda and t6.distribuidora=t1.distribuidora and  t6.mes=t1.mes
-where t3.modalidad='RE 704'
---*/
+--/*
+IF OBJECT_ID('DespachoTemp', 'U') IS NOT NULL DROP TABLE DespachoTemp
 
+--select t1.VersionDemanda,t1.Mes
+--	,t2.VersionIndex,t2.Version,t2.IDCodigoContrato,t2.idLicitacion,t2.TipoBloque
+--	,t1.IdDistribuidora
+--	,t2.IdGeneradora
+--	,t1.IdBarraNacional
+--	,t4.modalidad
+--	,t1.EnergiaPC
+--	,t2.PNELP, t2.PNPLP
+--	,t5.Asignacion,t5.FactorMod,t5.EDespachada,t5.[Desp%]
+----	,t6.FactEAdjMensual
+--	,t1.FactPtoCompra
+--	,t5.EDespachada*t6.FactEAdjMensual*t1.FactPtoCompra EDespPtoCompra
+--into DespachoTemp
+select *  
+from Demanda_Dx_PtoCompra_F t1
+left join (select	IdPNP,VersionIndex,MesIndexacion,Version,t1.IdCodigoContrato,IdBarraNacional,t2.IdLicitacion,IdDistribuidora,t2.IdGeneradora,t1.TipoBloque,t1.Bloque,t3.modalidad,PNELP,PNPLP
+					from TempPNP t1 
+					left join codigocontrato t2 on t1.IdCodigoContrato=t2.IdCodigoContrato
+					left join licitaciongx t3 on t2.IdGeneradora=t3.IdGeneradora and t2.IdLicitacion=t3.IdLicitacion					
+					) t2 --indica listado de contratos factibles para periodo de análisis
+	on t1.mes=t2.MesIndexacion and t1.idDistribuidora=t2.idDistribuidora and t1.IdBarraNacional=t2.IdBarraNacional
+left join DespMod t5 on t5.versiondemanda=t1.Versiondemanda and t5.idDistribuidora=t1.idDistribuidora and t5.mes=t1.mes and t5.modalidad=t2.modalidad and t5.Asignacion=concat('Re704',t2.tipobloque)
+left join EAdjMensDxTB_CC t6 on t6.idcodigocontrato=t2.IDCodigoContrato and t6.fecha=t1.Mes and t1.IdDistribuidora=t6.IdDistribuidora and t6.TipoBloque=t2.TipoBloque
+where t2.modalidad='RE 704'
+and t6.EAdjMensual is null
+--*/
 --Energía Licitada por Distribuidora y Modalidad para todos los años
 /*
 Drop table if exists EAdjDxAnual
