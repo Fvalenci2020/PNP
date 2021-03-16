@@ -18,18 +18,16 @@ into TempPNP
 from pnp
 where VersionIndex in ('2101V3','FPEC_2010V1','FPEC_2011-12V1')
 
---Definición de demanda para despacho licitación
+--Definición de demanda Se debe indicar forma de despacho.
 IF OBJECT_ID('TempDEMANDA', 'U') IS NOT NULL DROP TABLE TempDEMANDA
-SELECT	*
+SELECT	*,case	when IdDistribuidora in(45) then 4--45	Mataquito
+				when IdDistribuidora in(12,13,15) then 5--12	EEC--13	TIL TIL--15	LUZ ANDES
+				when IdDistribuidora in (20) then 2--20	COOPERSOL
+				when IdDistribuidora in (1,2,3,4,6,7,8,9,10,14,18,21,22,23,24,25,26,28,29,31,32,33,34,35,36,39,40,44) then 2 end IdTipoDespacho--Licitacion
 into TempDemanda
 FROM DEMANDA T1
-WHERE	T1.Version=@VERSIOND
-and IdDistribuidora not in (45,12,13,15,20)
-										--12	EEC
-										--13	TIL TIL
-										--15	LUZ ANDES
-										--20	COOPERSOL
-										--45	Mataquito
+WHERE	T1.Version=@VERSIOND									
+
 --Demanda_Dx_PtoCompra.
 --/*
 IF OBJECT_ID('Demanda_Dx_PtoCompra', 'U') IS NOT NULL DROP TABLE Demanda_Dx_PtoCompra
