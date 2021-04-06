@@ -15,8 +15,8 @@ alter procedure [dbo].[012_PROC_ESTABILIZACION]
 as
 --*/
 /*
-USE PNP_2
-DECLARE @IdVersionEstabilizacion VARCHAR(255)='140-141'
+USE PNP_3
+DECLARE @IdVersionEstabilizacion VARCHAR(255)='141-142'
 --*/
 
 --CREAR TABLA TEMPORAL DE VERSION PreciosPNP
@@ -43,6 +43,8 @@ group by T1.idversion,t1.IdEfact,t1.fechaefact,t1.IdVersionEFact,t1.PNP_VersionI
 
 --COMPARAR RESULTADOS
 delete from EstabilizacionDetalle WHERE IdVersionEstabilizacion=@IdVersionEstabilizacion
+
+--CONTRATOS ANTIGUOS AFECTADOS POR FACTOR DE ESTABILIZACION
 insert into EstabilizacionDetalle
 SELECT	@IdVersionEstabilizacion IdVersionEstabilizacion,
 		t1.IdEfact,t1.IdVersionPreciosDef,t2.IdVersionPreciosPNP,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.idtipodespacho,t1.Energia,t1.Potencia,
@@ -57,8 +59,30 @@ SELECT	@IdVersionEstabilizacion IdVersionEstabilizacion,
 		(isnull(T2.PRec_Peso,0)*t3.FactorAjusteP-T1.PRec_Peso)*t3.VariacionIPC*t3.Intereses/t3.DolarEstabilizacion DifPotenciaRecDolarEst
 FROM Temp_Efact_PreciosDef T1
 left join Temp_Efact_PreciosPNP t2 on t1.idefact=t2.idefact and t1.fechaefact=t2.fechaefact
+left join codigocontrato t4 on t4.IdCodigoContrato=t1.IdCodigoContrato
+left join licitaciongx t5 on t5.IdGeneradora=t1.IdGeneradora and t5.IdLicitacion=t4.IdLicitacion and t5.TipoBloque=t4.TipoBloque and t5.Bloque=t4.Bloque
 left join Estabilizacion t3 on t1.FechaEfact=t3.fecha
+where t5.VigenciaInicio<'2021-01-01'
 
+--CONTRATOS NUEVOS NO AFECTADOS POR FACTOR DE ESTABILIZACION
+insert into EstabilizacionDetalle
+SELECT	@IdVersionEstabilizacion IdVersionEstabilizacion,
+		t1.IdEfact,t1.IdVersionPreciosDef,t2.IdVersionPreciosPNP,t1.IdDistribuidora,t1.IdGeneradora,t1.IdCodigoContrato,t1.IdPuntoRetiro,t1.idtipodespacho,t1.Energia,t1.Potencia,
+		t1.fechaefact fechaefact_PrecioDef,t1.IdVersionEFact IdVersionEFact_PrecioDef,t1.PNP_MesIndexacion PNP_MesIndexacion_PrecioDef,t1.PNP_VersionIndex PNP_VersionIndex_PrecioDef,t1.PNP_Version PNP_Version_PrecioDef,t1.EPC EPC_PrecioDef,t1.PPC PPC_PrecioDef,T1.ERec_Peso ERec_Peso_PrecioDef,T1.PRec_Peso PRec_Peso_PrecioDef,
+		t2.fechaefact fechaefact_PrecioPNP,t2.IdVersionEFact IdVersionEFact_PrecioPNP,t2.PNP_MesIndexacion PNP_MesIndexacion_PrecioPNP,t1.PNP_VersionIndex PNP_VersionIndex_PrecioPNP,t2.PNP_Version PNP_Version_PrecioPNP,t2.EPC EPC_PrecioPNP,t2.PPC PPC_PRecioPNP,T2.ERec_Peso ERec_Peso_PrecioPNP,T2.PRec_Peso PRec_Peso_PrecioPNP,
+		1 VariacionIPC,1 Intereses,1 FactorAjusteE,1 FactorAjusteP,1 DolarEstabilizacion, 
+		(isnull(T2.ERec_Peso,0)-T1.ERec_Peso) DifEnergiaRecPeso,
+		(isnull(T2.PRec_Peso,0)-T1.PRec_Peso) DifPotenciaRecPeso,
+		(isnull(T2.ERec_Peso,0)-T1.ERec_Peso) DifEnergiaRecPesoEst,
+		(isnull(T2.PRec_Peso,0)-T1.PRec_Peso) DifPotenciaRecPesoEst,
+		(isnull(T2.ERec_Peso,0)-T1.ERec_Peso)/t3.DolarEstabilizacion DifEnergiaRecDolarEst,
+		(isnull(T2.PRec_Peso,0)-T1.PRec_Peso)/t3.DolarEstabilizacion DifPotenciaRecDolarEst
+FROM Temp_Efact_PreciosDef T1
+left join Temp_Efact_PreciosPNP t2 on t1.idefact=t2.idefact and t1.fechaefact=t2.fechaefact
+left join codigocontrato t4 on t4.IdCodigoContrato=t1.IdCodigoContrato
+left join licitaciongx t5 on t5.IdGeneradora=t1.IdGeneradora and t5.IdLicitacion=t4.IdLicitacion and t5.TipoBloque=t4.TipoBloque and t5.Bloque=t4.Bloque
+left join Estabilizacion t3 on t1.FechaEfact=t3.fecha
+where t5.VigenciaInicio>='2021-01-01'
 
 --BORRADO DE TABLAS TEMPORALES
 IF OBJECT_ID('Temp_Efact_PreciosDef', 'U') IS NOT NULL DROP TABLE Temp_Efact_PreciosDef

@@ -7,9 +7,9 @@ Created on Thu Jan 28 17:22:42 2021
 ###########################################################################
 #Para corrida local de los proc.
 
-ConectorDB='Driver={SQL Server};''Server=DESKTOP-SSPJTJO\SQLEXPRESS;''Database=Modelo PNP;''Trusted_Connection=yes;'
-IdVersion=22
-path ='Entrega_Revisión_EFacDx_2012.v01.xlsx' 
+#ConectorDB='Driver={SQL Server};''Server=DESKTOP-SSPJTJO\SQLEXPRESS;''Database=Modelo PNP;''Trusted_Connection=yes;'
+#IdVersion=22
+#path ='Entrega_Revisión_EFacDx_2012.v01.xlsx' 
 
 """
 ConectorDB='Driver={SQL Server};Server=GTD-NOT019\SQLSERVER2012;Database=PNP_2;Trusted_Connection=yes;'
@@ -163,14 +163,14 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
         
     #Id Casos especiales
         #Distribuidora
-    Efact_corregido['IdDistribuidora'].where(~((Efact_corregido.Distribuidora=='CGE Distribución') | (Efact_corregido.Distribuidora=='CGED') | (Efact_corregido.Distribuidora=='CGE DISTRIBUCION')) ,18 , inplace=True,)    
+    Efact_corregido['IdDistribuidora'].where(~((Efact_corregido.Distribuidora=='CGE Distribución') | (Efact_corregido.Distribuidora=='CGED') | (Efact_corregido.Distribuidora=='CGE DISTRIBUCION') | (Efact_corregido.Distribuidora=='CGE Distribucion')) ,18 , inplace=True,)    
     Efact_corregido['IdDistribuidora'].where(~((Efact_corregido.Distribuidora=='Enel Distribución') | (Efact_corregido.Distribuidora=='CHILECTRA') | (Efact_corregido.Distribuidora=='ENEL DISTRIBUCIÓN')) ,10 , inplace=True,)    
     Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='TIL-TIL') ,13 , inplace=True,)    
     Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='LUZANDES') ,15 , inplace=True,)    
-    Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='MATAQUITO') ,45 , inplace=True,)    
+    #Efact_corregido['IdDistribuidora'].where(~(Efact_corregido.Distribuidora=='MATAQUITO') ,45 , inplace=True,)    
         #Código Contrato
-    Efact_corregido['IdCodigoContrato'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 0, inplace=True,)    
-    Efact_corregido['IdCodigoContrato'].where(~(Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') , 0, inplace=True,)    
+    Efact_corregido['IdCodigoContrato'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_ENGIE')) , 0, inplace=True,)  
+    Efact_corregido['IdCodigoContrato'].where(~((Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA') | (Efact_corregido.CodigoContrato=='RECONVERSIÓN ENERGÉTICA_COPELEC_ENDESA')) , 0, inplace=True,)    
         #Caso punto retiro en blanco
     #Efact_corregido['IdPuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') , 194, inplace=True,)   
     #Efact_corregido['PuntoRetiro'].where(~(Efact_corregido.PuntoRetiro=='(en blanco)') ,'Quirihue 023' , inplace=True,)    
@@ -187,7 +187,7 @@ def CorrectorEfact(ConectorDB,IdVersion,Efact):
         #Caso 1	Licitacion
     Efact_corregido.IdTipoDespacho=1
         #Caso 2	Corto Plazo
-    Efact_corregido['IdTipoDespacho'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL')) , 2, inplace=True,)    
+    Efact_corregido['IdTipoDespacho'].where(~((Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Coelcha_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_Frontel_ENDESA') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_E-CL') | (Efact_corregido.CodigoContrato=='Contrato Corto Plazo_COOPERSOL_ENGIE')) , 2, inplace=True,)    
         #Caso 3	Déficit
     Efact_corregido['IdTipoDespacho'].where(~(Efact_corregido.CodigoContrato=='DÉFICIT_Coopelan') , 3, inplace=True,)    
         #Caso 4	Traspaso Excedentes
