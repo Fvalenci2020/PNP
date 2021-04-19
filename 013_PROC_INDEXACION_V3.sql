@@ -2,21 +2,21 @@
 --IndexadoresModeloPNP
 --IndexadoresContratos
 
-create PROCEDURE [013_PROC_INDEXACION]
+alter PROCEDURE [013_PROC_INDEXACION]
 					@FECHA DATE,@Version varchar(150)
 AS
 
---use pnp_2
---DECLARE @FECHA DATE='2020-08-01'
+--use pnp_3
+--DECLARE @FECHA DATE='2020-09-01'
 --DECLARE @Version varchar(45)='V1'
 
 IF OBJECT_ID('combustibletemp', 'U') IS NOT NULL DROP TABLE combustibletemp
 --drop table if exists combustibletemp
 
 select	t1.IdIndexC,t1.fecha,t1.IdTipoCombustible,TC.TipoCombustible,t1.Valor,
-		(t1.Valor+t2.Valor+t3.Valor)/3 X3,
-		(t1.Valor+t2.Valor+t3.Valor+t4.valor)/4 X4,
-		(t1.Valor+t2.Valor+t3.Valor+t4.valor+t5.valor+t6.valor)/6 X6
+		cast((t1.Valor+t2.Valor+t3.Valor)/3 as numeric(10,5)) X3,
+		cast((t1.Valor+t2.Valor+t3.Valor+t4.valor)/4 as numeric(10,5)) X4,
+		cast((t1.Valor+t2.Valor+t3.Valor+t4.valor+t5.valor+t6.valor)/6 as numeric(10,5)) X6
 into combustibletemp
 from IndexacionCombustible t1
 left join tipocombustible TC on t1.IdTipoCombustible=TC.IdTipoCombustible
@@ -28,12 +28,11 @@ left join IndexacionCombustible t6 on t6.Fecha=DATEADD(month,-5,t1.fecha) and t6
 WHERE T1.Fecha=@FECHA
 
 IF OBJECT_ID('CPITemp', 'U') IS NOT NULL DROP TABLE CPITemp
---drop table if exists CPITemp
 
 select	t1.IdCPI,t1.fecha,t1.Valor,
-		(t1.Valor+t2.Valor+t3.Valor+t4.Valor)/4 X4,
-		(t1.Valor+t2.Valor+t3.Valor+t4.Valor+t5.Valor+t6.Valor)/6 X6,
-		(t1.Valor+t2.Valor+t3.Valor+t4.Valor+t5.Valor+t6.Valor+t7.Valor+t8.Valor+t9.Valor)/9 X9
+		cast( (t1.Valor+t2.Valor+t3.Valor+t4.Valor)/4 as NUMERIC(10,6)) X4 ,
+		cast( (t1.Valor+t2.Valor+t3.Valor+t4.Valor+t5.Valor+t6.Valor)/6 as NUMERIC(10,6)) X6,
+		cast( (t1.Valor+t2.Valor+t3.Valor+t4.Valor+t5.Valor+t6.Valor+t7.Valor+t8.Valor+t9.Valor)/9 as NUMERIC(10,6)) X9
 into CPITemp
 from indexacionCPI t1
 left join indexacionCPI t2 on t2.Fecha=DATEADD(month,-1,t1.fecha)
@@ -54,22 +53,28 @@ select @Version,* from (
 														from combustibletemp t1 where t1.IdTipoCombustible=1 union all
 	select	t2.fecha,'FUEL N° 6'	Tipo,t2.valor		from combustibletemp t2 where t2.IdTipoCombustible=2 union all
 	select	t3.fecha,'CARBÓN'		Tipo,t3.Valor		from combustibletemp t3 where t3.IdTipoCombustible=3 union all
-	select	t3.fecha,'Carbón_6m'	Tipo,CASE WHEN round(t3.x6,3,1) - round(t3.x6,2,1) = 0.005 THEN round(t3.x6,2,1) ELSE round(t3.x6,2) END
+	--select	t3.fecha,'Carbón_6m'	Tipo,CASE WHEN round(t3.x6,3,1) - round(t3.x6,2,1) = 0.005 THEN round(t3.x6,2,1) ELSE round(t3.x6,2) END
+	select	t3.fecha,'Carbón_6m'	Tipo,round(t3.x6,2)
 														from combustibletemp t3 where t3.IdTipoCombustible=3 union all
 	select	t4.fecha,'GNL'			Tipo,t4.Valor		from combustibletemp t4 where t4.IdTipoCombustible=4 union all
-	select	t4.fecha,'GNL_6m'		Tipo,CASE WHEN round(t4.X6,3,1) - round(t4.X6,2,1) = 0.005 THEN round(t4.X6,2,1) ELSE round(t4.X6,2) END
+	--select	t4.fecha,'GNL_6m'		Tipo,CASE WHEN round(t4.x6,3,1) - round(t4.x6,2,1) = 0.005 THEN round(t4.x6,2,1) ELSE round(t4.x6,2) END
+	select	t4.fecha,'GNL_6m'		Tipo,round(t4.x6,2)
 														from combustibletemp t4 where t4.IdTipoCombustible=4 union all
-	select	t4.fecha,'GNL_4m'		Tipo,CASE WHEN round(t4.X4,3,1) - round(t4.X4,2,1) = 0.005 THEN round(t4.X4,2,1) ELSE round(t4.X4,2) END
+	--select	t4.fecha,'GNL_4m'		Tipo,CASE WHEN round(t4.x4 ,3,1) - round(t4.x4 ,2,1) = 0.005 THEN round(t4.x4 ,2,1) ELSE round(t4.x4 ,2) END
+	select	t4.fecha,'GNL_4m'		Tipo,round(t4.x4 ,2)
 														from combustibletemp t4 where t4.IdTipoCombustible=4 union all
 	select	t5.fecha,'Brent'		Tipo,t5.Valor		from combustibletemp t5 where t5.IdTipoCombustible=5 union all
-	select	t5.fecha,'Brent_6m'		Tipo,CASE WHEN round(t5.x6,3,1) - round(t5.x6,2,1) = 0.005 THEN round(t5.x6,2,1) ELSE round(t5.x6,2) END
+	--select	t5.fecha,'Brent_6m'		Tipo,CASE WHEN round(t5.x6 ,3,1) - round(t5.x6 ,2,1) = 0.005 THEN round(t5.x6 ,2,1) ELSE round(t5.x6 ,2) END
+	select	t5.fecha,'Brent_6m'		Tipo,round(t5.x6 ,2)
 														from combustibletemp t5 where t5.IdTipoCombustible=5 union all
 	select	fecha,'CPI'				Tipo,Valor		from CPITemp union all
-	select	fecha,'CPI_4m'			Tipo,CASE WHEN round(round(CPITemp.X4,4) - round(CPITemp.X4,3),4) = 0.0005 THEN round(CPITemp.X4,3,1)+0.001 ELSE round(CPITemp.X4,3) END
+	--select	fecha,'CPI_4m'			Tipo,CASE WHEN round(round(CPITemp.x4 ,4) - round(CPITemp.x4 ,3),4) = 0.0005 THEN round(CPITemp.x4 ,3,1)+0.001 ELSE round(CPITemp.x4 ,3) END
+	select	fecha,'CPI_4m'			Tipo,round(CPITemp.x4 ,3)
 														from CPITemp union all
-	select	fecha,'CPI_6m'			Tipo,CASE WHEN round(round(CPITemp.X6,4) - round(CPITemp.X6,3),4) = 0.0005 THEN round(CPITemp.X6,3,1)+0.001 ELSE round(CPITemp.X6,3) END
+	--select	fecha,'CPI_6m'			Tipo,CASE WHEN round(round(CPITemp.x6 ,4) - round(CPITemp.x6 ,3),4) = 0.0005 THEN round(CPITemp.x6 ,3,1)+0.001 ELSE round(CPITemp.x6 ,3) END
+	select	fecha,'CPI_6m'			Tipo,round(CPITemp.x6 ,3)
 														from CPITemp union all
-	select	fecha,'CPI_9m'			Tipo,CASE WHEN round(round(CPITemp.X9,4) - round(CPITemp.X9,3),4) = 0.0005 THEN round(CPITemp.X9,3,1)+0.001 ELSE round(CPITemp.X9,3) END
+	select	fecha,'CPI_9m'			Tipo,round(CPITemp.x9 ,3)
 														from CPITemp
 )t1
 

@@ -1,5 +1,5 @@
 --PROCEDIMIENTO PARA INDEXACION DE CONTRATOS.
-
+--use PNP_3
 --/*
 alter PROCEDURE [014_PROC_INDEXACONTRATO]
 					@VersionIndex		varchar(255),
@@ -31,7 +31,7 @@ declare @FECHAPNCP			date='2020-10-01'--Fecha del PNCP utilizado.
 	--UNIFCA TODOS LOS ELEMENTOS NECESARIOS para realizar indexación de contratos
 delete from IndexacionContratoDetalle where MesIndexacion=@MesIndexacion AND VersionIndex=@VersionIndex and Version=@Version
 
-	--Versión='Mes'
+	--Versión='Mes' y MesIndexacion not in  (4,10)
 insert into IndexacionContratoDetalle
 select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version Version
 		,t1.IdLicitacionGx,t1.Licitacion,t1.Generadora,t1.TipoBloque,t1.Bloque,t1.PtoOferta,t1.PrecioEnergia PrecioEnergiaBase
@@ -58,7 +58,36 @@ left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesR
 left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesIndexacion) and t4.[index]=t6.Tipo and t6.Version=@TipoIndexacion--extrae indexadores del mes
 left join LicitacionGxIndexEsp t9 on t9.IdLicitacionGx =t1.IdLicitacionGx and t9.tipo=t5.tipo--indexación situaciones especiales
 where	t1.VigenciaInicio<=@MesIndexacion and @MesIndexacion<=t1.VigenciaFin--que contrato esté activo
-		and @Version='Mes'
+		and @Version='Mes' and month(@MesIndexacion) not in (4,10)
+
+	--Versión='Mes' y MesIndexacion in  (4,10)
+insert into IndexacionContratoDetalle
+select	@VersionIndex VersionIndex,@MesIndexacion MesIndexacion,@Version Version
+		,t1.IdLicitacionGx,t1.Licitacion,t1.Generadora,t1.TipoBloque,t1.Bloque,t1.PtoOferta,t1.PrecioEnergia PrecioEnergiaBase
+		,t1.IdDecrPNudo,t1.DecPNudo,t1.TipoDecreto,t3.Precio
+		,t4.tipoindex,t4.[index],t1.MesReferencia,t4.rezago,t4.Ponderador
+		,t5.fecha FechaBase
+		,case	when t9.valor is not null then t9.valor 
+				else t5.Valor end ValorBase
+		,dateadd(month,(-t4.rezago),@MesIndexacion) FechaActual,t6.Valor ValorActual
+		,case	--when t6.Valor is null or t5.Valor is null then 0 
+				when t6.Valor is not null and t5.Valor is not null and t9.valor is not null then t6.Valor/t9.Valor 
+				when t6.Valor is not null and t5.Valor is not null and t9.valor is null  then t6.Valor/t5.Valor end FactorIndexacion		
+		,case	when Tipoindex='P' then t6.Valor/t5.Valor*t4.Ponderador*t3.Precio 
+				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null and t9.valor is not null then t6.Valor/t9.Valor*t4.Ponderador*t1.PrecioEnergia 
+				when Tipoindex!='P'  and t6.Valor is not null and t5.Valor is not null							then t6.Valor/t5.Valor*t4.Ponderador*t1.PrecioEnergia end PrecioIndexadoPonderado
+		,case	when t6.Valor is null or t5.Valor is null then 1 
+				else 0 end FlagInd	
+		,case	when t9.valor is not null or t1.Observacion is not null then concat(t1.Observacion,t9.Observacion) 
+				else '' end Observacion
+from LicitacionGx t1--Gx,lictación contiene precio ofertado
+left join PrecioNudoLicitacion t3 on t3.IdDecPNudo=t1.IdDecrPNudo and t3.Tipo='Pp' and t3.TipoDecreto=t1.Tipodecreto--precios Decreto PN, se usa los de potencia
+left join LicitacionGxIndexacion t4 on t4.IdLicitacionGx=t1.IdLicitacionGx-- relación Licitación-Gx indica info de indexación
+left join IndexadoresContratos t5 on t5.fecha=dateadd(month,(-t4.rezago),t1.MesReferencia) and t4.[index]=t5.Tipo and t5.Version=@TipoIndexacion--extrae indexadores base
+left join IndexadoresContratos t6 on t6.fecha=dateadd(month,(-t4.rezago),@MesIndexacion) and t4.[index]=t6.Tipo and t6.Version=@TipoIndexacion--extrae indexadores del mes
+left join LicitacionGxIndexEsp t9 on t9.IdLicitacionGx =t1.IdLicitacionGx and t9.tipo=t5.tipo--indexación situaciones especiales
+where	dateadd(month,-6,t1.VigenciaInicio)<=@MesIndexacion and @MesIndexacion<=t1.VigenciaFin--que contrato esté activo en periodo de Decreto PNP
+		and @Version='Mes' and month(@MesIndexacion) in (4,10)
 
 	--Versión='ITD'
 insert into IndexacionContratoDetalle
@@ -279,8 +308,8 @@ where @version='ITD'
 --CONTRATOS EN PUNTO DE COMPRA CON CET
 
 	--CREACION DE CODIGOCONTRATO temporal
---DROP TABLE IF EXISTS CodigoContrato1
 IF OBJECT_ID('CodigoContrato1', 'U') IS NOT NULL DROP TABLE CodigoContrato1
+	--Versión='Mes' y MesIndexacion not in  (4,10)
 SELECT	t3.IdCodigoContrato,t3.CODIGOCONTRATO
 		,T1.IdLicitacionGx,t1.IdLicitacion,t1.IdGeneradora,t2.IdDistribuidora,t1.IdDecrPNudo
 		,t1.Licitacion,T1.Generadora,IdPtoOferta,PtoOferta,T1.TipoBloque,T1.BLOQUE
@@ -288,11 +317,43 @@ SELECT	t3.IdCodigoContrato,t3.CODIGOCONTRATO
 		,t1.VigenciaInicio,t1.VigenciaFin
 into CodigoContrato1
 from codigocontrato t3
---inner join VigenciaContrato t8 on t3.Licitacion=t8.Licitacion and t8.Gx=t3.Generadora and t8.bloque=t3.BLOQUE
 left join LicitacionGx t1 on	t3.licitacion=t1.Licitacion and t3.generadora=t1.Generadora and t3.bloque=t1.BLOQUE 
 								and t3.tipobloque=t1.TipoBloque
 left join LicitacionDx t2 on t3.Licitacion=t2.Licitacion and t2.Distribuidora=t3.Distribuidora
 where VigenciaInicio<=@MesIndexacion and @MesIndexacion<=VigenciaFin--que contrato esté activo
+and IdCodigoContrato in (select distinct IdCodigoContrato from eadjanual where ano=year(@MesIndexacion))
+and @Version='Mes' and month(@MesIndexacion) not in  (4,10)
+
+	--Versión='Mes' y MesIndexacion in  (4,10)
+insert into CodigoContrato1
+SELECT	t3.IdCodigoContrato,t3.CODIGOCONTRATO
+		,T1.IdLicitacionGx,t1.IdLicitacion,t1.IdGeneradora,t2.IdDistribuidora,t1.IdDecrPNudo
+		,t1.Licitacion,T1.Generadora,IdPtoOferta,PtoOferta,T1.TipoBloque,T1.BLOQUE
+		,T2.IdLicitacionDx,T1.RExBases,T1.DecPNudo,T1.Modalidad,T3.Distribuidora
+		,t1.VigenciaInicio,t1.VigenciaFin
+from codigocontrato t3
+left join LicitacionGx t1 on	t3.licitacion=t1.Licitacion and t3.generadora=t1.Generadora and t3.bloque=t1.BLOQUE 
+								and t3.tipobloque=t1.TipoBloque
+left join LicitacionDx t2 on t3.Licitacion=t2.Licitacion and t2.Distribuidora=t3.Distribuidora
+where VigenciaInicio<=@MesIndexacion and @MesIndexacion<=VigenciaFin--que contrato esté activo
+and IdCodigoContrato in (select distinct IdCodigoContrato from eadjanual where ano in (year(@MesIndexacion),year(dateadd(month,6,@MesFijacion))))
+and @Version='Mes' and month(@MesIndexacion) in  (4,10)
+
+	--Versión='ITD'
+insert into CodigoContrato1
+SELECT	t3.IdCodigoContrato,t3.CODIGOCONTRATO
+		,T1.IdLicitacionGx,t1.IdLicitacion,t1.IdGeneradora,t2.IdDistribuidora,t1.IdDecrPNudo
+		,t1.Licitacion,T1.Generadora,IdPtoOferta,PtoOferta,T1.TipoBloque,T1.BLOQUE
+		,T2.IdLicitacionDx,T1.RExBases,T1.DecPNudo,T1.Modalidad,T3.Distribuidora
+		,t1.VigenciaInicio,t1.VigenciaFin
+from codigocontrato t3
+left join LicitacionGx t1 on	t3.licitacion=t1.Licitacion and t3.generadora=t1.Generadora and t3.bloque=t1.BLOQUE 
+								and t3.tipobloque=t1.TipoBloque
+left join LicitacionDx t2 on t3.Licitacion=t2.Licitacion and t2.Distribuidora=t3.Distribuidora
+where dateadd(month,-6,t1.VigenciaInicio)<=@MesIndexacion and @MesIndexacion<=t1.VigenciaFin--que contrato esté activo en periodo de Decreto PNP
+and IdCodigoContrato in (	select distinct IdCodigoContrato from eadjanual where ano in (year(@MesIndexacion)))							
+and @Version='ITD'
+
 
 --APERTURAR CONTRATOS INDEXADOS A TODOS LOS PUNTOS DE COMPRA
 delete from indexacioncontratoFM  where MesIndexacion=@MesIndexacion and versionindex=@VersionIndex and [Version]=@Version
