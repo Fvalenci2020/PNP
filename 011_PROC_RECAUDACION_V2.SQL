@@ -117,7 +117,7 @@ WHERE IdTipoDespacho=2
 --RECAUDACION PARA ENERGÍAS DE TRASPASO DE EXCEDENTES IdTipoDespacho=4 --"Traspaso Excedentes"
 
 	--CARGAR PRECIOS A PNPTraspExc
-delete from PNPTraspExc where versionPNP=@VersionCMG and VersionPNP=@VersionPNP and Fecha=@FECHAPNP and version=@TipoPNP
+delete from PNPTraspExc where VersionCMg=@VersionCMG and VersionPNP=@VersionPNP and Fecha=@FECHAPNP and version=@TipoPNP
 
 insert into PNPTraspExc
 select	t2.versionindex,t2.mesindexacion,t2.version,t1.IdCodigoContrato,t2.idptooferta,t5.idBarraNacional PtoCompra,t2.cet_USD,t2.PrecioEnergia,t2.PrecioPotencia,t2.Observacion
